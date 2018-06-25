@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.3.0/workbox-sw.js");
 
 importScripts(
-  "precache-manifest.de905a167e1ded987b8578ce0af7940a.js"
+  "precache-manifest.b15de24b3dc1e9998a6bc5b92f7af730.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "tebak"});

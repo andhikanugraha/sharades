@@ -169,7 +169,6 @@ export default Vue.extend({
   props: ['encodedCategory', 'timeLimit'],
 
   data(): GameData {
-    console.log(this.encodedCategory);
     return {
       category: decodeCategory(this.encodedCategory),
       isStarted: false,

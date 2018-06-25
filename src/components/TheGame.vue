@@ -143,8 +143,9 @@ ol {
 
 <script lang="ts">
 import Vue from 'vue';
+import { addSeconds, differenceInSeconds } from 'date-fns';
 import { shuffle } from 'lodash';
-import { Category, decodeCategory } from '../lib';
+import { Category, decodeCategory } from '../category';
 
 interface GameData {
   isStarted: boolean;
@@ -164,23 +165,15 @@ interface Word {
   isCorrect: boolean;
 }
 
-import { addSeconds, differenceInSeconds } from 'date-fns';
-import {
-  setTimeout,
-  clearInterval,
-  clearTimeout,
-  clearImmediate,
-} from 'timers';
-
 export default Vue.extend({
-  props: ['encodedCategory'],
+  props: ['encodedCategory', 'timeLimit'],
 
   data(): GameData {
     console.log(this.encodedCategory);
     return {
       category: decodeCategory(this.encodedCategory),
       isStarted: false,
-      timeLimit: 10,
+      timeLimit: this.timeLimit,
       endTime: new Date(),
       shuffledWords: [],
       correctIndices: new Set(),

@@ -1,5 +1,5 @@
 <template>
-  <TheGame :timeLimit="10" :encodedCategory="$route.params.encodedCategory"/>
+  <TheGame :timeLimit="60" :encodedCategory="$route.params.encodedCategory"/>
 </template>
 
 <script lang="ts">

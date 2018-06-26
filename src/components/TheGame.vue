@@ -36,6 +36,7 @@
     <main/>
     <nav>
       <p><button id="start" @click="start">Start</button></p>
+      <p><router-link tag="button" id="reset" :to="{name: 'home'}">Home</router-link></p>
     </nav>
   </div>
 </template>
@@ -75,8 +76,21 @@ export default Vue.extend({
   props: ['encodedCategory', 'timeLimit'],
 
   data(): GameData {
+    let category: Category;
+
+    try {
+      category = decodeCategory(this.encodedCategory);
+    } catch (e) {
+      this.$router.replace({name: 'home'});
+
+      category = {
+        title: '',
+        words: [],
+      };
+    }
+
     return {
-      category: decodeCategory(this.encodedCategory),
+      category,
       isStarted: false,
       endTime: new Date(),
       shuffledWords: [],

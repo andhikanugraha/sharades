@@ -5,16 +5,12 @@
     </header>
     <main>
       <div>
-        <ol>
-        <li v-for="cat in categoryLinks" :key="cat.title">
+        <p v-for="cat in categoryLinks" :key="cat.title">
           <router-link tag="button" :to="{name: 'game', params: {encodedCategory: cat.encodedCategory}}">{{cat.title}}</router-link>
-        </li>
-        </ol>
+        </p>
+        <p><button id="random" @click="random">Random</button></p>
       </div>
     </main>
-    <nav>
-      <p><button id="random" @click="random">Random</button></p>
-    </nav>
   </div>
 </template>
 

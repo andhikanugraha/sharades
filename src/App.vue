@@ -14,7 +14,7 @@ export default Vue;
 $font-family-monospace: 'Fira Mono', monospace;
 $font-family-base: $font-family-monospace;
 $font-size-secondary: 4vmax;
-$font-size-tertiary: $font-size-secondary;
+$font-size-tertiary: 3vmax;
 $font-size-base: $font-size-tertiary;
 
 $spacer: $font-size-secondary / 2;
@@ -56,11 +56,12 @@ main {
   position: relative;
   display: flex;
   width: 100%;
-  overflow-y: auto;
   flex-grow: 1;
+  flex-basis: 0;
   flex-direction: column;
   justify-content: center;
   align-content: center;
+  overflow: hidden;
 }
 nav {
   display: flex;
@@ -132,6 +133,7 @@ button {
   touch-action: manipulation;
   cursor: pointer;
   @include btn($color-primary);
+  -webkit-tap-highlight-color: transparent;
 }
 #start, #correct {
   @include btn($color-primary);
@@ -141,7 +143,12 @@ button {
 }
 
 main div {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
   height: 100%;
+  overflow-y: auto;
 }
 ol {
   margin: 0 $spacer;

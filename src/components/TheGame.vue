@@ -13,7 +13,8 @@
       </div>
     </main>
     <nav>
-      <p><button id="reset" @click="reset">Reset</button></p>
+      <p><button id="reset" @click="reset">Try again</button></p>
+      <p><router-link :to="{name:'home'}" tag="button">Home</router-link></p>
     </nav>
   </div>
   <div class="root" id="active" v-else-if="isStarted">
@@ -30,11 +31,9 @@
   </div>
   <div class="root" id="initial" v-else>
     <header>
-      <h3 id="timer">Charades</h3>
+      <h3>{{category.title}}</h3>
     </header>
-    <main>
-      <v-fit :text="category.title" id="category"/>
-    </main>
+    <main/>
     <nav>
       <p><button id="start" @click="start">Start</button></p>
     </nav>
@@ -42,7 +41,6 @@
 </template>
 
 <script lang="ts">
-import 'typeface-fira-mono';
 import Vue from 'vue';
 import { addSeconds, differenceInSeconds } from 'date-fns';
 import { Category, decodeCategory } from '../category';
@@ -57,6 +55,7 @@ interface GameData {
   category: Category;
   shuffledWords: string[];
   correctIndices: Set<number>;
+  maxViewedIndex: number;
   currentIndex: number;
   remainingSeconds: number;
   endTime: Date;
@@ -82,6 +81,7 @@ export default Vue.extend({
       endTime: new Date(),
       shuffledWords: [],
       correctIndices: new Set(),
+      maxViewedIndex: 0,
       currentIndex: 0,
       remainingSeconds: 0,
       isFinished: false,
@@ -94,12 +94,13 @@ export default Vue.extend({
     },
 
     results(): Word[] {
-      const results = this.shuffledWords.map((word) => {
-        return {
-          word,
+      const results: Word[] = [];
+      for (let i = 0; i <= this.maxViewedIndex; ++i) {
+        results.push({
+          word: this.shuffledWords[i],
           isCorrect: false,
-        };
-      });
+        });
+      }
 
       for (const correctIndex of this.correctIndices) {
         if (results[correctIndex]) {
@@ -147,6 +148,10 @@ export default Vue.extend({
           this.currentIndex = nextIndex;
         }
       }
+
+      if (nextIndex > this.maxViewedIndex) {
+        this.maxViewedIndex = nextIndex;
+      }
     },
 
     finish() {
@@ -161,6 +166,7 @@ export default Vue.extend({
       this.isFinished = false;
       this.currentIndex = 0;
       this.correctIndices = new Set();
+      this.maxViewedIndex = 0;
       this.shuffledWords = shuffle(this.category.words);
     },
 
@@ -198,125 +204,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-$spacer: 2vmax;
-$font-size-secondary: 4vmax;
-$font-size-tertiary: 3vmax;
-$white: #FEF0D5;
-$red: #D81E5B;
-$primary: #00BEB2;
-
-.root {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  flex-direction: column;
-  text-align: center;
-}
-
-header > h3 {
-  font-size: $font-size-secondary;
-  margin: ($spacer * 2) 0;
-}
-
-main {
-  position: relative;
-  display: flex;
-  width: 100%;
-  overflow-y: auto;
-  flex-grow: 1;
-  flex-direction: column;
-  justify-content: center;
-  align-content: center;
-}
-
-h1 {
-  margin: 0;
-  height: auto;
-  line-height: 1;
-  font-weight: bold;
-}
-#category {
-  font-weight: 400;
-}
-
-#timer {
-  color: $primary;
-  font-weight: 400;
-}
-
-nav {
-  display: flex;
-  flex-direction: row-reverse;
-  width: 100%;
-  padding: ($spacer / 2);
-
-  @media (orientation: landscape) {
-    flex-direction: row-reverse;
-  }
-  @media (orientation: portrait) {
-    flex-direction: column;
-  }
-}
-
-p {
-  position: relative;
-  margin: ($spacer / 2);
-  flex-grow: 1;
-}
-
-button {
-  font-weight: bold;
-  display: block;
-  width: 100%;
-  height: 100%;
-  font-size: $font-size-secondary;
-  line-height: 1;
-  border-radius: ($spacer * 2 + $font-size-secondary) / 2;
-  padding: $spacer;
-  border: none;
-  cursor: pointer;
-}
-
-@mixin btn($color) {
-  background-color: $color;
-  color: $white;
-
-  &:hover {
-    background-color: darken($color, 5%);
-  }
-
-  &:active, &:focus {
-    background-color: darken($color, 10%);
-  }
-}
-
-#start, #correct {
-  @include btn($primary);
-}
-#skip, #reset {
-  @include btn($red);
-}
-
-main div {
-  height: 100%;
-}
-ol {
-  margin: 0 ($spacer * 2);
-  column-width: 8 * $font-size-tertiary;
-  column-gap: $spacer * 2;
-  list-style: none outside;
-  padding: 0;
-  font-size: $font-size-tertiary;
-}
-li {
-  padding-bottom: $spacer;
-  color: $primary;
-  font-weight: bold;
-}
-.correct {
-  font-weight: bold;
-  color: $white;
-}
-</style>

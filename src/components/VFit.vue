@@ -1,5 +1,5 @@
 <template>
-  <h1 id="fitty" :style="{fontSize}">{{text}}</h1>
+  <h1 :style="{fontSize}">{{text}}</h1>
 </template>
 
 <script lang="ts">

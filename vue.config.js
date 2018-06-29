@@ -1,5 +1,5 @@
 module.exports = {
-  baseUrl: '',
-  outputDir: 'docs',
-  productionSourceMap: false,
-}
+  baseUrl: "",
+  outputDir: "docs",
+  productionSourceMap: false
+};

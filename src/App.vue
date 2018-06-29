@@ -3,25 +3,25 @@
 </template>
 
 <script lang="ts">
-import 'typeface-fira-mono';
-import Vue from 'vue';
+import "typeface-fira-mono";
+import Vue from "vue";
 export default Vue;
 </script>
 
 <style lang="scss">
-@import '/node_modules/normalize.css/normalize.css';
+@import "/node_modules/normalize.css/normalize.css";
 
-$font-family-monospace: 'Fira Mono', monospace;
+$font-family-monospace: "Fira Mono", monospace;
 $font-family-base: $font-family-monospace;
 $font-size-secondary: 4vmax;
 $font-size-tertiary: 3vmax;
 $font-size-base: $font-size-tertiary;
 
 $spacer: $font-size-secondary / 2;
-$color-background: #1A5D63;
-$color-foreground: #FEF0D5;
-$color-primary: #00BEB2;
-$color-secondary: #D81E5B;
+$color-background: #1a5d63;
+$color-foreground: #fef0d5;
+$color-primary: #00beb2;
+$color-secondary: #d81e5b;
 
 * {
   box-sizing: border-box;
@@ -113,7 +113,8 @@ p {
     background-color: darken($color, 5%);
   }
 
-  &:active, &:focus {
+  &:active,
+  &:focus {
     background-color: darken($color, 10%);
     border: none;
   }
@@ -135,10 +136,13 @@ button {
   @include btn($color-primary);
   -webkit-tap-highlight-color: transparent;
 }
-#start, #correct {
+#start,
+#correct {
   @include btn($color-primary);
 }
-#skip, #reset, #random {
+#skip,
+#reset,
+#random {
   @include btn($color-secondary);
 }
 
@@ -151,7 +155,7 @@ input {
   text-align: center;
   background: $color-foreground;
   color: $color-background;
-  border: .25vmax solid $color-primary;
+  border: 0.25vmax solid $color-primary;
   padding: 1.75vmax;
   border-radius: 4vmax;
 }

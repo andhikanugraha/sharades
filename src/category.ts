@@ -1,12 +1,12 @@
-import base64url from 'base64url/dist/base64url';
-import pako from 'pako';
+import base64url from "base64url/dist/base64url";
+import pako from "pako";
 
 export interface Category {
   title: string;
   words: string[];
 }
 
-const separator = '|';
+const separator = "|";
 
 export function categoryToString(categoryObj: Category): string {
   return categoryObj.title + separator + categoryObj.words.join(separator);
@@ -14,11 +14,11 @@ export function categoryToString(categoryObj: Category): string {
 
 export function stringToCategory(categoryString: string): Category {
   const words = categoryString.split(separator);
-  const title = words.shift() || '';
+  const title = words.shift() || "";
 
   return {
     title,
-    words,
+    words
   };
 }
 

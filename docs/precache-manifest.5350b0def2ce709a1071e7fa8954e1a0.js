@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "fonts/fira-mono-latin-700.430ed725.woff2"
   },
   {
-    "revision": "5a6a3a08c891e63b687fa3e57ba98ff0",
+    "revision": "c8ce367d70fb54fe309df8947c756be2",
     "url": "index.html"
   },
   {
@@ -36,11 +36,11 @@ self.__precacheManifest = [
     "url": "chunk-vendors.4d18aac7.js"
   },
   {
-    "revision": "4c8de23c21167609f781",
-    "url": "app.a2c7ad8a.css"
+    "revision": "c1efb2926a2fadeedf5b",
+    "url": "app.c1efb292.js"
   },
   {
-    "revision": "4c8de23c21167609f781",
-    "url": "app.4c8de23c.js"
+    "revision": "c1efb2926a2fadeedf5b",
+    "url": "app.a2c7ad8a.css"
   }
 ];

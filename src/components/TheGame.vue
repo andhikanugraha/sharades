@@ -42,13 +42,13 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { addSeconds, differenceInSeconds } from 'date-fns';
-import { Category, decodeCategory } from '../category';
-import VFit from '../components/VFit.vue';
+import Vue from "vue";
+import { addSeconds, differenceInSeconds } from "date-fns";
+import { Category, decodeCategory } from "../category";
+import VFit from "../components/VFit.vue";
 
 // tslint:disable-next-line
-const shuffle = require('lodash.shuffle');
+const shuffle = require("lodash.shuffle");
 
 interface GameData {
   isStarted: boolean;
@@ -70,10 +70,10 @@ interface Word {
 
 export default Vue.extend({
   components: {
-    'v-fit': VFit,
+    "v-fit": VFit
   },
 
-  props: ['encodedCategory', 'timeLimit'],
+  props: ["encodedCategory", "timeLimit"],
 
   data(): GameData {
     let category: Category;
@@ -81,11 +81,11 @@ export default Vue.extend({
     try {
       category = decodeCategory(this.encodedCategory);
     } catch (e) {
-      this.$router.replace({name: 'home'});
+      this.$router.replace({ name: "home" });
 
       category = {
-        title: '',
-        words: [],
+        title: "",
+        words: []
       };
     }
 
@@ -98,7 +98,7 @@ export default Vue.extend({
       maxViewedIndex: 0,
       currentIndex: 0,
       remainingSeconds: 0,
-      isFinished: false,
+      isFinished: false
     };
   },
 
@@ -112,7 +112,7 @@ export default Vue.extend({
       for (let i = 0; i <= this.maxViewedIndex; ++i) {
         results.push({
           word: this.shuffledWords[i],
-          isCorrect: false,
+          isCorrect: false
         });
       }
 
@@ -127,7 +127,7 @@ export default Vue.extend({
 
     score(): number {
       return this.correctIndices.size;
-    },
+    }
   },
 
   methods: {
@@ -210,11 +210,11 @@ export default Vue.extend({
     correctWord() {
       this.correctIndices.add(this.currentIndex);
       this.nextWord();
-    },
+    }
   },
 
   mounted() {
     this.reset();
-  },
+  }
 });
 </script>

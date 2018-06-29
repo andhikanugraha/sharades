@@ -3,12 +3,12 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import TheGame from '../components/TheGame.vue';
+import Vue from "vue";
+import TheGame from "../components/TheGame.vue";
 
 export default Vue.extend({
   components: {
-    TheGame,
-  },
+    TheGame
+  }
 });
 </script>

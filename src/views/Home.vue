@@ -15,9 +15,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import TheGame from '../components/TheGame.vue';
-import { encodeCategory } from '../category';
+import Vue from "vue";
+import TheGame from "../components/TheGame.vue";
+import { encodeCategory } from "../category";
 
 // tslint:disable-next-line
 const categories: any[] = require("../defaultCategories.json");
@@ -32,34 +32,34 @@ interface ComputedCategoryLink {
 
 export default Vue.extend({
   components: {
-    TheGame,
+    TheGame
   },
   data(): HomeData {
     return {
-      categories,
+      categories
     };
   },
   computed: {
     categoryLinks(): ComputedCategoryLink[] {
-      return this.categories.map((cat) => {
+      return this.categories.map(cat => {
         return {
           title: cat.title,
-          encodedCategory: encodeCategory(cat),
+          encodedCategory: encodeCategory(cat)
         };
       });
-    },
+    }
   },
   methods: {
     random() {
       const randomIndex = Math.round(
-        Math.random() * (this.categories.length - 1),
+        Math.random() * (this.categories.length - 1)
       );
       const encodedCategory = this.categoryLinks[randomIndex].encodedCategory;
       this.$router.push({
-        name: 'game',
-        params: { encodedCategory },
+        name: "game",
+        params: { encodedCategory }
       });
-    },
-  },
+    }
+  }
 });
 </script>

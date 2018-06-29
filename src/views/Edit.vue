@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import { decodeCategory, encodeCategory, Category } from '../category';
+import Vue from "vue";
+import { decodeCategory, encodeCategory, Category } from "../category";
 
 interface WordListItem {
   key: number;
@@ -36,22 +36,24 @@ export default Vue.extend({
     const decodedCategory = decodeCategory(this.$route.params.encodedCategory);
     return {
       title: decodedCategory.title,
-      wordList: decodedCategory.words.map((word, i): WordListItem => {
-        return {
-          key: i,
-          word,
-        };
-      }),
+      wordList: decodedCategory.words.map(
+        (word, i): WordListItem => {
+          return {
+            key: i,
+            word
+          };
+        }
+      ),
       maxKey: decodedCategory.words.length,
-      emptyIndices: new Set<number>(),
+      emptyIndices: new Set<number>()
     };
   },
   methods: {
     addWord() {
       this.wordList.push({
-        word: '',
+        word: "",
         key: this.maxKey,
-        focus: true,
+        focus: true
       });
 
       this.maxKey = this.maxKey + 1;
@@ -59,13 +61,13 @@ export default Vue.extend({
     save() {
       const updatedCategory: Category = {
         title: this.title,
-        words: this.wordList.map((item) => item.word),
+        words: this.wordList.map(item => item.word)
       };
       const encodedCategory = encodeCategory(updatedCategory);
-      this.$router.push({name: 'game', params: {encodedCategory}})
+      this.$router.push({ name: "game", params: { encodedCategory } });
     },
     onBlur(idx: number) {
-      if (this.wordList[idx].word.trim() === '') {
+      if (this.wordList[idx].word.trim() === "") {
         this.emptyIndices.add(idx);
       }
     },
@@ -76,7 +78,7 @@ export default Vue.extend({
         }
         this.emptyIndices = new Set();
       }
-    },
+    }
   },
   directives: {
     focus: {
@@ -84,8 +86,8 @@ export default Vue.extend({
         if (binding.value) {
           el.focus();
         }
-      },
-    },
-  },
+      }
+    }
+  }
 });
 </script>

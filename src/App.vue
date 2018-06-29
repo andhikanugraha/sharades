@@ -142,6 +142,20 @@ button {
   @include btn($color-secondary);
 }
 
+input {
+  user-select: text;
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-size: 4vmax;
+  text-align: center;
+  background: $color-foreground;
+  color: $color-background;
+  border: .25vmax solid $color-primary;
+  padding: 1.75vmax;
+  border-radius: 4vmax;
+}
+
 main div {
   position: absolute;
   top: 0;

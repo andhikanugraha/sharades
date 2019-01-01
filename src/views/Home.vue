@@ -5,8 +5,8 @@
     </header>
     <main>
       <div>
-        <p v-for="cat in categoryLinks" :key="cat.title">
-          <router-link tag="button" :to="{name: 'game', params: {encodedCategory: cat.encodedCategory}}">{{cat.title}}</router-link>
+        <p v-for="categoryTitle in categoryTitles" :key="categoryTitle">
+          <button @click="openCategory(categoryTitle)">{{categoryTitle}}</button>
         </p>
         <p><button id="random" @click="random">Random</button></p>
       </div>
@@ -17,13 +17,14 @@
 <script lang="ts">
 import Vue from "vue";
 import TheGame from "../components/TheGame.vue";
-import { encodeCategory } from "../category";
-
-// tslint:disable-next-line
-const categories: any[] = require("../defaultCategories.json");
+import {
+  encodeCategory,
+  getAvailableCategoryTitles,
+  getStoredCategory
+} from "../category";
 
 interface HomeData {
-  categories: any[];
+  categoryTitles: string[];
 }
 interface ComputedCategoryLink {
   title: string;
@@ -36,20 +37,16 @@ export default Vue.extend({
   },
   data(): HomeData {
     return {
-      categories
+      categoryTitles: []
     };
   },
-  computed: {
-    categoryLinks(): ComputedCategoryLink[] {
-      return this.categories.map(cat => {
-        return {
-          title: cat.title,
-          encodedCategory: encodeCategory(cat)
-        };
-      });
-    }
-  },
   methods: {
+    async openCategory(categoryTitle: string) {
+      const categoryObj = await getStoredCategory(categoryTitle);
+      const encodedCategory = encodeCategory(categoryObj);
+      this.$router.push({ name: "game", params: { encodedCategory } });
+    },
+
     random() {
       const randomIndex = Math.round(
         Math.random() * (this.categories.length - 1)
@@ -60,6 +57,10 @@ export default Vue.extend({
         params: { encodedCategory }
       });
     }
+  },
+  async mounted() {
+    const categoryTitles = await getAvailableCategoryTitles();
+    this.categoryTitles = categoryTitles;
   }
 });
 </script>

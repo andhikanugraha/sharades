@@ -13,8 +13,8 @@ export default Vue;
 
 $font-family-monospace: "Fira Mono", monospace;
 $font-family-base: $font-family-monospace;
-$font-size-secondary: 4vmax;
-$font-size-tertiary: 3vmax;
+$font-size-secondary: 3vmax;
+$font-size-tertiary: 2vmax;
 $font-size-base: $font-size-tertiary;
 
 $spacer: $font-size-secondary / 2;
@@ -183,6 +183,6 @@ li {
   break-inside: avoid;
 }
 .correct {
-  font-weight: bold;
+  color: $color-foreground;
 }
 </style>

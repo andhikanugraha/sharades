@@ -8,19 +8,28 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.0",
+    "@fortawesome/free-solid-svg-icons": "^5.1.0",
+    "@fortawesome/vue-fontawesome": "^0.1.0",
     "base64url": "^3.0.0",
+    "crypto-hash": "^0.1.0",
     "date-fns": "^1.29.0",
+    "hasha": "^3.0.0",
+    "localforage": "^1.7.2",
     "lodash.shuffle": "^4.2.0",
     "normalize.css": "^8.0.0",
     "pako": "^1.0.6",
     "register-service-worker": "^1.0.0",
     "typeface-fira-mono": "0.0.54",
     "vue": "^2.5.16",
-    "vue-router": "^3.0.1"
+    "vue-router": "^3.0.1",
+    "xxhashjs": "^0.2.2"
   },
   "devDependencies": {
+    "@types/hasha": "^3.0.0",
     "@types/lodash.shuffle": "^4.2.3",
     "@types/pako": "^1.0.0",
+    "@types/xxhashjs": "^0.1.1",
     "@vue/cli-plugin-babel": "^3.0.0-beta.15",
     "@vue/cli-plugin-eslint": "^3.0.0-beta.15",
     "@vue/cli-plugin-pwa": "^3.0.0-beta.15",
@@ -30,7 +39,7 @@
     "@vue/eslint-config-typescript": "^3.0.0-rc.3",
     "eslint": "^5.0.1",
     "eslint-plugin-vue": "^4.5.0",
-    "node-sass": "^4.9.0",
+    "node-sass": "^4.11.0",
     "sass-loader": "^7.0.1",
     "vue-template-compiler": "^2.5.16"
   },

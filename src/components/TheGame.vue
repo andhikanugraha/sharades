@@ -13,8 +13,8 @@
       </div>
     </main>
     <nav>
-      <p><button id="reset" @click="reset">Try again</button></p>
-      <p><router-link :to="{name:'home'}" tag="button">Home</router-link></p>
+      <p><router-link :to="{name:'home'}" tag="button"><font-awesome-icon icon="home"/></router-link></p>
+      <p><button id="reset" @click="reset"><font-awesome-icon icon="undo"/></button></p>
     </nav>
   </div>
   <div class="root" id="active" v-else-if="isStarted">
@@ -25,18 +25,25 @@
       <v-fit :text="currentWord"/>
     </main>
     <nav>
-      <p><button id="correct" @click="correctWord">Correct</button></p>
-      <p><button id="skip" @click="skipWord">Skip</button></p>
+      <p><button id="correct" @click="correctWord"><font-awesome-icon icon="check"/></button></p>
+      <p><button id="skip" @click="skipWord"><font-awesome-icon icon="step-forward"/></button></p>
     </nav>
   </div>
   <div class="root" id="initial" v-else>
     <header>
       <h3>{{category.title}}</h3>
     </header>
-    <main/>
+    <main>
+      <div>
+        <p class="start-button">
+          <!-- <button id="start" @click="start">Start</button> -->
+        </p>
+      </div>
+    </main>
     <nav>
-      <p><button id="start" @click="start">Start</button></p>
-      <p><router-link tag="button" id="reset" :to="{name: 'home'}">Home</router-link></p>
+      <p><button id="start" @click="start"><font-awesome-icon icon="play"/></button></p>
+      <p><button id="start" @click="edit"><font-awesome-icon icon="edit"/></button></p>
+      <p><router-link tag="button" id="reset" :to="{name: 'home'}"><font-awesome-icon icon="home"/></router-link></p>
     </nav>
   </div>
 </template>
@@ -46,14 +53,24 @@ import Vue from "vue";
 import { addSeconds, differenceInSeconds } from "date-fns";
 import { Category, decodeCategory } from "../category";
 import VFit from "../components/VFit.vue";
-
-// tslint:disable-next-line
+import { library } from "@fortawesome/fontawesome-svg-core";
+import {
+  faHome,
+  faPlay,
+  faStepForward,
+  faCheck,
+  faUndo,
+  faPencilAlt,
+  faEdit
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 const shuffle = require("lodash.shuffle");
+
+library.add(faHome, faPlay, faStepForward, faCheck, faUndo, faEdit);
 
 interface GameData {
   isStarted: boolean;
   isFinished: boolean;
-  category: Category;
   shuffledWords: string[];
   correctIndices: Set<number>;
   maxViewedIndex: number;
@@ -70,27 +87,14 @@ interface Word {
 
 export default Vue.extend({
   components: {
-    "v-fit": VFit
+    VFit,
+    FontAwesomeIcon
   },
 
-  props: ["encodedCategory", "timeLimit"],
+  props: ["timeLimit", "encodedCategory", "category"],
 
   data(): GameData {
-    let category: Category;
-
-    try {
-      category = decodeCategory(this.encodedCategory);
-    } catch (e) {
-      this.$router.replace({ name: "home" });
-
-      category = {
-        title: "",
-        words: []
-      };
-    }
-
     return {
-      category,
       isStarted: false,
       endTime: new Date(),
       shuffledWords: [],
@@ -197,6 +201,13 @@ export default Vue.extend({
       };
 
       tick();
+    },
+
+    edit() {
+      this.$router.push({
+        name: "edit",
+        params: { encodedCategory: this.encodedCategory }
+      });
     },
 
     updateRemainingSeconds() {

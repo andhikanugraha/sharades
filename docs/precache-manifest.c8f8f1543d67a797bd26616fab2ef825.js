@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "fonts/fira-mono-latin-700.430ed725.woff2"
   },
   {
-    "revision": "c8ce367d70fb54fe309df8947c756be2",
+    "revision": "400bfab082ef377ef3e87c54f5f1fefa",
     "url": "index.html"
   },
   {
@@ -28,19 +28,19 @@ self.__precacheManifest = [
     "url": "fonts/fira-mono-latin-400.067d869a.woff2"
   },
   {
-    "revision": "4d18aac72085bf937133",
+    "revision": "61030bad651638c8f1e8",
     "url": "chunk-vendors.829cdca3.css"
   },
   {
-    "revision": "4d18aac72085bf937133",
-    "url": "chunk-vendors.4d18aac7.js"
+    "revision": "61030bad651638c8f1e8",
+    "url": "chunk-vendors.61030bad.js"
   },
   {
-    "revision": "c1efb2926a2fadeedf5b",
-    "url": "app.c1efb292.js"
+    "revision": "88a2462f567316127275",
+    "url": "app.88a2462f.js"
   },
   {
-    "revision": "c1efb2926a2fadeedf5b",
-    "url": "app.a2c7ad8a.css"
+    "revision": "88a2462f567316127275",
+    "url": "app.606f3818.css"
   }
 ];

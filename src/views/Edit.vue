@@ -1,29 +1,18 @@
 <template>
-  <div class="root">
-    <header>
-      <h3><input type="text" v-model.trim.lazy="title"></h3>
-    </header>
-    <main>
-      <div>
-        <p v-for="(item, i) in wordList" :key="item.key">
-          <input type="text" v-model.trim.lazy="item.word" @blur="onBlur(i)" @focus="onFocus(i)" v-focus="item.focus">
-        </p>
-      </div>
-    </main>
-    <nav>
-      <p>
-        <button @click="addWord">Add</button>
-      </p>
-      <p>
-        <button @click="save">Save</button>
-      </p>
-    </nav>
-  </div>
+  <the-editor :category="category" @save="handleSave"/>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { decodeCategory, encodeCategory, Category } from "../category";
+import TheEditor from "../components/TheEditor.vue";
+import {
+  decodeCategory,
+  encodeCategory,
+  Category,
+  defaultCategoriesByTitle,
+  compareCategory
+} from "../category";
+import { decode } from "punycode";
 
 interface WordListItem {
   key: number;
@@ -32,61 +21,54 @@ interface WordListItem {
 }
 
 export default Vue.extend({
+  components: {
+    TheEditor
+  },
   data() {
-    const decodedCategory = decodeCategory(this.$route.params.encodedCategory);
+    let decodedCategory: Category;
+    let existing: boolean;
+    if (this.$route.params.encodedCategory) {
+      try {
+        decodedCategory = decodeCategory(this.$route.params.encodedCategory);
+        existing = true;
+      } catch (e) {
+        this.$router.push({ name: "home" });
+      }
+    } else {
+      decodedCategory = {
+        title: "",
+        words: []
+      };
+      existing = false;
+    }
+
     return {
-      title: decodedCategory.title,
-      wordList: decodedCategory.words.map(
-        (word, i): WordListItem => {
-          return {
-            key: i,
-            word
-          };
-        }
-      ),
-      maxKey: decodedCategory.words.length,
-      emptyIndices: new Set<number>()
+      category: decodedCategory,
+      existing
     };
   },
   methods: {
-    addWord() {
-      this.wordList.push({
-        word: "",
-        key: this.maxKey,
-        focus: true
-      });
+    handleSave(updatedCategory: Category) {
+      // Logic:
+      // If editing a default category, save it as new.
+      // If it's a new category, save it as new.
+      //   If there's a name conflict, resolve it automatically.
+      // If editing a custom category, see if there are any changes
+      //   If there are any changes, overwrite the old one
+      //   If there are no changes, do nothing
 
-      this.maxKey = this.maxKey + 1;
-    },
-    save() {
-      const updatedCategory: Category = {
-        title: this.title,
-        words: this.wordList.map(item => item.word)
-      };
-      const encodedCategory = encodeCategory(updatedCategory);
-      this.$router.push({ name: "game", params: { encodedCategory } });
-    },
-    onBlur(idx: number) {
-      if (this.wordList[idx].word.trim() === "") {
-        this.emptyIndices.add(idx);
+      let treatAsNew = false;
+
+      // Check if the category before editing was a default category
+      let wasDefaultCategory = true;
+      if (defaultCategoriesByTitle.get(this.category.title)) {
+        wasDefaultCategory = true;
       }
-    },
-    onFocus(idx: number) {
-      if (this.emptyIndices.size > 0) {
-        for (let emptyIndex of this.emptyIndices) {
-          this.wordList.splice(emptyIndex, 1);
-        }
-        this.emptyIndices = new Set();
-      }
-    }
-  },
-  directives: {
-    focus: {
-      inserted(el, binding) {
-        if (binding.value) {
-          el.focus();
-        }
-      }
+
+      this.$router.push({
+        name: "game",
+        params: { encodedCategory: encodeCategory(updatedCategory) }
+      });
     }
   }
 });

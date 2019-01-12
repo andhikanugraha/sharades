@@ -160,7 +160,7 @@ input {
   border-radius: 4vmax;
 }
 
-main div {
+main > div.scrollable {
   position: absolute;
   top: 0;
   left: 0;
@@ -168,6 +168,32 @@ main div {
   height: 100%;
   overflow-y: auto;
 }
+
+div.info {
+  margin: ($spacer * 2) 0;
+
+  .label {
+    font-size: $font-size-tertiary;
+    color: $color-primary;
+    padding-bottom: $spacer / 2;
+  }
+  .value {
+    font-weight: bold;
+    font-size: 1.5 * $font-size-secondary;
+    .option {
+      display: inline-block;
+      padding: 0 $spacer;
+      color: $color-primary;
+      &.selected {
+        color: $color-foreground;
+        &::after {
+          content: " seconds";
+        }
+      }
+    }
+  }
+}
+
 ol {
   margin: 0 $spacer;
   column-width: 8 * $font-size-tertiary;

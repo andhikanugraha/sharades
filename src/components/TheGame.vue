@@ -30,14 +30,21 @@
     </nav>
   </div>
   <div class="root" id="initial" v-else>
-    <header>
-      <h3>{{category.title}}</h3>
-    </header>
     <main>
       <div>
-        <p class="start-button">
-          <!-- <button id="start" @click="start">Start</button> -->
-        </p>
+        <div class="info">
+          <div class="label">Category:</div>
+          <div class="value">{{category.title}}</div>
+        </div>
+        <div class="info">
+          <div class="label">Time limit:</div>
+          <div class="value">
+            <span @click="setTimeLimit(30)" :class="{ option: true, selected: timeLimit === 30 }">30</span>
+            <span @click="setTimeLimit(60)" :class="{ option: true, selected: timeLimit === 60 }">60</span>
+            <span @click="setTimeLimit(90)" :class="{ option: true, selected: timeLimit === 90 }">90</span>
+            <span @click="setTimeLimit(120)" :class="{ option: true, selected: timeLimit === 120 }">120</span>
+          </div>
+        </div>
       </div>
     </main>
     <nav>
@@ -78,6 +85,7 @@ interface GameData {
   remainingSeconds: number;
   endTime: Date;
   timer?: NodeJS.Timer;
+  timeLimit: number;
 }
 
 interface Word {
@@ -91,7 +99,7 @@ export default Vue.extend({
     FontAwesomeIcon
   },
 
-  props: ["timeLimit", "encodedCategory", "category"],
+  props: ["encodedCategory", "category"],
 
   data(): GameData {
     return {
@@ -102,7 +110,8 @@ export default Vue.extend({
       maxViewedIndex: 0,
       currentIndex: 0,
       remainingSeconds: 0,
-      isFinished: false
+      isFinished: false,
+      timeLimit: 60
     };
   },
 
@@ -135,6 +144,10 @@ export default Vue.extend({
   },
 
   methods: {
+    setTimeLimit(timeLimit) {
+      this.timeLimit = timeLimit
+    },
+
     nextWord() {
       // find next unanswered word
       const answeredSet = new Set<number>(this.correctIndices);

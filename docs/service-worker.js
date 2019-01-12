@@ -11,10 +11,10 @@
  * See https://goo.gl/2aRDsh
  */
 
-importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.3.0/workbox-sw.js");
+importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "precache-manifest.c8f8f1543d67a797bd26616fab2ef825.js"
+  "precache-manifest.189f20688ea7c927012a16a64d07c0c5.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "tebak"});

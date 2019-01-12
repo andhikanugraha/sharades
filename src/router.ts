@@ -19,6 +19,11 @@ export default new Router({
       component: Game
     },
     {
+      path: "/g/:timeLimit/:encodedCategory",
+      name: "game-time-limit",
+      component: Game
+    },
+    {
       path: "/e/:encodedCategory",
       name: "edit",
       component: Edit

@@ -49,13 +49,9 @@ export default Vue.extend({
 
     random() {
       const randomIndex = Math.round(
-        Math.random() * (this.categories.length - 1)
+        Math.random() * (this.categoryTitles.length - 1)
       );
-      const encodedCategory = this.categoryLinks[randomIndex].encodedCategory;
-      this.$router.push({
-        name: "game",
-        params: { encodedCategory }
-      });
+      this.openCategory(this.categoryTitles[randomIndex]);
     }
   },
   async mounted() {

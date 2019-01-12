@@ -1,5 +1,5 @@
 <template>
-  <the-game :timeLimit="5" :encodedCategory="encodedCategory" :category="category"/>
+  <the-game :encodedCategory="encodedCategory" :category="category"/>
 </template>
 
 <script lang="ts">

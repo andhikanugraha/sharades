@@ -4,7 +4,7 @@
       <h3><input type="text" v-model.trim.lazy="title"></h3>
     </header>
     <main>
-      <div>
+      <div class="scrollable">
         <p v-for="(item, i) in wordList" :key="item.key">
           <input type="text" v-model.trim.lazy="item.word" @blur="onBlur(i)" @focus="onFocus(i)" v-focus="item.focus">
         </p>

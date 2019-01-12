@@ -8,6 +8,7 @@
         <ol>
           <li v-for="(result, i) in results" :key="i" :class="{correct: result.isCorrect}">
             {{result.word}}
+            <font-awesome-icon :icon="result.isCorrect ? 'check' : 'times'"/>
           </li>
         </ol>
       </div>
@@ -68,12 +69,13 @@ import {
   faCheck,
   faUndo,
   faPencilAlt,
-  faEdit
+  faEdit,
+  faTimes
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 const shuffle = require("lodash.shuffle");
 
-library.add(faHome, faPlay, faStepForward, faCheck, faUndo, faEdit);
+library.add(faHome, faPlay, faStepForward, faCheck, faUndo, faEdit, faTimes);
 
 interface GameData {
   isStarted: boolean;

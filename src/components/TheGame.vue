@@ -1,14 +1,17 @@
 <template>
   <div class="root" id="finished" v-if="isFinished">
     <header>
+      <div class="close-button" @click="reset">
+        <font-awesome-icon icon="times" fixed-width/>
+      </div>
       <h3>Score: {{score}}</h3>
     </header>
     <main>
       <div>
         <ol>
           <li v-for="(result, i) in results" :key="i" :class="{correct: result.isCorrect}">
-            {{result.word}}
             <font-awesome-icon :icon="result.isCorrect ? 'check' : 'times'"/>
+            {{result.word}}
           </li>
         </ol>
       </div>
@@ -20,17 +23,34 @@
   </div>
   <div class="root" id="active" v-else-if="isStarted">
     <header>
+      <div class="close-button" @click="reset">
+        <font-awesome-icon icon="times" fixed-width/>
+      </div>
       <h3 id="timer">{{remainingSeconds}}</h3>
     </header>
     <main>
+      <div class="overlay">
+        <div class="half" @click="correctWord"></div>
+        <div class="half" @click="skipWord"></div>
+      </div>
       <v-fit :text="currentWord"/>
     </main>
     <nav>
-      <p><button id="correct" @click="correctWord"><font-awesome-icon icon="check"/></button></p>
-      <p><button id="skip" @click="skipWord"><font-awesome-icon icon="step-forward"/></button></p>
+      <p @click="correctWord"><button id="correct"><font-awesome-icon icon="check"/></button></p>
+      <p @click="skipWord"><button id="skip"><font-awesome-icon icon="step-forward"/></button></p>
     </nav>
   </div>
   <div class="root" id="initial" v-else>
+    <header>
+      <div class="close-button" @click="goHome">
+        <font-awesome-icon icon="home"/>
+      </div>
+      <div class="pull-right">
+        <font-awesome-icon @click="edit" icon="edit"/>
+        <font-awesome-icon @click="share" icon="share" v-if="canShare"/>
+      </div>
+      <h3>Piramida</h3>
+    </header>
     <main>
       <div>
         <div class="info">
@@ -50,8 +70,6 @@
     </main>
     <nav>
       <p><button id="start" @click="start"><font-awesome-icon icon="play"/></button></p>
-      <p><button id="start" @click="edit"><font-awesome-icon icon="edit"/></button></p>
-      <p><router-link tag="button" id="reset" :to="{name: 'home'}"><font-awesome-icon icon="home"/></router-link></p>
     </nav>
   </div>
 </template>
@@ -70,12 +88,22 @@ import {
   faUndo,
   faPencilAlt,
   faEdit,
-  faTimes
+  faTimes,
+  faShare
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 const shuffle = require("lodash.shuffle");
 
-library.add(faHome, faPlay, faStepForward, faCheck, faUndo, faEdit, faTimes);
+library.add(
+  faHome,
+  faPlay,
+  faStepForward,
+  faCheck,
+  faUndo,
+  faEdit,
+  faTimes,
+  faShare
+);
 
 interface GameData {
   isStarted: boolean;
@@ -118,6 +146,9 @@ export default Vue.extend({
   },
 
   computed: {
+    canShare(): boolean {
+      return !!(navigator as any).share;
+    },
     currentWord(): string {
       return this.shuffledWords[this.currentIndex];
     },
@@ -146,8 +177,20 @@ export default Vue.extend({
   },
 
   methods: {
+    goHome() {
+      this.$router.push({ name: "home" });
+    },
+
     setTimeLimit(timeLimit) {
-      this.timeLimit = timeLimit
+      this.timeLimit = timeLimit;
+    },
+
+    share() {
+      const share: any = (navigator as any).share;
+      share({
+        title: `Piramida: ${this.category.title}`,
+        url: window.location
+      });
     },
 
     nextWord() {
@@ -244,3 +287,23 @@ export default Vue.extend({
   }
 });
 </script>
+
+<style lang="scss">
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  .half {
+    height: 100%;
+    flex-grow: 1;
+  }
+}
+@media (orientation: portrait) {
+  .overlay {
+    display: none;
+  }
+}
+</style>

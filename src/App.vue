@@ -49,8 +49,27 @@ body {
   text-align: center;
 }
 
+.close-button {
+  position: absolute;
+  left: 0;
+  color: $color-secondary;
+  font-size: $font-size-secondary;
+  padding: 0 ($spacer * 2);
+}
+.pull-right {
+  position: absolute;
+  right: 0;
+  color: $color-primary;
+  font-size: $font-size-secondary;
+  padding: 0 ($spacer * 2);
+  svg {
+    margin-left: ($spacer * 2);
+  }
+}
+
 header {
-  padding: ($spacer * 2) 0;
+  padding: ($spacer * 2) $spacer;
+  background: darken($color-background, 5%);
 }
 main {
   position: relative;
@@ -67,7 +86,10 @@ nav {
   display: flex;
   flex-direction: row-reverse;
   width: 100%;
-  padding: ($spacer / 2);
+
+  p {
+    padding: ($spacer / 2);
+  }
 
   @media (orientation: landscape) {
     flex-direction: row-reverse;
@@ -84,6 +106,7 @@ h1 {
 h3 {
   margin: 0;
   font-size: $font-size-secondary;
+  font-weight: normal;
 }
 
 #timer {
@@ -100,7 +123,7 @@ p {
 
   main & {
     margin: 0;
-    padding: ($spacer / 2);
+    padding: ($spacer / 2) $spacer;
     flex-grow: 0;
   }
 }
@@ -151,21 +174,27 @@ input {
   display: block;
   width: 100%;
   font: inherit;
-  font-size: 4vmax;
+  font-size: $font-size-secondary;
+  font-weight: bold;
   text-align: center;
-  background: $color-foreground;
-  color: $color-background;
-  border: 0.25vmax solid $color-primary;
+  background: darken($color-background, 5%);
+  color: $color-foreground;
+  border: 0.25vmax solid transparent;
   padding: 1.75vmax;
   border-radius: 4vmax;
+  &:focus {
+    background: $color-foreground;
+    color: $color-background;
+    border: 0.25vmax solid $color-primary;
+  }
 }
 
 main > div.scrollable {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  // position: absolute;
+  // top: 0;
+  // left: 0;
+  // width: 100%;
+  // height: 100%;
   overflow-y: auto;
 }
 

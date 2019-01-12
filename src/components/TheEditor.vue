@@ -1,23 +1,33 @@
 <template>
   <div class="root">
     <header>
-      <h3><input type="text" v-model.trim.lazy="title"></h3>
+      <div class="close-button" @click="cancel">
+        <font-awesome-icon icon="times" fixed-width />
+      </div>
+      <div class="pull-right" @click="save">
+        <font-awesome-icon icon="save" />
+      </div>
+      <h3>Edit Category</h3>
     </header>
     <main>
       <div class="scrollable">
-        <p v-for="(item, i) in wordList" :key="item.key">
-          <input type="text" v-model.trim.lazy="item.word" @blur="onBlur(i)" @focus="onFocus(i)" v-focus="item.focus">
-        </p>
+        <div class="info">
+          <div class="label">Title:</div>
+          <p>
+            <input type="text" v-model.trim.lazy="title">
+          </p>
+        </div>
+        <div class="info">
+          <div class="label">Answers:</div>
+          <p v-for="(item, i) in wordList" :key="item.key">
+            <input type="text" v-model.trim.lazy="item.word" @blur="onBlur(i)" @focus="onFocus(i)" v-focus="item.focus">
+          </p>
+          <p>
+            <button @click="addWord"><font-awesome-icon icon="plus"/></button>
+          </p>
+        </div>
       </div>
     </main>
-    <nav>
-      <p>
-        <button @click="addWord"><font-awesome-icon icon="plus"/></button>
-      </p>
-      <p>
-        <button @click="save"><font-awesome-icon icon="save"/></button>
-      </p>
-    </nav>
   </div>
 </template>
 
@@ -26,9 +36,9 @@ import Vue from "vue";
 import { encodeCategory, Category } from "../category";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { faSave, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faSave, faPlus, faTimes } from "@fortawesome/free-solid-svg-icons";
 
-library.add(faSave, faPlus);
+library.add(faSave, faPlus, faTimes);
 
 interface WordListItem {
   key: number;
@@ -37,7 +47,7 @@ interface WordListItem {
 }
 
 export default Vue.extend({
-  props: ["category"],
+  props: ["category", "originalEncodedCategory"],
   components: {
     FontAwesomeIcon
   },
@@ -58,6 +68,14 @@ export default Vue.extend({
     };
   },
   methods: {
+    cancel() {
+      this.$router.push({
+        name: "game",
+        params: {
+          encodedCategory: this.originalEncodedCategory
+        }
+      });
+    },
     addWord() {
       this.wordList.push({
         word: "",

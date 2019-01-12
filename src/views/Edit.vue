@@ -1,5 +1,5 @@
 <template>
-  <the-editor :category="category" @save="handleSave"/>
+  <the-editor :category="category" :originalEncodedCategory="originalEncodedCategory" @save="handleSave"/>
 </template>
 
 <script lang="ts">
@@ -27,7 +27,8 @@ export default Vue.extend({
   data() {
     let decodedCategory: Category;
     let existing: boolean;
-    if (this.$route.params.encodedCategory) {
+    const { encodedCategory } = this.$route.params
+    if (encodedCategory) {
       try {
         decodedCategory = decodeCategory(this.$route.params.encodedCategory);
         existing = true;
@@ -44,6 +45,7 @@ export default Vue.extend({
 
     return {
       category: decodedCategory,
+      originalEncodedCategory: encodedCategory,
       existing
     };
   },

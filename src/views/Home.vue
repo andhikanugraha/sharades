@@ -1,14 +1,17 @@
 <template>
   <div class="root">
     <header>
-      <h3>Charades</h3>
+      <h3>Piramida</h3>
     </header>
     <main>
-      <div>
-        <p v-for="categoryTitle in categoryTitles" :key="categoryTitle">
-          <button @click="openCategory(categoryTitle)">{{categoryTitle}}</button>
-        </p>
-        <p><button id="random" @click="random">Random</button></p>
+      <div class="scrollable">
+        <div class="info">
+          <div class="label">Choose a category:</div>
+          <p v-for="categoryTitle in categoryTitles" :key="categoryTitle">
+            <button @click="openCategory(categoryTitle)">{{categoryTitle}}</button>
+          </p>
+          <p><button id="random" @click="random">Random</button></p>
+        </div>
       </div>
     </main>
   </div>

@@ -78,13 +78,12 @@ function getStore(): LocalForage {
 }
 
 export function hashEncodedCategory(encodedCategory: string) {
-  return hasha(encodedCategory);
+  return hasha(encodedCategory, { algorithm: 'md5' });
 }
 
 export async function listStoredCategories() {
   const store = getStore();
   const categories: Category[] = []
-  debugger;
   store.iterate<string, void>((value, key) => {
     try {
       const decodedCategory = decodeCategory(value)
@@ -98,7 +97,6 @@ export async function listStoredCategories() {
 }
 
 export async function updateCategory(oldEncodedCategory: string, newCategory: Category) {
-  console.log("Update category");
   const store = getStore();
   // await store.removeItem(`title:${hashEncodedCategory(oldEncodedCategory)}`);
   await store.removeItem(`full:${hashEncodedCategory(oldEncodedCategory)}`);

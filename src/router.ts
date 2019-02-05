@@ -25,7 +25,7 @@ export default new Router({
     },
     {
       path: "/e",
-      name: "edit",
+      name: "edit-new",
       component: Edit
     },
     {

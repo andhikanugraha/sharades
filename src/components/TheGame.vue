@@ -108,7 +108,8 @@ library.add(
 interface GameData {
   isStarted: boolean;
   isFinished: boolean;
-  shuffledWords: string[];
+  shuffledWords: number[];
+  usedWordIndices: Set<number>;
   correctIndices: Set<number>;
   maxViewedIndex: number;
   currentIndex: number;
@@ -136,6 +137,7 @@ export default Vue.extend({
       isStarted: false,
       endTime: new Date(),
       shuffledWords: [],
+      usedWordIndices: new Set(),
       correctIndices: new Set(),
       maxViewedIndex: 0,
       currentIndex: 0,
@@ -150,14 +152,14 @@ export default Vue.extend({
       return !!(navigator as any).share;
     },
     currentWord(): string {
-      return this.shuffledWords[this.currentIndex];
+      return this.category.words[this.shuffledWords[this.currentIndex]];
     },
 
     results(): Word[] {
       const results: Word[] = [];
       for (let i = 0; i <= this.maxViewedIndex; ++i) {
         results.push({
-          word: this.shuffledWords[i],
+          word: this.category.words[this.shuffledWords[i]],
           isCorrect: false
         });
       }
@@ -198,6 +200,9 @@ export default Vue.extend({
     },
 
     nextWord() {
+      // add current index to used words
+      this.usedWordIndices.add(this.currentIndex);
+
       // find next unanswered word
       const answeredSet = new Set<number>(this.correctIndices);
 
@@ -236,6 +241,7 @@ export default Vue.extend({
 
     finish() {
       this.isFinished = true;
+      this.endTime = new Date();
       if (this.timer) {
         clearTimeout(this.timer);
       }
@@ -247,7 +253,26 @@ export default Vue.extend({
       this.currentIndex = 0;
       this.correctIndices = new Set();
       this.maxViewedIndex = 0;
-      this.shuffledWords = shuffle(this.category.words);
+      this.shuffleWords();
+    },
+
+    shuffleWords() {
+      const { words } = this.category;
+      const indices = [];
+      if (this.usedWordIndices.size < words.length) {
+        for (let i = 0; i < words.length; ++i) {
+          if (!this.usedWordIndices.has(i)) {
+            indices.push(i);
+          }
+        }
+      } else {
+        for (let i = 0; i < words.length; ++i) {
+          indices.push(i);
+        }
+      }
+      const shuffledLeft = shuffle(indices);
+      const shuffledRight = shuffle(Array.from(this.usedWordIndices.values()));
+      this.shuffledWords = [...shuffledLeft, ...shuffledRight];
     },
 
     start() {

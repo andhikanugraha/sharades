@@ -52,7 +52,6 @@ export default Vue.extend({
   },
   methods: {
     async handleSave(updatedCategory: Category) {
-      console.log('Hello');
       // Logic:
       // If editing a default category, save it as new.
       // If it's a new category, save it as new.
@@ -66,10 +65,10 @@ export default Vue.extend({
       const { originalEncodedCategory = "" } = this;
       await updateCategory(originalEncodedCategory, updatedCategory);
 
-      // this.$router.push({
-      //   name: "game",
-      //   params: { encodedCategory: encodeCategory(updatedCategory) }
-      // });
+      this.$router.push({
+        name: "game",
+        params: { encodedCategory: encodeCategory(updatedCategory) }
+      });
     }
   }
 });

@@ -10,7 +10,8 @@ import {
   encodeCategory,
   Category,
   defaultCategoriesByTitle,
-  compareCategory
+  compareCategory,
+  updateCategory
 } from "../category";
 import { decode } from "punycode";
 
@@ -50,7 +51,8 @@ export default Vue.extend({
     };
   },
   methods: {
-    handleSave(updatedCategory: Category) {
+    async handleSave(updatedCategory: Category) {
+      console.log('Hello');
       // Logic:
       // If editing a default category, save it as new.
       // If it's a new category, save it as new.
@@ -61,16 +63,13 @@ export default Vue.extend({
 
       let treatAsNew = false;
 
-      // Check if the category before editing was a default category
-      let wasDefaultCategory = true;
-      if (defaultCategoriesByTitle.get(this.category.title)) {
-        wasDefaultCategory = true;
-      }
+      const { originalEncodedCategory = "" } = this;
+      await updateCategory(originalEncodedCategory, updatedCategory);
 
-      this.$router.push({
-        name: "game",
-        params: { encodedCategory: encodeCategory(updatedCategory) }
-      });
+      // this.$router.push({
+      //   name: "game",
+      //   params: { encodedCategory: encodeCategory(updatedCategory) }
+      // });
     }
   }
 });

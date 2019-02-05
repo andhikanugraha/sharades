@@ -1,10 +1,14 @@
 <template>
-  <the-game :encodedCategory="encodedCategory" :category="category"/>
+  <the-game :encodedCategory="encodedCategory" :category="category" :is-editable="isEditable"/>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { decodeCategory, Category } from "../category";
+import {
+  decodeCategory,
+  defaultCategoriesByTitle,
+  Category
+} from "../category";
 import TheGame from "../components/TheGame.vue";
 
 export default Vue.extend({
@@ -12,10 +16,16 @@ export default Vue.extend({
     TheGame
   },
   data() {
-    const encodedCategory = this.$route.params.encodedCategory;
+    const { encodedCategory, builtInCategoryTitle } = this.$route.params;
     let category: Category;
+    let isEditable = false;
     try {
-      category = decodeCategory(encodedCategory);
+      if (encodedCategory) {
+        category = decodeCategory(encodedCategory);
+        isEditable = true;
+      } else if (builtInCategoryTitle) {
+        category = defaultCategoriesByTitle.get(builtInCategoryTitle)
+      }
     } catch (e) {
       this.$router.replace({ name: "home" });
 
@@ -27,7 +37,8 @@ export default Vue.extend({
 
     return {
       category,
-      encodedCategory
+      encodedCategory,
+      isEditable
     };
   }
 });

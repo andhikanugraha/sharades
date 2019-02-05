@@ -17,8 +17,8 @@
       </div>
     </main>
     <nav>
-      <p><router-link :to="{name:'home'}" tag="button"><font-awesome-icon icon="home"/></router-link></p>
-      <p><button id="reset" @click="reset"><font-awesome-icon icon="undo"/></button></p>
+      <p><button @click="bumper() && goHome()"><font-awesome-icon icon="home"/> Home</button></p>
+      <p><button id="reset" @click="bumper() && reset()"><font-awesome-icon icon="undo"/> Play again</button></p>
     </nav>
   </div>
   <div class="root" id="active" v-else-if="isStarted">
@@ -36,8 +36,8 @@
       <v-fit :text="currentWord"/>
     </main>
     <nav>
-      <p @click="correctWord"><button id="correct"><font-awesome-icon icon="check"/></button></p>
-      <p @click="skipWord"><button id="skip"><font-awesome-icon icon="step-forward"/></button></p>
+      <p @click="correctWord"><button id="correct"><font-awesome-icon icon="check"/> Correct</button></p>
+      <p @click="skipWord"><button id="skip"><font-awesome-icon icon="step-forward"/> Skip</button></p>
     </nav>
   </div>
   <div class="root" id="initial" v-else>
@@ -46,10 +46,10 @@
         <font-awesome-icon icon="home"/>
       </div>
       <div class="pull-right">
-        <font-awesome-icon @click="edit" icon="edit"/>
-        <font-awesome-icon @click="share" icon="share" v-if="canShare"/>
+        <font-awesome-icon @click="edit" icon="edit" v-if="isEditable"/>
+        <font-awesome-icon @click="share" icon="share"/>
       </div>
-      <h3>Piramida</h3>
+      <h3>Parade</h3>
     </header>
     <main>
       <div>
@@ -69,7 +69,7 @@
       </div>
     </main>
     <nav>
-      <p><button id="start" @click="start"><font-awesome-icon icon="play"/></button></p>
+      <p><button id="start" @click="start"><font-awesome-icon icon="play"/> Play</button></p>
     </nav>
   </div>
 </template>
@@ -129,7 +129,7 @@ export default Vue.extend({
     FontAwesomeIcon
   },
 
-  props: ["encodedCategory", "category"],
+  props: ["encodedCategory", "category", "isEditable"],
 
   data(): GameData {
     return {
@@ -181,6 +181,10 @@ export default Vue.extend({
       this.$router.push({ name: "home" });
     },
 
+    bumper() {
+      return differenceInSeconds(new Date(), this.endTime) > 1;
+    },
+
     setTimeLimit(timeLimit) {
       this.timeLimit = timeLimit;
     },
@@ -188,7 +192,7 @@ export default Vue.extend({
     share() {
       const share: any = (navigator as any).share;
       share({
-        title: `Piramida: ${this.category.title}`,
+        title: `Parade: ${this.category.title}`,
         url: window.location
       });
     },

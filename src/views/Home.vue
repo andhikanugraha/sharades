@@ -5,7 +5,7 @@
         <font-awesome-icon class="expand-button" icon="expand" @click="requestFullscreen" />
         <font-awesome-icon class="compress-button" icon="compress" @click="exitFullscreen" />
       </div>
-      <h3>Piramida</h3>
+      <h3>Parade</h3>
     </header>
     <main>
       <div class="scrollable">
@@ -14,6 +14,11 @@
           <p v-for="categoryTitle in categoryTitles" :key="categoryTitle">
             <button @click="openCategory(categoryTitle)">{{categoryTitle}}</button>
           </p>
+          <hr>
+          <p v-for="(item, index) in storedCategories" :key="index">
+            <button @click="openStoredCategory(index)">{{item.title}}</button>
+          </p>
+          <hr v-if="storedCategories.length > 0">
           <p><button id="random" @click="random">Random</button></p>
         </div>
       </div>
@@ -26,7 +31,8 @@ import Vue from "vue";
 import {
   encodeCategory,
   getAvailableCategoryTitles,
-  getStoredCategory
+  listStoredCategories,
+  Category
 } from "../category";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faExpand, faCompress } from "@fortawesome/free-solid-svg-icons";
@@ -36,6 +42,7 @@ library.add(faExpand, faCompress);
 
 interface HomeData {
   categoryTitles: string[];
+  storedCategories: Category[];
 }
 interface ComputedCategoryLink {
   title: string;
@@ -48,18 +55,34 @@ export default Vue.extend({
   },
   data(): HomeData {
     return {
-      categoryTitles: []
+      categoryTitles: [],
+      storedCategories: []
     };
+  },
+  async created() {
+    const storedCategories = await listStoredCategories();
+    this.storedCategories = storedCategories;
   },
   methods: {
     async openCategory(categoryTitle: string) {
-      const categoryObj = await getStoredCategory(categoryTitle);
-      const encodedCategory = encodeCategory(categoryObj);
       try {
         await this.requestFullscreen();
       } finally {
-        this.$router.push({ name: "game", params: { encodedCategory } });
+        this.$router.push({
+          name: "game-built-in",
+          params: {
+            builtInCategoryTitle: categoryTitle
+          }
+        });
       }
+    },
+
+    async openStoredCategory(index: number) {
+      const encodedCategory = encodeCategory(this.storedCategories[index]);
+      this.$router.push({
+        name: "game",
+        params: { encodedCategory }
+      });
     },
 
     async requestFullscreen() {

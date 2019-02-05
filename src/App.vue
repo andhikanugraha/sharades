@@ -19,6 +19,7 @@ $font-size-base: $font-size-tertiary;
 
 $spacer: $font-size-secondary / 2;
 $color-background: #1a5d63;
+$color-dark: darken($color-background, 5%);
 $color-foreground: #fef0d5;
 $color-primary: #00beb2;
 $color-secondary: #d81e5b;
@@ -221,9 +222,6 @@ div.info {
       color: $color-primary;
       &.selected {
         color: $color-foreground;
-        &::after {
-          content: " seconds";
-        }
       }
     }
   }
@@ -245,5 +243,11 @@ li {
 }
 .correct {
   color: $color-foreground;
+}
+
+hr {
+  margin: $spacer;
+  border: solid $color-dark;
+  border-width: 2pt 0 0 0;
 }
 </style>

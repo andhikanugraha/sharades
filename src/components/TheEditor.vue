@@ -52,7 +52,10 @@ export default Vue.extend({
     FontAwesomeIcon
   },
   data() {
-    const category: Category = this.category;
+    const category: Category = this.category || {
+      title: "",
+      words: []
+    };
     return {
       title: category.title,
       wordList: category.words.map(
@@ -69,12 +72,16 @@ export default Vue.extend({
   },
   methods: {
     cancel() {
-      this.$router.push({
-        name: "game",
-        params: {
-          encodedCategory: this.originalEncodedCategory
-        }
-      });
+      if (this.originalEncodedCategory) {
+        this.$router.push({
+          name: "game",
+          params: {
+            encodedCategory: this.originalEncodedCategory
+          }
+        });
+      } else {
+        this.$router.push({ name: "home" });
+      }
     },
     addWord() {
       this.wordList.push({
@@ -92,7 +99,6 @@ export default Vue.extend({
       };
       const encodedCategory = encodeCategory(updatedCategory);
       this.$emit("save", updatedCategory);
-      this.$router.push({ name: "game", params: { encodedCategory } });
     },
     onBlur(idx: number) {
       if (this.wordList[idx].word.trim() === "") {

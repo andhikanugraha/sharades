@@ -1,11 +1,11 @@
 import base64url from "base64url/dist/base64url";
 import { deflate, inflate } from "pako";
 import localForage from "localforage";
+import hasha from 'hasha';
 
 export interface Category {
   title: string;
   words: string[];
-  custom?: boolean;
 }
 
 const separator = "|";
@@ -14,6 +14,10 @@ export const defaultCategories: Category[] = require("./defaultCategories.json")
 export const defaultCategoriesByTitle = new Map<string, Category>();
 for (const cat of defaultCategories) {
   defaultCategoriesByTitle.set(cat.title, cat);
+}
+
+export function getBuiltInCategoryByTitle(title: string) {
+  return defaultCategoriesByTitle.get(title);
 }
 
 export function canonicaliseCategory(categoryObj: Category): Category {
@@ -73,28 +77,41 @@ function getStore(): LocalForage {
   });
 }
 
-async function getStoredCategoryTitles(): Promise<string[]> {
-  const store = getStore();
-  return store.getItem<string[]>("categoryTitles");
+export function hashEncodedCategory(encodedCategory: string) {
+  return hasha(encodedCategory);
 }
 
-async function getStoredHashForCategory(
-  categoryTitle: string
-): Promise<string> {
+export async function listStoredCategories() {
   const store = getStore();
-  return store.getItem<string>(`hash:${categoryTitle}`);
+  const categories: Category[] = []
+  debugger;
+  store.iterate<string, void>((value, key) => {
+    try {
+      const decodedCategory = decodeCategory(value)
+      categories.push(decodedCategory)
+    } finally {
+      // empty
+    }
+  })
+
+  return categories
 }
 
-export async function getStoredCategory(categoryTitle): Promise<Category> {
-  if (defaultCategoriesByTitle.get(categoryTitle)) {
-    return defaultCategoriesByTitle.get(categoryTitle);
-  }
-
+export async function updateCategory(oldEncodedCategory: string, newCategory: Category) {
+  console.log("Update category");
   const store = getStore();
-  const compressedCategoryString = await store.getItem<Uint8Array>(
-    `full:${categoryTitle}`
-  );
-  return decompressCategory(compressedCategoryString);
+  // await store.removeItem(`title:${hashEncodedCategory(oldEncodedCategory)}`);
+  await store.removeItem(`full:${hashEncodedCategory(oldEncodedCategory)}`);
+  return saveCategory(newCategory);
+}
+
+export async function saveCategory(category: Category) {
+  const { title } = category;
+  const encodedCategory = encodeCategory(category);
+  const hash = hashEncodedCategory(encodedCategory);
+  const store = getStore();
+  // await store.setItem(`title:${hash}`, title);
+  await store.setItem(`full:${hash}`, encodedCategory);
 }
 
 export function getDefaultCategoryTitles(): string[] {
@@ -103,7 +120,6 @@ export function getDefaultCategoryTitles(): string[] {
 }
 
 export async function getAvailableCategoryTitles(): Promise<string[]> {
-  const storedTitles = await getStoredCategoryTitles();
   const defaultTitles = getDefaultCategoryTitles();
   return defaultTitles.sort();
 }
@@ -124,8 +140,4 @@ export function compareCategory(cat1: Category, cat2: Category): boolean {
   }
 
   return true;
-}
-
-export async function saveNewCategory(category: Category) {
-  // Check if it's an existing one by checking the hash
 }

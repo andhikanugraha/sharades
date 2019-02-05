@@ -1,0 +1,128 @@
+{
+  "name": "tebak",
+  "version": "0.1.0",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": {
+      "version": "1.2.14",
+      "from": "@fortawesome/fontawesome-svg-core@1.2.14",
+      "resolved": "https://registry.npmjs.org/@fortawesome/fontawesome-svg-core/-/fontawesome-svg-core-1.2.14.tgz",
+      "dependencies": {
+        "@fortawesome/fontawesome-common-types": {
+          "version": "0.2.14",
+          "from": "@fortawesome/fontawesome-common-types@^0.2.14",
+          "resolved": "https://registry.npmjs.org/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.14.tgz"
+        }
+      }
+    },
+    "@fortawesome/free-solid-svg-icons": {
+      "version": "5.7.1",
+      "from": "@fortawesome/free-solid-svg-icons@5.7.1",
+      "resolved": "https://registry.npmjs.org/@fortawesome/free-solid-svg-icons/-/free-solid-svg-icons-5.7.1.tgz",
+      "dependencies": {
+        "@fortawesome/fontawesome-common-types": {
+          "version": "0.2.14",
+          "from": "@fortawesome/fontawesome-common-types@^0.2.14",
+          "resolved": "https://registry.npmjs.org/@fortawesome/fontawesome-common-types/-/fontawesome-common-types-0.2.14.tgz"
+        }
+      }
+    },
+    "@fortawesome/vue-fontawesome": {
+      "version": "0.1.5",
+      "from": "@fortawesome/vue-fontawesome@0.1.5",
+      "resolved": "https://registry.npmjs.org/@fortawesome/vue-fontawesome/-/vue-fontawesome-0.1.5.tgz"
+    },
+    "base64url": {
+      "version": "3.0.1",
+      "from": "base64url@3.0.1",
+      "resolved": "https://registry.npmjs.org/base64url/-/base64url-3.0.1.tgz"
+    },
+    "crypto-hash": {
+      "version": "0.1.0",
+      "from": "crypto-hash@0.1.0",
+      "resolved": "https://registry.npmjs.org/crypto-hash/-/crypto-hash-0.1.0.tgz"
+    },
+    "date-fns": {
+      "version": "1.30.1",
+      "from": "date-fns@1.30.1",
+      "resolved": "https://registry.npmjs.org/date-fns/-/date-fns-1.30.1.tgz"
+    },
+    "hasha": {
+      "version": "3.0.0",
+      "from": "hasha@3.0.0",
+      "resolved": "https://registry.npmjs.org/hasha/-/hasha-3.0.0.tgz",
+      "dependencies": {
+        "is-stream": {
+          "version": "1.1.0",
+          "from": "is-stream@1.1.0",
+          "resolved": "https://registry.npmjs.org/is-stream/-/is-stream-1.1.0.tgz"
+        }
+      }
+    },
+    "localforage": {
+      "version": "1.7.3",
+      "from": "localforage@1.7.3",
+      "resolved": "https://registry.npmjs.org/localforage/-/localforage-1.7.3.tgz",
+      "dependencies": {
+        "lie": {
+          "version": "3.1.1",
+          "from": "lie@3.1.1",
+          "resolved": "https://registry.npmjs.org/lie/-/lie-3.1.1.tgz",
+          "dependencies": {
+            "immediate": {
+              "version": "3.0.6",
+              "from": "immediate@3.0.6",
+              "resolved": "https://registry.npmjs.org/immediate/-/immediate-3.0.6.tgz"
+            }
+          }
+        }
+      }
+    },
+    "lodash.shuffle": {
+      "version": "4.2.0",
+      "from": "lodash.shuffle@4.2.0",
+      "resolved": "https://registry.npmjs.org/lodash.shuffle/-/lodash.shuffle-4.2.0.tgz"
+    },
+    "normalize.css": {
+      "version": "8.0.1",
+      "from": "normalize.css@8.0.1",
+      "resolved": "https://registry.npmjs.org/normalize.css/-/normalize.css-8.0.1.tgz"
+    },
+    "pako": {
+      "version": "1.0.8",
+      "from": "pako@1.0.8",
+      "resolved": "https://registry.npmjs.org/pako/-/pako-1.0.8.tgz"
+    },
+    "register-service-worker": {
+      "version": "1.5.2",
+      "from": "register-service-worker@1.5.2",
+      "resolved": "https://registry.npmjs.org/register-service-worker/-/register-service-worker-1.5.2.tgz"
+    },
+    "typeface-fira-mono": {
+      "version": "0.0.54",
+      "from": "typeface-fira-mono@0.0.54",
+      "resolved": "https://registry.npmjs.org/typeface-fira-mono/-/typeface-fira-mono-0.0.54.tgz"
+    },
+    "vue": {
+      "version": "2.6.1",
+      "from": "vue@2.6.1",
+      "resolved": "https://registry.npmjs.org/vue/-/vue-2.6.1.tgz"
+    },
+    "vue-router": {
+      "version": "3.0.2",
+      "from": "vue-router@3.0.2",
+      "resolved": "https://registry.npmjs.org/vue-router/-/vue-router-3.0.2.tgz"
+    },
+    "xxhashjs": {
+      "version": "0.2.2",
+      "from": "xxhashjs@0.2.2",
+      "resolved": "https://registry.npmjs.org/xxhashjs/-/xxhashjs-0.2.2.tgz",
+      "dependencies": {
+        "cuint": {
+          "version": "0.2.2",
+          "from": "cuint@0.2.2",
+          "resolved": "https://registry.npmjs.org/cuint/-/cuint-0.2.2.tgz"
+        }
+      }
+    }
+  }
+}

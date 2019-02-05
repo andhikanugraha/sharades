@@ -27,7 +27,7 @@ export default Vue.extend({
   data() {
     let decodedCategory: Category;
     let existing: boolean;
-    const { encodedCategory } = this.$route.params
+    const { encodedCategory } = this.$route.params;
     if (encodedCategory) {
       try {
         decodedCategory = decodeCategory(this.$route.params.encodedCategory);

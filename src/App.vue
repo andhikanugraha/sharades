@@ -23,6 +23,7 @@ $color-dark: darken($color-background, 5%);
 $color-foreground: #fef0d5;
 $color-primary: #00beb2;
 $color-secondary: #d81e5b;
+$border-width: 0.2 * $spacer;
 
 * {
   box-sizing: border-box;
@@ -129,9 +130,23 @@ p {
   align-content: center;
 
   main & {
-    margin: 0;
-    padding: ($spacer / 2) $spacer;
+    margin: $spacer;
     flex-grow: 0;
+  }
+}
+
+.item-delete {
+  display: block;
+  position: absolute;
+  right: $spacer + $border-width;
+  top: $spacer + $border-width;
+  font-size: $font-size-secondary;
+  color: $color-primary;
+  input:focus + & {
+    color: $color-secondary;
+  }
+  button + & {
+    color: $color-dark;
   }
 }
 
@@ -175,6 +190,13 @@ button {
 #random {
   @include btn($color-secondary);
 }
+#create {
+  @include btn($color-dark);
+}
+
+.delete-button {
+  color: $color-secondary;
+}
 
 input {
   user-select: text;
@@ -186,13 +208,13 @@ input {
   text-align: center;
   background: darken($color-background, 5%);
   color: $color-foreground;
-  border: 0.25vmax solid transparent;
-  padding: 1.75vmax;
+  border: $border-width solid transparent;
+  padding: $spacer;
   border-radius: 4vmax;
   &:focus {
     background: $color-foreground;
     color: $color-background;
-    border: 0.25vmax solid $color-primary;
+    border: $border-width solid $color-primary;
   }
 }
 
@@ -248,6 +270,6 @@ li {
 hr {
   margin: $spacer;
   border: solid $color-dark;
-  border-width: 2pt 0 0 0;
+  border-width: $border-width 0 0 0;
 }
 </style>

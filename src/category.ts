@@ -97,10 +97,14 @@ export async function listStoredCategories() {
 }
 
 export async function updateCategory(oldEncodedCategory: string, newCategory: Category) {
-  const store = getStore();
-  // await store.removeItem(`title:${hashEncodedCategory(oldEncodedCategory)}`);
-  await store.removeItem(`full:${hashEncodedCategory(oldEncodedCategory)}`);
+  await removeCategory(oldEncodedCategory);
   return saveCategory(newCategory);
+}
+
+export async function removeCategory(encodedCategory) {
+  const store = getStore();
+  // await store.removeItem(`title:${hashEncodedCategory(encodedCategory)}`);
+  await store.removeItem(`full:${hashEncodedCategory(encodedCategory)}`);
 }
 
 export async function saveCategory(category: Category) {

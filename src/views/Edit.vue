@@ -1,5 +1,10 @@
 <template>
-  <the-editor :category="category" :originalEncodedCategory="originalEncodedCategory" @save="handleSave"/>
+  <the-editor
+    :category="category"
+    :originalEncodedCategory="originalEncodedCategory"
+    @save="handleSave"
+    @delete="handleDelete"
+  />
 </template>
 
 <script lang="ts">
@@ -11,7 +16,8 @@ import {
   Category,
   defaultCategoriesByTitle,
   compareCategory,
-  updateCategory
+  updateCategory,
+  removeCategory
 } from "../category";
 import { decode } from "punycode";
 
@@ -69,6 +75,11 @@ export default Vue.extend({
         name: "game",
         params: { encodedCategory: encodeCategory(updatedCategory) }
       });
+    },
+
+    async handleDelete(encodedCategory: string) {
+      await removeCategory(encodedCategory);
+      this.$router.push({ name: "home" });
     }
   }
 });

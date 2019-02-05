@@ -18,7 +18,8 @@
           <p v-for="(item, index) in storedCategories" :key="index">
             <button @click="openStoredCategory(index)">{{item.title}}</button>
           </p>
-          <hr v-if="storedCategories.length > 0">
+          <p><button id="create" @click="createNewCategory">Create new category</button></p>
+          <hr>
           <p><button id="random" @click="random">Random</button></p>
         </div>
       </div>
@@ -82,6 +83,12 @@ export default Vue.extend({
       this.$router.push({
         name: "game",
         params: { encodedCategory }
+      });
+    },
+
+    createNewCategory() {
+      this.$router.push({
+        name: "edit-new"
       });
     },
 

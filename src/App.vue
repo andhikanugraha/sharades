@@ -39,9 +39,11 @@ html {
 body {
   margin: 0;
   height: 100%;
+  background: $color-background;
 }
 
 .root {
+  background: $color-background;
   display: flex;
   width: 100%;
   height: 100%;
@@ -49,12 +51,16 @@ body {
   text-align: center;
 }
 
-.close-button {
+.close-button,
+.pull-left {
   position: absolute;
   left: 0;
-  color: $color-secondary;
   font-size: $font-size-secondary;
   padding: 0 ($spacer * 2);
+  color: $color-primary;
+  &.close-button {
+    color: $color-secondary;
+  }
 }
 .pull-right {
   position: absolute;

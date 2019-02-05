@@ -1,6 +1,10 @@
 <template>
   <div class="root">
     <header>
+      <div class="pull-left">
+        <font-awesome-icon class="expand-button" icon="expand" @click="requestFullscreen" />
+        <font-awesome-icon class="compress-button" icon="compress" @click="exitFullscreen" />
+      </div>
       <h3>Piramida</h3>
     </header>
     <main>
@@ -19,12 +23,16 @@
 
 <script lang="ts">
 import Vue from "vue";
-import TheGame from "../components/TheGame.vue";
 import {
   encodeCategory,
   getAvailableCategoryTitles,
   getStoredCategory
 } from "../category";
+import { library } from "@fortawesome/fontawesome-svg-core";
+import { faExpand, faCompress } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+library.add(faExpand, faCompress);
 
 interface HomeData {
   categoryTitles: string[];
@@ -36,7 +44,7 @@ interface ComputedCategoryLink {
 
 export default Vue.extend({
   components: {
-    TheGame
+    FontAwesomeIcon
   },
   data(): HomeData {
     return {
@@ -47,7 +55,19 @@ export default Vue.extend({
     async openCategory(categoryTitle: string) {
       const categoryObj = await getStoredCategory(categoryTitle);
       const encodedCategory = encodeCategory(categoryObj);
-      this.$router.push({ name: "game", params: { encodedCategory } });
+      try {
+        await this.requestFullscreen();
+      } finally {
+        this.$router.push({ name: "game", params: { encodedCategory } });
+      }
+    },
+
+    async requestFullscreen() {
+      return document.body.requestFullscreen();
+    },
+
+    async exitFullscreen() {
+      return document.exitFullscreen();
     },
 
     random() {
@@ -63,3 +83,12 @@ export default Vue.extend({
   }
 });
 </script>
+
+<style lang="scss">
+:fullscreen .expand-button {
+  display: none;
+}
+body:not(:fullscreen) .compress-button {
+  display: none;
+}
+</style>

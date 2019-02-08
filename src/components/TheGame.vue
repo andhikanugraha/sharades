@@ -49,7 +49,7 @@
         <font-awesome-icon @click="edit" icon="edit" v-if="isEditable"/>
         <font-awesome-icon @click="share" icon="share"/>
       </div>
-      <h3>Parade</h3>
+      <h3>Sharades</h3>
     </header>
     <main>
       <div>
@@ -194,7 +194,7 @@ export default Vue.extend({
     share() {
       const share: any = (navigator as any).share;
       share({
-        title: `Parade: ${this.category.title}`,
+        title: `Sharades: ${this.category.title}`,
         url: window.location
       });
     },
@@ -269,6 +269,7 @@ export default Vue.extend({
         for (let i = 0; i < words.length; ++i) {
           indices.push(i);
         }
+        this.usedWordIndices.clear();
       }
       const shuffledLeft = shuffle(indices);
       const shuffledRight = shuffle(Array.from(this.usedWordIndices.values()));

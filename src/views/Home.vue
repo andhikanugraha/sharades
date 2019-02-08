@@ -5,7 +5,7 @@
         <font-awesome-icon class="expand-button" icon="expand" @click="requestFullscreen" />
         <font-awesome-icon class="compress-button" icon="compress" @click="exitFullscreen" />
       </div>
-      <h3>Parade</h3>
+      <h3>Sharades</h3>
     </header>
     <main>
       <div class="scrollable">

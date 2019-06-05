@@ -14,7 +14,7 @@ $font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
   "Segoe UI Symbol";
 $font-family-base: "Inter", $font-family-system;
-$font-size-base: 24pt;
+$font-size-base: 16pt;
 $font-size-secondary: 1.5 * $font-size-base;
 $font-size-tertiary: $font-size-base;
 

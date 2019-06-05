@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-import "typeface-fira-mono";
+import "inter-ui";
 import Vue from "vue";
 export default Vue;
 </script>
@@ -11,7 +11,7 @@ export default Vue;
 <style lang="scss">
 @import "/node_modules/normalize.css/normalize.css";
 
-$font-family-monospace: "Fira Mono", monospace;
+$font-family-monospace: "Inter", monospace;
 $font-family-base: $font-family-monospace;
 $font-size-secondary: 3vmax;
 $font-size-tertiary: 2vmax;
@@ -37,6 +37,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1;
+  overscroll-behavior-y: contain;
 }
 body {
   margin: 0;
@@ -114,7 +115,7 @@ h1 {
 h3 {
   margin: 0;
   font-size: $font-size-secondary;
-  font-weight: normal;
+  // font-weight: normal;
 }
 
 #timer {

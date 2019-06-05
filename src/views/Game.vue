@@ -24,7 +24,7 @@ export default Vue.extend({
         category = decodeCategory(encodedCategory);
         isEditable = true;
       } else if (builtInCategoryTitle) {
-        category = defaultCategoriesByTitle.get(builtInCategoryTitle)
+        category = defaultCategoriesByTitle.get(builtInCategoryTitle);
       }
     } catch (e) {
       this.$router.replace({ name: "home" });

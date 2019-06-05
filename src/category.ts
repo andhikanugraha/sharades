@@ -1,7 +1,7 @@
 import base64url from "base64url/dist/base64url";
 import { deflate, inflate } from "pako";
 import localForage from "localforage";
-import hasha from 'hasha';
+import hasha from "hasha";
 
 export interface Category {
   title: string;
@@ -78,25 +78,28 @@ function getStore(): LocalForage {
 }
 
 export function hashEncodedCategory(encodedCategory: string) {
-  return hasha(encodedCategory, { algorithm: 'md5' });
+  return hasha(encodedCategory, { algorithm: "md5" });
 }
 
 export async function listStoredCategories() {
   const store = getStore();
-  const categories: Category[] = []
+  const categories: Category[] = [];
   store.iterate<string, void>((value, key) => {
     try {
-      const decodedCategory = decodeCategory(value)
-      categories.push(decodedCategory)
+      const decodedCategory = decodeCategory(value);
+      categories.push(decodedCategory);
     } finally {
       // empty
     }
-  })
+  });
 
-  return categories
+  return categories;
 }
 
-export async function updateCategory(oldEncodedCategory: string, newCategory: Category) {
+export async function updateCategory(
+  oldEncodedCategory: string,
+  newCategory: Category
+) {
   await removeCategory(oldEncodedCategory);
   return saveCategory(newCategory);
 }

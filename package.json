@@ -11,6 +11,7 @@
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
     "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/vue-fontawesome": "^0.1.6",
+    "@typescript-eslint/typescript-estree": "^1.9.0",
     "base64url": "^3.0.1",
     "crypto-hash": "^0.1.0",
     "date-fns": "^1.30.1",

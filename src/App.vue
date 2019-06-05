@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts">
-import "inter-ui";
 import Vue from "vue";
 export default Vue;
 </script>
@@ -11,11 +10,13 @@ export default Vue;
 <style lang="scss">
 @import "/node_modules/normalize.css/normalize.css";
 
-$font-family-monospace: "Inter", monospace;
-$font-family-base: $font-family-monospace;
-$font-size-secondary: 3vmax;
-$font-size-tertiary: 2vmax;
-$font-size-base: $font-size-tertiary;
+$font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+  Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+  "Segoe UI Symbol";
+$font-family-base: "Inter", $font-family-system;
+$font-size-base: 24pt;
+$font-size-secondary: 1.5 * $font-size-base;
+$font-size-tertiary: $font-size-base;
 
 $spacer: $font-size-secondary / 2;
 $color-background: #1a5d63;
@@ -24,6 +25,18 @@ $color-foreground: #fef0d5;
 $color-primary: #00beb2;
 $color-secondary: #d81e5b;
 $border-width: 0.2 * $spacer;
+
+@font-face {
+  font-family: "Inter";
+  font-weight: 400;
+  src: url("/fonts/Inter-Regular.woff2"), local("Inter");
+}
+
+@font-face {
+  font-family: "Inter";
+  font-weight: bold;
+  src: url("/fonts/Inter-Bold.woff2"), local("Inter");
+}
 
 * {
   box-sizing: border-box;
@@ -36,6 +49,7 @@ html {
   font-family: $font-family-base;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.03em;
   line-height: 1;
   overscroll-behavior-y: contain;
 }

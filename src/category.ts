@@ -23,8 +23,8 @@ export function getBuiltInCategoryByTitle(title: string) {
 export function canonicaliseCategory(categoryObj: Category): Category {
   categoryObj.title = categoryObj.title.trim();
   categoryObj.words = categoryObj.words
-    .map(word => word.trim())
-    .filter(x => !!x)
+    .map((word) => word.trim())
+    .filter((x) => !!x)
     .sort();
   return categoryObj;
 }
@@ -44,7 +44,7 @@ export function stringToCategory(categoryString: string): Category {
 
   return {
     title,
-    words
+    words,
   };
 }
 
@@ -73,7 +73,7 @@ export function decodeCategory(encodedCategory: string): Category {
 
 function getStore(): LocalForage {
   return localForage.createInstance({
-    name: "charades"
+    name: "charades",
   });
 }
 
@@ -120,7 +120,7 @@ export async function saveCategory(category: Category) {
 }
 
 export function getDefaultCategoryTitles(): string[] {
-  const defaultTitles = defaultCategories.map(cat => cat.title);
+  const defaultTitles = defaultCategories.map((cat) => cat.title);
   return defaultTitles.sort();
 }
 

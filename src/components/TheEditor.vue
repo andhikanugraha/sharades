@@ -5,7 +5,12 @@
         <font-awesome-icon icon="times" fixed-width />
       </div>
       <div class="pull-right">
-        <font-awesome-icon icon="trash-alt" class="delete-button" @click="deleteCategory" v-if="!isNew" />
+        <font-awesome-icon
+          icon="trash-alt"
+          class="delete-button"
+          @click="deleteCategory"
+          v-if="!isNew"
+        />
         <font-awesome-icon icon="save" @click="save" />
       </div>
       <h3 v-if="isNew">New Category</h3>
@@ -16,17 +21,30 @@
         <div class="info">
           <div class="label">Title:</div>
           <p>
-            <input type="text" v-model.trim.lazy="title" @keyup.enter="addWord">
+            <input
+              type="text"
+              v-model.trim.lazy="title"
+              @keyup.enter="addWord"
+            />
           </p>
         </div>
         <div class="info">
           <div class="label">Words:</div>
           <p v-for="(item, i) in wordList" :key="item.key" class="item">
-            <input type="text" v-model.trim.lazy="item.word" @blur="onBlur(i)" @focus="onFocus(i)" v-focus="item.focus" @keyup.enter="addWord">
-            <span class="item-delete" @click="deleteWordAtIndex(i)"><font-awesome-icon icon="times-circle" /></span>
+            <input
+              type="text"
+              v-model.trim.lazy="item.word"
+              @blur="onBlur(i)"
+              @focus="onFocus(i)"
+              v-focus="item.focus"
+              @keyup.enter="addWord"
+            />
+            <span class="item-delete" @click="deleteWordAtIndex(i)"
+              ><font-awesome-icon icon="times-circle"
+            /></span>
           </p>
           <p>
-            <button @click="addWord"><font-awesome-icon icon="plus"/></button>
+            <button @click="addWord"><font-awesome-icon icon="plus" /></button>
           </p>
         </div>
       </div>
@@ -44,7 +62,7 @@ import {
   faPlus,
   faTimes,
   faTimesCircle,
-  faTrashAlt
+  faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
 
 library.add(faSave, faPlus, faTimes, faTimesCircle, faTrashAlt);
@@ -58,12 +76,12 @@ interface WordListItem {
 export default Vue.extend({
   props: ["category", "originalEncodedCategory"],
   components: {
-    FontAwesomeIcon
+    FontAwesomeIcon,
   },
   data() {
     const category: Category = this.category || {
       title: "",
-      words: []
+      words: [],
     };
     return {
       title: category.title,
@@ -71,18 +89,18 @@ export default Vue.extend({
         (word, i): WordListItem => {
           return {
             key: i,
-            word
+            word,
           };
         }
       ),
       maxKey: category.words.length,
-      emptyIndices: new Set<number>()
+      emptyIndices: new Set<number>(),
     };
   },
   computed: {
     isNew() {
       return !this.originalEncodedCategory;
-    }
+    },
   },
   methods: {
     cancel() {
@@ -90,8 +108,8 @@ export default Vue.extend({
         this.$router.push({
           name: "game",
           params: {
-            encodedCategory: this.originalEncodedCategory
-          }
+            encodedCategory: this.originalEncodedCategory,
+          },
         });
       } else {
         this.$router.push({ name: "home" });
@@ -101,7 +119,7 @@ export default Vue.extend({
       this.wordList.push({
         word: "",
         key: this.maxKey,
-        focus: true
+        focus: true,
       });
 
       this.maxKey = this.maxKey + 1;
@@ -109,7 +127,7 @@ export default Vue.extend({
     save() {
       const updatedCategory: Category = {
         title: this.title,
-        words: this.wordList.map(item => item.word)
+        words: this.wordList.map((item) => item.word),
       };
       const encodedCategory = encodeCategory(updatedCategory);
       this.$emit("save", updatedCategory);
@@ -132,7 +150,7 @@ export default Vue.extend({
     },
     deleteWordAtIndex(idx: number) {
       this.wordList.splice(idx, 1);
-    }
+    },
   },
   directives: {
     focus: {
@@ -140,8 +158,8 @@ export default Vue.extend({
         if (binding.value) {
           el.focus();
         }
-      }
-    }
-  }
+      },
+    },
+  },
 });
 </script>

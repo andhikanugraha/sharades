@@ -17,7 +17,7 @@ import {
   defaultCategoriesByTitle,
   compareCategory,
   updateCategory,
-  removeCategory
+  removeCategory,
 } from "../category";
 import { decode } from "punycode";
 
@@ -29,7 +29,7 @@ interface WordListItem {
 
 export default Vue.extend({
   components: {
-    TheEditor
+    TheEditor,
   },
   data() {
     let decodedCategory: Category;
@@ -45,7 +45,7 @@ export default Vue.extend({
     } else {
       decodedCategory = {
         title: "",
-        words: []
+        words: [],
       };
       existing = false;
     }
@@ -53,7 +53,7 @@ export default Vue.extend({
     return {
       category: decodedCategory,
       originalEncodedCategory: encodedCategory,
-      existing
+      existing,
     };
   },
   methods: {
@@ -73,14 +73,14 @@ export default Vue.extend({
 
       this.$router.push({
         name: "game",
-        params: { encodedCategory: encodeCategory(updatedCategory) }
+        params: { encodedCategory: encodeCategory(updatedCategory) },
       });
     },
 
     async handleDelete(encodedCategory: string) {
       await removeCategory(encodedCategory);
       this.$router.push({ name: "home" });
-    }
-  }
+    },
+  },
 });
 </script>

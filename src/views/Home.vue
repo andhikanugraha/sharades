@@ -2,8 +2,16 @@
   <div class="root">
     <header>
       <div class="pull-left">
-        <font-awesome-icon class="expand-button" icon="expand" @click="requestFullscreen" />
-        <font-awesome-icon class="compress-button" icon="compress" @click="exitFullscreen" />
+        <font-awesome-icon
+          class="expand-button"
+          icon="expand"
+          @click="requestFullscreen"
+        />
+        <font-awesome-icon
+          class="compress-button"
+          icon="compress"
+          @click="exitFullscreen"
+        />
       </div>
       <h3>Sharades</h3>
     </header>
@@ -12,14 +20,20 @@
         <div class="info">
           <div class="label">Choose a category:</div>
           <p v-for="categoryTitle in categoryTitles" :key="categoryTitle">
-            <button @click="openCategory(categoryTitle)">{{categoryTitle}}</button>
+            <button @click="openCategory(categoryTitle)">
+              {{ categoryTitle }}
+            </button>
           </p>
-          <hr>
+          <hr />
           <p v-for="(item, index) in storedCategories" :key="index">
-            <button @click="openStoredCategory(index)">{{item.title}}</button>
+            <button @click="openStoredCategory(index)">{{ item.title }}</button>
           </p>
-          <p><button id="create" @click="createNewCategory">Create new category</button></p>
-          <hr>
+          <p>
+            <button id="create" @click="createNewCategory">
+              Create new category
+            </button>
+          </p>
+          <hr />
           <p><button id="random" @click="random">Random</button></p>
         </div>
       </div>
@@ -33,7 +47,7 @@ import {
   encodeCategory,
   getAvailableCategoryTitles,
   listStoredCategories,
-  Category
+  Category,
 } from "../category";
 import { library } from "@fortawesome/fontawesome-svg-core";
 import { faExpand, faCompress } from "@fortawesome/free-solid-svg-icons";
@@ -52,12 +66,12 @@ interface ComputedCategoryLink {
 
 export default Vue.extend({
   components: {
-    FontAwesomeIcon
+    FontAwesomeIcon,
   },
   data(): HomeData {
     return {
       categoryTitles: [],
-      storedCategories: []
+      storedCategories: [],
     };
   },
   async created() {
@@ -72,8 +86,8 @@ export default Vue.extend({
         this.$router.push({
           name: "game-built-in",
           params: {
-            builtInCategoryTitle: categoryTitle
-          }
+            builtInCategoryTitle: categoryTitle,
+          },
         });
       }
     },
@@ -82,13 +96,13 @@ export default Vue.extend({
       const encodedCategory = encodeCategory(this.storedCategories[index]);
       this.$router.push({
         name: "game",
-        params: { encodedCategory }
+        params: { encodedCategory },
       });
     },
 
     createNewCategory() {
       this.$router.push({
-        name: "edit-new"
+        name: "edit-new",
       });
     },
 
@@ -105,12 +119,12 @@ export default Vue.extend({
         Math.random() * (this.categoryTitles.length - 1)
       );
       this.openCategory(this.categoryTitles[randomIndex]);
-    }
+    },
   },
   async mounted() {
     const categoryTitles = await getAvailableCategoryTitles();
     this.categoryTitles = categoryTitles;
-  }
+  },
 });
 </script>
 

@@ -1,5 +1,5 @@
 module.exports = {
   publicPath: "",
   outputDir: "docs",
-  productionSourceMap: false
+  productionSourceMap: false,
 };

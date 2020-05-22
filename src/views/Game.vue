@@ -1,5 +1,9 @@
 <template>
-  <the-game :encodedCategory="encodedCategory" :category="category" :is-editable="isEditable"/>
+  <the-game
+    :encodedCategory="encodedCategory"
+    :category="category"
+    :is-editable="isEditable"
+  />
 </template>
 
 <script lang="ts">
@@ -7,13 +11,13 @@ import Vue from "vue";
 import {
   decodeCategory,
   defaultCategoriesByTitle,
-  Category
+  Category,
 } from "../category";
 import TheGame from "../components/TheGame.vue";
 
 export default Vue.extend({
   components: {
-    TheGame
+    TheGame,
   },
   data() {
     const { encodedCategory, builtInCategoryTitle } = this.$route.params;
@@ -31,15 +35,15 @@ export default Vue.extend({
 
       category = {
         title: "",
-        words: []
+        words: [],
       };
     }
 
     return {
       category,
       encodedCategory,
-      isEditable
+      isEditable,
     };
-  }
+  },
 });
 </script>

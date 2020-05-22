@@ -1,5 +1,5 @@
 <template>
-  <h1 :style="{fontSize}">{{text}}</h1>
+  <h1 :style="{ fontSize }">{{ text }}</h1>
 </template>
 
 <script lang="ts">
@@ -12,7 +12,7 @@ export default Vue.extend({
       const characters: number = this.text.length;
       const size: number = Math.min(Math.max(width / characters, 8), 22);
       return `${size}vw`;
-    }
-  }
+    },
+  },
 });
 </script>

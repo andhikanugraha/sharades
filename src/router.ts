@@ -11,27 +11,27 @@ export default new Router({
     {
       path: "/",
       name: "home",
-      component: Home
+      component: Home,
     },
     {
       path: "/g/:encodedCategory",
       name: "game",
-      component: Game
+      component: Game,
     },
     {
       path: "/g/b/:builtInCategoryTitle",
       name: "game-built-in",
-      component: Game
+      component: Game,
     },
     {
       path: "/e",
       name: "edit-new",
-      component: Edit
+      component: Edit,
     },
     {
       path: "/e/:encodedCategory",
       name: "edit",
-      component: Edit
-    }
-  ]
+      component: Edit,
+    },
+  ],
 });

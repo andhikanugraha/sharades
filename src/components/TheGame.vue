@@ -2,52 +2,70 @@
   <div class="root" id="finished" v-if="isFinished">
     <header>
       <div class="close-button" @click="reset">
-        <font-awesome-icon icon="times" fixed-width/>
+        <font-awesome-icon icon="times" fixed-width />
       </div>
-      <h3>Score: {{score}}</h3>
+      <h3>Score: {{ score }}</h3>
     </header>
     <main>
       <div>
         <ol>
-          <li v-for="(result, i) in results" :key="i" :class="{correct: result.isCorrect}">
-            <font-awesome-icon :icon="result.isCorrect ? 'check' : 'times'"/>
-            {{result.word}}
+          <li
+            v-for="(result, i) in results"
+            :key="i"
+            :class="{ correct: result.isCorrect }"
+          >
+            <font-awesome-icon :icon="result.isCorrect ? 'check' : 'times'" />
+            {{ result.word }}
           </li>
         </ol>
       </div>
     </main>
     <nav>
-      <p><button @click="bumper() && goHome()"><font-awesome-icon icon="home"/> Home</button></p>
-      <p><button id="reset" @click="bumper() && reset()"><font-awesome-icon icon="undo"/> Play again</button></p>
+      <p>
+        <button @click="bumper() && goHome()">
+          <font-awesome-icon icon="home" /> Home
+        </button>
+      </p>
+      <p>
+        <button id="reset" @click="bumper() && reset()">
+          <font-awesome-icon icon="undo" /> Play again
+        </button>
+      </p>
     </nav>
   </div>
   <div class="root" id="active" v-else-if="isStarted">
     <header>
       <div class="close-button" @click="reset">
-        <font-awesome-icon icon="times" fixed-width/>
+        <font-awesome-icon icon="times" fixed-width />
       </div>
-      <h3 id="timer">{{remainingSeconds}}</h3>
+      <h3 id="timer">{{ remainingSeconds }}</h3>
     </header>
     <main>
       <div class="overlay">
         <div class="half" @click="correctWord"></div>
         <div class="half" @click="skipWord"></div>
       </div>
-      <v-fit :text="currentWord"/>
+      <v-fit :text="currentWord" />
     </main>
     <nav>
-      <p @click="correctWord"><button id="correct"><font-awesome-icon icon="check"/> Correct</button></p>
-      <p @click="skipWord"><button id="skip"><font-awesome-icon icon="step-forward"/> Skip</button></p>
+      <p @click="correctWord">
+        <button id="correct"><font-awesome-icon icon="check" /> Correct</button>
+      </p>
+      <p @click="skipWord">
+        <button id="skip">
+          <font-awesome-icon icon="step-forward" /> Skip
+        </button>
+      </p>
     </nav>
   </div>
   <div class="root" id="initial" v-else>
     <header>
       <div class="close-button" @click="goHome">
-        <font-awesome-icon icon="home"/>
+        <font-awesome-icon icon="home" />
       </div>
       <div class="pull-right">
-        <font-awesome-icon @click="edit" icon="edit" v-if="isEditable"/>
-        <font-awesome-icon @click="share" icon="share"/>
+        <font-awesome-icon @click="edit" icon="edit" v-if="isEditable" />
+        <font-awesome-icon @click="share" icon="share" />
       </div>
       <h3>Sharades</h3>
     </header>
@@ -55,21 +73,41 @@
       <div>
         <div class="info">
           <div class="label">Category:</div>
-          <div class="value">{{category.title}}</div>
+          <div class="value">{{ category.title }}</div>
         </div>
         <div class="info">
           <div class="label">Time limit:</div>
           <div class="value">
-            <span @click="setTimeLimit(30)" :class="{ option: true, selected: timeLimit === 30 }">30</span>
-            <span @click="setTimeLimit(60)" :class="{ option: true, selected: timeLimit === 60 }">60</span>
-            <span @click="setTimeLimit(90)" :class="{ option: true, selected: timeLimit === 90 }">90</span>
-            <span @click="setTimeLimit(120)" :class="{ option: true, selected: timeLimit === 120 }">120</span>
+            <span
+              @click="setTimeLimit(30)"
+              :class="{ option: true, selected: timeLimit === 30 }"
+              >30</span
+            >
+            <span
+              @click="setTimeLimit(60)"
+              :class="{ option: true, selected: timeLimit === 60 }"
+              >60</span
+            >
+            <span
+              @click="setTimeLimit(90)"
+              :class="{ option: true, selected: timeLimit === 90 }"
+              >90</span
+            >
+            <span
+              @click="setTimeLimit(120)"
+              :class="{ option: true, selected: timeLimit === 120 }"
+              >120</span
+            >
           </div>
         </div>
       </div>
     </main>
     <nav>
-      <p><button id="start" @click="start"><font-awesome-icon icon="play"/> Play</button></p>
+      <p>
+        <button id="start" @click="start">
+          <font-awesome-icon icon="play" /> Play
+        </button>
+      </p>
     </nav>
   </div>
 </template>
@@ -89,7 +127,7 @@ import {
   faPencilAlt,
   faEdit,
   faTimes,
-  faShare
+  faShare,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 const shuffle = require("lodash.shuffle");
@@ -127,7 +165,7 @@ interface Word {
 export default Vue.extend({
   components: {
     VFit,
-    FontAwesomeIcon
+    FontAwesomeIcon,
   },
 
   props: ["encodedCategory", "category", "isEditable"],
@@ -143,7 +181,7 @@ export default Vue.extend({
       currentIndex: 0,
       remainingSeconds: 0,
       isFinished: false,
-      timeLimit: 60
+      timeLimit: 60,
     };
   },
 
@@ -160,7 +198,7 @@ export default Vue.extend({
       for (let i = 0; i <= this.maxViewedIndex; ++i) {
         results.push({
           word: this.category.words[this.shuffledWords[i]],
-          isCorrect: false
+          isCorrect: false,
         });
       }
 
@@ -175,7 +213,7 @@ export default Vue.extend({
 
     score(): number {
       return this.correctIndices.size;
-    }
+    },
   },
 
   methods: {
@@ -195,7 +233,7 @@ export default Vue.extend({
       const share: any = (navigator as any).share;
       share({
         title: `Sharades: ${this.category.title}`,
-        url: window.location
+        url: window.location,
       });
     },
 
@@ -294,7 +332,7 @@ export default Vue.extend({
     edit() {
       this.$router.push({
         name: "edit",
-        params: { encodedCategory: this.encodedCategory }
+        params: { encodedCategory: this.encodedCategory },
       });
     },
 
@@ -309,12 +347,12 @@ export default Vue.extend({
     correctWord() {
       this.correctIndices.add(this.currentIndex);
       this.nextWord();
-    }
+    },
   },
 
   mounted() {
     this.reset();
-  }
+  },
 });
 </script>
 

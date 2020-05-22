@@ -58,6 +58,7 @@ library.add(faExpand, faCompress);
 interface HomeData {
   categoryTitles: string[];
   storedCategories: Category[];
+  autoFullScreen: boolean;
 }
 interface ComputedCategoryLink {
   title: string;
@@ -72,6 +73,7 @@ export default Vue.extend({
     return {
       categoryTitles: [],
       storedCategories: [],
+      autoFullScreen: true,
     };
   },
   async created() {
@@ -81,7 +83,9 @@ export default Vue.extend({
   methods: {
     async openCategory(categoryTitle: string) {
       try {
-        await this.requestFullscreen();
+        if (this.autoFullScreen) {
+          await this.requestFullscreen();
+        }
       } finally {
         this.$router.push({
           name: "game-built-in",
@@ -107,10 +111,12 @@ export default Vue.extend({
     },
 
     async requestFullscreen() {
+      this.autoFullScreen = true;
       return document.body.requestFullscreen();
     },
 
     async exitFullscreen() {
+      this.autoFullScreen = false;
       return document.exitFullscreen();
     },
 

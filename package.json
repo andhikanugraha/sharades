@@ -21,7 +21,7 @@
     "pako": "^1.0.11",
     "register-service-worker": "^1.7.1",
     "vue": "^2.6.11",
-    "vue-router": "^3.4.2",
+    "vue-router": "^3.4.3",
     "vuex": "^3.5.1",
     "xxhashjs": "^0.2.2"
   },

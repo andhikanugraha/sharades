@@ -4,6 +4,7 @@
     :encodedCategory="encodedCategory"
     :category="category"
     :is-editable="isEditable"
+    :go-home="goHome"
   />
 </template>
 
@@ -20,7 +21,11 @@ export default Vue.extend({
     TheGame: () => import("../components/TheGame.vue"),
   },
   data() {
-    const { encodedCategory, builtInCategoryTitle } = this.$route.params;
+    const {
+      encodedCategory,
+      builtInCategoryTitle,
+      homeParams,
+    } = this.$route.params;
     let category: Category;
     let isEditable = false;
 
@@ -28,6 +33,7 @@ export default Vue.extend({
       category,
       encodedCategory,
       isEditable,
+      homeParams,
     };
   },
   async created() {
@@ -52,6 +58,14 @@ export default Vue.extend({
 
     this.category = category;
     this.isEditable = isEditable;
+  },
+  methods: {
+    goHome() {
+      this.$router.replace({
+        name: "home",
+        params: this.homeParams,
+      });
+    },
   },
 });
 </script>

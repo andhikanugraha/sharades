@@ -157,7 +157,7 @@ export default Vue.extend({
       (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
 
-  props: ["encodedCategory", "category", "isEditable"],
+  props: ["encodedCategory", "category", "isEditable", "goHome"],
 
   data(): GameData {
     return {
@@ -220,10 +220,6 @@ export default Vue.extend({
   },
 
   methods: {
-    goHome() {
-      this.$router.push({ name: "home" });
-    },
-
     bumper() {
       return differenceInSeconds(new Date(), this.endTime) > 1;
     },

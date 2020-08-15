@@ -57,6 +57,11 @@ interface HomeData {
   autoFullScreen: boolean;
   isLoaded: boolean;
 }
+interface HomeParams {
+  categoryTitles: string[];
+  storedCategories: Category[];
+  autoFullScreen: boolean;
+}
 interface ComputedCategoryLink {
   title: string;
   encodedCategory: string;
@@ -68,11 +73,16 @@ export default Vue.extend({
       (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
   data(): HomeData {
+    const {
+      categoryTitles = [],
+      storedCategories = [],
+      autoFullScreen = false,
+    } = (this.$route.params as unknown) as HomeParams;
     return {
-      categoryTitles: [],
-      storedCategories: [],
-      autoFullScreen: true,
-      isLoaded: false,
+      categoryTitles,
+      storedCategories,
+      autoFullScreen,
+      isLoaded: true,
     };
   },
   methods: {
@@ -86,19 +96,37 @@ export default Vue.extend({
           name: "game-built-in",
           params: {
             builtInCategoryTitle: categoryTitle,
+            homeParams: {
+              categoryTitles: this.categoryTitles,
+              storedCategories: this.storedCategories,
+              autoFullScreen: this.autoFullScreen,
+            },
           },
         });
       }
     },
 
     async openStoredCategory(index: number) {
-      const encodedCategory = await encodeCategory(
-        this.storedCategories[index]
-      );
-      this.$router.push({
-        name: "game",
-        params: { encodedCategory },
-      });
+      try {
+        if (this.autoFullScreen) {
+          await this.requestFullscreen();
+        }
+      } finally {
+        const encodedCategory = await encodeCategory(
+          this.storedCategories[index]
+        );
+        this.$router.push({
+          name: "game",
+          params: {
+            encodedCategory,
+            homeParams: {
+              categoryTitles: this.categoryTitles,
+              storedCategories: this.storedCategories,
+              autoFullScreen: this.autoFullScreen,
+            },
+          },
+        });
+      }
     },
 
     createNewCategory() {
@@ -124,7 +152,7 @@ export default Vue.extend({
       this.openCategory(this.categoryTitles[randomIndex]);
     },
   },
-  async created() {
+  async mounted() {
     const storedCategories = await listStoredCategories();
     const categoryTitles = await getAvailableCategoryTitles();
     this.storedCategories = storedCategories;

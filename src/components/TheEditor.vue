@@ -55,8 +55,6 @@
 <script lang="ts">
 import Vue from "vue";
 import { encodeCategory, Category } from "../category";
-import { library } from "@fortawesome/fontawesome-svg-core";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import {
   faSave,
   faPlus,
@@ -64,8 +62,6 @@ import {
   faTimesCircle,
   faTrashAlt,
 } from "@fortawesome/free-solid-svg-icons";
-
-library.add(faSave, faPlus, faTimes, faTimesCircle, faTrashAlt);
 
 interface WordListItem {
   key: number;
@@ -76,7 +72,8 @@ interface WordListItem {
 export default Vue.extend({
   props: ["category", "originalEncodedCategory"],
   components: {
-    FontAwesomeIcon,
+    FontAwesomeIcon: async () =>
+      (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
   data() {
     const category: Category = this.category || {
@@ -96,6 +93,10 @@ export default Vue.extend({
       maxKey: category.words.length,
       emptyIndices: new Set<number>(),
     };
+  },
+  async created() {
+    const { library } = await import("@fortawesome/fontawesome-svg-core");
+    library.add(faSave, faPlus, faTimes, faTimesCircle, faTrashAlt);
   },
   computed: {
     isNew() {

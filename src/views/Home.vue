@@ -17,20 +17,20 @@
     </header>
     <main>
       <div class="scrollable">
-        <div class="info">
-          <div class="label">Choose a category:</div>
-          <p v-for="categoryTitle in categoryTitles" :key="categoryTitle">
-            <button @click="openCategory(categoryTitle)">
-              {{ categoryTitle }}
-            </button>
-          </p>
-          <hr />
+        <div class="info" v-if="isLoaded">
           <p v-for="(item, index) in storedCategories" :key="index">
             <button @click="openStoredCategory(index)">{{ item.title }}</button>
           </p>
           <p>
             <button id="create" @click="createNewCategory">
-              Create new category
+              Make your own category
+            </button>
+          </p>
+          <hr />
+          <div class="label">Choose a category:</div>
+          <p v-for="categoryTitle in categoryTitles" :key="categoryTitle">
+            <button @click="openCategory(categoryTitle)">
+              {{ categoryTitle }}
             </button>
           </p>
           <hr />
@@ -49,16 +49,13 @@ import {
   listStoredCategories,
   Category,
 } from "../category";
-import { library } from "@fortawesome/fontawesome-svg-core";
 import { faExpand, faCompress } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
-library.add(faExpand, faCompress);
 
 interface HomeData {
   categoryTitles: string[];
   storedCategories: Category[];
   autoFullScreen: boolean;
+  isLoaded: boolean;
 }
 interface ComputedCategoryLink {
   title: string;
@@ -67,18 +64,16 @@ interface ComputedCategoryLink {
 
 export default Vue.extend({
   components: {
-    FontAwesomeIcon,
+    FontAwesomeIcon: async () =>
+      (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
   data(): HomeData {
     return {
       categoryTitles: [],
       storedCategories: [],
       autoFullScreen: true,
+      isLoaded: false,
     };
-  },
-  async created() {
-    const storedCategories = await listStoredCategories();
-    this.storedCategories = storedCategories;
   },
   methods: {
     async openCategory(categoryTitle: string) {
@@ -97,7 +92,9 @@ export default Vue.extend({
     },
 
     async openStoredCategory(index: number) {
-      const encodedCategory = encodeCategory(this.storedCategories[index]);
+      const encodedCategory = await encodeCategory(
+        this.storedCategories[index]
+      );
       this.$router.push({
         name: "game",
         params: { encodedCategory },
@@ -127,9 +124,15 @@ export default Vue.extend({
       this.openCategory(this.categoryTitles[randomIndex]);
     },
   },
-  async mounted() {
+  async created() {
+    const storedCategories = await listStoredCategories();
     const categoryTitles = await getAvailableCategoryTitles();
+    this.storedCategories = storedCategories;
     this.categoryTitles = categoryTitles;
+    this.isLoaded = true;
+
+    const { library } = await import("@fortawesome/fontawesome-svg-core");
+    library.add(faExpand, faCompress);
   },
 });
 </script>

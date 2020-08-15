@@ -1,5 +1,6 @@
 <template>
   <the-editor
+    v-if="category"
     :category="category"
     :originalEncodedCategory="originalEncodedCategory"
     @save="handleSave"
@@ -9,12 +10,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import TheEditor from "../components/TheEditor.vue";
 import {
   decodeCategory,
   encodeCategory,
   Category,
-  defaultCategoriesByTitle,
   compareCategory,
   updateCategory,
   removeCategory,
@@ -29,15 +28,25 @@ interface WordListItem {
 
 export default Vue.extend({
   components: {
-    TheEditor,
+    TheEditor: () => import("../components/TheEditor.vue"),
   },
   data() {
+    const { encodedCategory } = this.$route.params;
+    return {
+      category: null,
+      originalEncodedCategory: encodedCategory,
+      existing: false,
+    };
+  },
+  async created() {
+    const { encodedCategory } = this.$route.params;
     let decodedCategory: Category;
     let existing: boolean;
-    const { encodedCategory } = this.$route.params;
     if (encodedCategory) {
       try {
-        decodedCategory = decodeCategory(this.$route.params.encodedCategory);
+        decodedCategory = await decodeCategory(
+          this.$route.params.encodedCategory
+        );
         existing = true;
       } catch (e) {
         this.$router.push({ name: "home" });
@@ -50,11 +59,8 @@ export default Vue.extend({
       existing = false;
     }
 
-    return {
-      category: decodedCategory,
-      originalEncodedCategory: encodedCategory,
-      existing,
-    };
+    this.category = decodedCategory;
+    this.existing = existing;
   },
   methods: {
     async handleSave(updatedCategory: Category) {
@@ -73,7 +79,7 @@ export default Vue.extend({
 
       this.$router.push({
         name: "game",
-        params: { encodedCategory: encodeCategory(updatedCategory) },
+        params: { encodedCategory: await encodeCategory(updatedCategory) },
       });
     },
 

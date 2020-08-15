@@ -114,10 +114,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { addSeconds, differenceInSeconds } from "date-fns";
-import { Category, decodeCategory } from "../category";
+const addSeconds = require("date-fns/add_seconds");
+const differenceInSeconds = require("date-fns/difference_in_seconds");
+import { Category } from "../category";
 import VFit from "../components/VFit.vue";
-import { library } from "@fortawesome/fontawesome-svg-core";
 import {
   faHome,
   faPlay,
@@ -129,19 +129,7 @@ import {
   faTimes,
   faShare,
 } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 const shuffle = require("lodash.shuffle");
-
-library.add(
-  faHome,
-  faPlay,
-  faStepForward,
-  faCheck,
-  faUndo,
-  faEdit,
-  faTimes,
-  faShare
-);
 
 interface GameData {
   isStarted: boolean;
@@ -165,7 +153,8 @@ interface Word {
 export default Vue.extend({
   components: {
     VFit,
-    FontAwesomeIcon,
+    FontAwesomeIcon: async () =>
+      (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
 
   props: ["encodedCategory", "category", "isEditable"],
@@ -183,6 +172,20 @@ export default Vue.extend({
       isFinished: false,
       timeLimit: 60,
     };
+  },
+
+  async created() {
+    const { library } = await import("@fortawesome/fontawesome-svg-core");
+    library.add(
+      faHome,
+      faPlay,
+      faStepForward,
+      faCheck,
+      faUndo,
+      faEdit,
+      faTimes,
+      faShare
+    );
   },
 
   computed: {

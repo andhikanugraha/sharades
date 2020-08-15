@@ -1,23 +1,9 @@
-import base64url from "base64url/dist/base64url";
-import { deflate, inflate } from "pako";
-import localForage from "localforage";
-
 export interface Category {
   title: string;
   words: string[];
 }
 
 const separator = "|";
-
-export const defaultCategories: Category[] = require("./defaultCategories.json");
-export const defaultCategoriesByTitle = new Map<string, Category>();
-for (const cat of defaultCategories) {
-  defaultCategoriesByTitle.set(cat.title, cat);
-}
-
-export function getBuiltInCategoryByTitle(title: string) {
-  return defaultCategoriesByTitle.get(title);
-}
 
 export function canonicaliseCategory(categoryObj: Category): Category {
   categoryObj.title = categoryObj.title.trim();
@@ -47,46 +33,52 @@ export function stringToCategory(categoryString: string): Category {
   };
 }
 
-export function compressCategory(categoryObj: Category): Uint8Array {
+async function compressCategory(categoryObj: Category): Promise<Uint8Array> {
+  const { deflate } = await import("pako");
   const categoryString = categoryToString(categoryObj);
   const compressedCategoryString = new Buffer(deflate(categoryString));
   return compressedCategoryString;
 }
 
-export function decompressCategory(
+async function decompressCategory(
   compressedCategoryString: Uint8Array
-): Category {
+): Promise<Category> {
+  const { inflate } = await import("pako");
   const decompressedBuffer = inflate(compressedCategoryString);
   const decompressedString = new Buffer(decompressedBuffer).toString();
   return stringToCategory(decompressedString);
 }
 
-export function encodeCategory(categoryObj: Category): string {
-  return base64url.encode(new Buffer(compressCategory(categoryObj)));
+export async function encodeCategory(categoryObj: Category): Promise<string> {
+  const { encode } = (await import("base64url")).default;
+  return encode(new Buffer(await compressCategory(categoryObj)));
 }
 
-export function decodeCategory(encodedCategory: string): Category {
-  const base64decoded = base64url.toBuffer(encodedCategory);
-  return decompressCategory(base64decoded);
+export async function decodeCategory(
+  encodedCategory: string
+): Promise<Category> {
+  const { toBuffer } = (await import("base64url")).default;
+  const base64decoded = toBuffer(encodedCategory);
+  return await decompressCategory(base64decoded);
 }
 
-function getStore(): LocalForage {
+async function getStore(): Promise<LocalForage> {
+  const localForage = await import("localforage");
   return localForage.createInstance({
     name: "charades",
   });
 }
 
-export async function hashEncodedCategoryAsync(encodedCategory: string) {
-  const hasha = await import("hasha");
-  return hasha(encodedCategory, { algorithm: "md5" });
+export async function hashEncodedCategory(encodedCategory: string) {
+  return encodedCategory.substr(0, 32);
 }
 
 export async function listStoredCategories() {
-  const store = getStore();
+  const store = await getStore();
   const categories: Category[] = [];
-  store.iterate<string, void>((value, key) => {
+  store.iterate<string, void>(async (value) => {
     try {
-      const decodedCategory = decodeCategory(value);
+      const decodedCategory = await decodeCategory(value);
       categories.push(decodedCategory);
     } finally {
       // empty
@@ -105,26 +97,35 @@ export async function updateCategory(
 }
 
 export async function removeCategory(encodedCategory) {
-  const store = getStore();
-  const hash = await hashEncodedCategoryAsync(encodedCategory);
+  const store = await getStore();
+  const hash = await hashEncodedCategory(encodedCategory);
   await store.removeItem(`full:${hash}`);
 }
 
 export async function saveCategory(category: Category) {
-  const { title } = category;
-  const encodedCategory = encodeCategory(category);
-  const hash = await hashEncodedCategoryAsync(encodedCategory);
-  const store = getStore();
+  const encodedCategory = await encodeCategory(category);
+  const hash = await hashEncodedCategory(encodedCategory);
+  const store = await getStore();
   await store.setItem(`full:${hash}`, encodedCategory);
 }
 
-export function getDefaultCategoryTitles(): string[] {
+export async function getDefaultCategoryTitles(): Promise<string[]> {
+  const defaultCategories: Category[] = (await import("./defaultCategories"))
+    .default;
   const defaultTitles = defaultCategories.map((cat) => cat.title);
   return defaultTitles.sort();
 }
 
+export async function getDefaultCategoryByTitle(
+  title: string
+): Promise<Category> {
+  const defaultCategories: Category[] = (await import("./defaultCategories"))
+    .default;
+  return defaultCategories.find((v) => v.title === title);
+}
+
 export async function getAvailableCategoryTitles(): Promise<string[]> {
-  const defaultTitles = getDefaultCategoryTitles();
+  const defaultTitles = await getDefaultCategoryTitles();
   return defaultTitles.sort();
 }
 

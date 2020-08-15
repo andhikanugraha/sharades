@@ -1,5 +1,6 @@
 <template>
   <the-game
+    v-if="category"
     :encodedCategory="encodedCategory"
     :category="category"
     :is-editable="isEditable"
@@ -10,25 +11,35 @@
 import Vue from "vue";
 import {
   decodeCategory,
-  defaultCategoriesByTitle,
   Category,
+  getDefaultCategoryByTitle,
 } from "../category";
-import TheGame from "../components/TheGame.vue";
 
 export default Vue.extend({
   components: {
-    TheGame,
+    TheGame: () => import("../components/TheGame.vue"),
   },
   data() {
     const { encodedCategory, builtInCategoryTitle } = this.$route.params;
     let category: Category;
     let isEditable = false;
+
+    return {
+      category,
+      encodedCategory,
+      isEditable,
+    };
+  },
+  async created() {
+    const { encodedCategory, builtInCategoryTitle } = this.$route.params;
+    let category: Category;
+    let isEditable = false;
     try {
       if (encodedCategory) {
-        category = decodeCategory(encodedCategory);
+        category = await decodeCategory(encodedCategory);
         isEditable = true;
       } else if (builtInCategoryTitle) {
-        category = defaultCategoriesByTitle.get(builtInCategoryTitle);
+        category = await getDefaultCategoryByTitle(builtInCategoryTitle);
       }
     } catch (e) {
       this.$router.replace({ name: "home" });
@@ -39,11 +50,8 @@ export default Vue.extend({
       };
     }
 
-    return {
-      category,
-      encodedCategory,
-      isEditable,
-    };
+    this.category = category;
+    this.isEditable = isEditable;
   },
 });
 </script>

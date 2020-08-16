@@ -8,8 +8,6 @@ export default Vue;
 </script>
 
 <style lang="scss">
-@import "/node_modules/normalize.css/normalize.css";
-
 $font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
   Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
   "Segoe UI Symbol";
@@ -194,7 +192,13 @@ button {
   touch-action: manipulation;
   cursor: pointer;
   @include btn($color-primary);
+  -webkit-appearance: button;
   -webkit-tap-highlight-color: transparent;
+
+  &::-moz-focus-inner {
+    border-style: none;
+    padding: 0;
+  }
 }
 #start,
 #correct {
@@ -283,6 +287,8 @@ li {
 }
 
 hr {
+  box-sizing: content-box;
+  height: 0;
   margin: $spacer;
   border: solid $color-dark;
   border-width: $border-width 0 0 0;

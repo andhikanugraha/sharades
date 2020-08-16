@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "precache-manifest.c880c0857e5cab135145edcd93d8811b.js"
+  "precache-manifest.3c6ff8e25db84c15b0d3a8be333f9843.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "sharades"});

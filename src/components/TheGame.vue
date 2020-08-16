@@ -72,8 +72,8 @@
     <main>
       <div>
         <div class="info">
-          <div class="label">Category:</div>
-          <div class="value">{{ category.title }}</div>
+          <div class="label">Topic:</div>
+          <div class="value">{{ topic.title }}</div>
         </div>
         <div class="info">
           <div class="label">Time limit:</div>
@@ -116,7 +116,7 @@
 import Vue from "vue";
 const addSeconds = require("date-fns/add_seconds");
 const differenceInSeconds = require("date-fns/difference_in_seconds");
-import { Category } from "../category";
+import { Topic } from "../topic";
 import VFit from "../components/VFit.vue";
 import {
   faHome,
@@ -157,7 +157,7 @@ export default Vue.extend({
       (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
 
-  props: ["encodedCategory", "category", "isEditable", "goHome"],
+  props: ["encodedTopic", "topic", "isEditable", "goHome"],
 
   data(): GameData {
     return {
@@ -193,14 +193,14 @@ export default Vue.extend({
       return !!(navigator as any).share;
     },
     currentWord(): string {
-      return this.category.words[this.shuffledWords[this.currentIndex]];
+      return this.topic.words[this.shuffledWords[this.currentIndex]];
     },
 
     results(): Word[] {
       const results: Word[] = [];
       for (let i = 0; i <= this.maxViewedIndex; ++i) {
         results.push({
-          word: this.category.words[this.shuffledWords[i]],
+          word: this.topic.words[this.shuffledWords[i]],
           isCorrect: false,
         });
       }
@@ -231,7 +231,7 @@ export default Vue.extend({
     share() {
       const share: any = (navigator as any).share;
       share({
-        title: `Sharades: ${this.category.title}`,
+        title: `Sharades: ${this.topic.title}`,
         url: window.location,
       });
     },
@@ -294,7 +294,7 @@ export default Vue.extend({
     },
 
     shuffleWords() {
-      const { words } = this.category;
+      const { words } = this.topic;
       const indices = [];
       if (this.usedWordIndices.size < words.length) {
         for (let i = 0; i < words.length; ++i) {
@@ -331,7 +331,7 @@ export default Vue.extend({
     edit() {
       this.$router.push({
         name: "edit",
-        params: { encodedCategory: this.encodedCategory },
+        params: { encodedTopic: this.encodedTopic },
       });
     },
 

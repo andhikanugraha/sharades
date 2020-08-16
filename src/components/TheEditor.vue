@@ -8,13 +8,13 @@
         <font-awesome-icon
           icon="trash-alt"
           class="delete-button"
-          @click="deleteCategory"
+          @click="deleteTopic"
           v-if="!isNew"
         />
         <font-awesome-icon icon="save" @click="save" />
       </div>
-      <h3 v-if="isNew">New Category</h3>
-      <h3 v-else>Edit Category</h3>
+      <h3 v-if="isNew">New Topic</h3>
+      <h3 v-else>Edit Topic</h3>
     </header>
     <main>
       <div class="scrollable">
@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { encodeCategory, Category } from "../category";
+import { encodeTopic, Topic } from "../topic";
 import {
   faSave,
   faPlus,
@@ -70,19 +70,19 @@ interface WordListItem {
 }
 
 export default Vue.extend({
-  props: ["category", "originalEncodedCategory"],
+  props: ["topic", "originalEncodedTopic"],
   components: {
     FontAwesomeIcon: async () =>
       (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
   data() {
-    const category: Category = this.category || {
+    const topic: Topic = this.topic || {
       title: "",
       words: [],
     };
     return {
-      title: category.title,
-      wordList: category.words.map(
+      title: topic.title,
+      wordList: topic.words.map(
         (word, i): WordListItem => {
           return {
             key: i,
@@ -90,7 +90,7 @@ export default Vue.extend({
           };
         }
       ),
-      maxKey: category.words.length,
+      maxKey: topic.words.length,
       emptyIndices: new Set<number>(),
     };
   },
@@ -100,16 +100,16 @@ export default Vue.extend({
   },
   computed: {
     isNew() {
-      return !this.originalEncodedCategory;
+      return !this.originalEncodedTopic;
     },
   },
   methods: {
     cancel() {
-      if (this.originalEncodedCategory) {
+      if (this.originalEncodedTopic) {
         this.$router.push({
           name: "game",
           params: {
-            encodedCategory: this.originalEncodedCategory,
+            encodedTopic: this.originalEncodedTopic,
           },
         });
       } else {
@@ -126,15 +126,15 @@ export default Vue.extend({
       this.maxKey = this.maxKey + 1;
     },
     save() {
-      const updatedCategory: Category = {
+      const updatedTopic: Topic = {
         title: this.title,
         words: this.wordList.map((item) => item.word),
       };
-      const encodedCategory = encodeCategory(updatedCategory);
-      this.$emit("save", updatedCategory);
+      const encodedTopic = encodeTopic(updatedTopic);
+      this.$emit("save", updatedTopic);
     },
-    deleteCategory() {
-      this.$emit("delete", this.originalEncodedCategory);
+    deleteTopic() {
+      this.$emit("delete", this.originalEncodedTopic);
     },
     onBlur(idx: number) {
       if (this.wordList[idx].word.trim() === "") {

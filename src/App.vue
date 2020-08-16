@@ -1,10 +1,34 @@
 <template>
-  <router-view />
+  <router-view
+    :set-app-state="setState"
+    :stored-topics="storedTopics"
+    :built-in-topic-titles="builtInTopicTitles"
+  />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-export default Vue;
+import { Topic } from "./topic";
+
+interface AppState {
+  storedTopics: Topic[];
+  builtInTopicTitles: string[];
+}
+
+export default Vue.extend({
+  data() {
+    return {
+      storedTopics: [] as Topic[],
+      builtInTopicTitles: [] as string[],
+    };
+  },
+  methods: {
+    setState({ storedTopics, builtInTopicTitles }: AppState) {
+      this.storedTopics = storedTopics;
+      this.builtInTopicTitles = builtInTopicTitles;
+    },
+  },
+});
 </script>
 
 <style lang="scss">

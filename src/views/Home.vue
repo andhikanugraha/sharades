@@ -18,19 +18,19 @@
     <main>
       <div class="scrollable">
         <div class="info" v-if="isLoaded">
-          <p v-for="(item, index) in storedCategories" :key="index">
-            <button @click="openStoredCategory(index)">{{ item.title }}</button>
+          <p v-for="(item, index) in storedTopics" :key="item.title">
+            <button @click="openStoredTopic(index)">{{ item.title }}</button>
           </p>
           <p>
-            <button id="create" @click="createNewCategory">
-              Make your own category
+            <button id="create" @click="createNewTopic">
+              Make your own topic
             </button>
           </p>
           <hr />
-          <div class="label">Choose a category:</div>
-          <p v-for="categoryTitle in categoryTitles" :key="categoryTitle">
-            <button @click="openCategory(categoryTitle)">
-              {{ categoryTitle }}
+          <div class="label">Choose a topic:</div>
+          <p v-for="topicTitle in builtInTopicTitles" :key="topicTitle">
+            <button @click="openTopic(topicTitle)">
+              {{ topicTitle }}
             </button>
           </p>
           <hr />
@@ -44,27 +44,27 @@
 <script lang="ts">
 import Vue from "vue";
 import {
-  encodeCategory,
-  getAvailableCategoryTitles,
-  listStoredCategories,
-  Category,
-} from "../category";
+  encodeTopic,
+  getAvailableTopicTitles,
+  listStoredTopics,
+  Topic,
+} from "../topic";
 import { faExpand, faCompress } from "@fortawesome/free-solid-svg-icons";
 
 interface HomeData {
-  categoryTitles: string[];
-  storedCategories: Category[];
+  builtInTopicTitles: string[];
+  storedTopics: Topic[];
   autoFullScreen: boolean;
   isLoaded: boolean;
 }
 interface HomeParams {
-  categoryTitles: string[];
-  storedCategories: Category[];
+  builtInTopicTitles: string[];
+  storedTopics: Topic[];
   autoFullScreen: boolean;
 }
-interface ComputedCategoryLink {
+interface ComputedTopicLink {
   title: string;
-  encodedCategory: string;
+  encodedTopic: string;
 }
 
 export default Vue.extend({
@@ -72,21 +72,17 @@ export default Vue.extend({
     FontAwesomeIcon: async () =>
       (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
-  data(): HomeData {
-    const {
-      categoryTitles = [],
-      storedCategories = [],
-      autoFullScreen = false,
-    } = (this.$route.params as unknown) as HomeParams;
+  props: ["storedTopics", "builtInTopicTitles", "setAppState"],
+  data() {
+    const { autoFullScreen = false } = (this.$route
+      .params as unknown) as HomeParams;
     return {
-      categoryTitles,
-      storedCategories,
       autoFullScreen,
       isLoaded: true,
     };
   },
   methods: {
-    async openCategory(categoryTitle: string) {
+    async openTopic(topicTitle: string) {
       try {
         if (this.autoFullScreen) {
           await this.requestFullscreen();
@@ -95,10 +91,10 @@ export default Vue.extend({
         this.$router.push({
           name: "game-built-in",
           params: {
-            builtInCategoryTitle: categoryTitle,
+            builtInTopicTitle: topicTitle,
             homeParams: {
-              categoryTitles: this.categoryTitles,
-              storedCategories: this.storedCategories,
+              builtInTopicTitles: this.builtInTopicTitles,
+              storedTopics: this.storedTopics,
               autoFullScreen: this.autoFullScreen,
             },
           },
@@ -106,22 +102,20 @@ export default Vue.extend({
       }
     },
 
-    async openStoredCategory(index: number) {
+    async openStoredTopic(index: number) {
       try {
         if (this.autoFullScreen) {
           await this.requestFullscreen();
         }
       } finally {
-        const encodedCategory = await encodeCategory(
-          this.storedCategories[index]
-        );
+        const encodedTopic = await encodeTopic(this.storedTopics[index]);
         this.$router.push({
           name: "game",
           params: {
-            encodedCategory,
+            encodedTopic,
             homeParams: {
-              categoryTitles: this.categoryTitles,
-              storedCategories: this.storedCategories,
+              builtInTopicTitles: this.builtInTopicTitles,
+              storedTopics: this.storedTopics,
               autoFullScreen: this.autoFullScreen,
             },
           },
@@ -129,7 +123,7 @@ export default Vue.extend({
       }
     },
 
-    createNewCategory() {
+    createNewTopic() {
       this.$router.push({
         name: "edit-new",
       });
@@ -147,17 +141,21 @@ export default Vue.extend({
 
     random() {
       const randomIndex = Math.round(
-        Math.random() * (this.categoryTitles.length - 1)
+        Math.random() * (this.builtInTopicTitles.length - 1)
       );
-      this.openCategory(this.categoryTitles[randomIndex]);
+      this.openTopic(this.builtInTopicTitles[randomIndex]);
     },
   },
   async mounted() {
-    const storedCategories = await listStoredCategories();
-    const categoryTitles = await getAvailableCategoryTitles();
-    this.storedCategories = storedCategories;
-    this.categoryTitles = categoryTitles;
-    this.isLoaded = true;
+    if (this.builtInTopicTitles.length > 0) {
+      return;
+    }
+    const storedTopics = await listStoredTopics();
+    const builtInTopicTitles = await getAvailableTopicTitles();
+    this.setAppState({
+      storedTopics,
+      builtInTopicTitles,
+    });
 
     const { library } = await import("@fortawesome/fontawesome-svg-core");
     library.add(faExpand, faCompress);

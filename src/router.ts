@@ -14,12 +14,12 @@ export default new Router({
       component: Home,
     },
     {
-      path: "/g/:encodedCategory",
+      path: "/g/:encodedTopic",
       name: "game",
       component: Game,
     },
     {
-      path: "/g/b/:builtInCategoryTitle",
+      path: "/g/b/:builtInTopicTitle",
       name: "game-built-in",
       component: Game,
     },
@@ -29,7 +29,7 @@ export default new Router({
       component: Edit,
     },
     {
-      path: "/e/:encodedCategory",
+      path: "/e/:encodedTopic",
       name: "edit",
       component: Edit,
     },

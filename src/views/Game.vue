@@ -1,8 +1,8 @@
 <template>
   <the-game
-    v-if="category"
-    :encodedCategory="encodedCategory"
-    :category="category"
+    v-if="topic"
+    :encodedTopic="encodedTopic"
+    :topic="topic"
     :is-editable="isEditable"
     :go-home="goHome"
   />
@@ -10,53 +10,45 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  decodeCategory,
-  Category,
-  getDefaultCategoryByTitle,
-} from "../category";
+import { decodeTopic, Topic, getDefaultTopicByTitle } from "../topic";
 
 export default Vue.extend({
   components: {
     TheGame: () => import("../components/TheGame.vue"),
   },
   data() {
-    const {
-      encodedCategory,
-      builtInCategoryTitle,
-      homeParams,
-    } = this.$route.params;
-    let category: Category;
+    const { encodedTopic, builtInTopicTitle, homeParams } = this.$route.params;
+    let topic: Topic;
     let isEditable = false;
 
     return {
-      category,
-      encodedCategory,
+      topic,
+      encodedTopic,
       isEditable,
       homeParams,
     };
   },
   async created() {
-    const { encodedCategory, builtInCategoryTitle } = this.$route.params;
-    let category: Category;
+    const { encodedTopic, builtInTopicTitle } = this.$route.params;
+    let topic: Topic;
     let isEditable = false;
     try {
-      if (encodedCategory) {
-        category = await decodeCategory(encodedCategory);
+      if (encodedTopic) {
+        topic = await decodeTopic(encodedTopic);
         isEditable = true;
-      } else if (builtInCategoryTitle) {
-        category = await getDefaultCategoryByTitle(builtInCategoryTitle);
+      } else if (builtInTopicTitle) {
+        topic = await getDefaultTopicByTitle(builtInTopicTitle);
       }
     } catch (e) {
       this.$router.replace({ name: "home" });
 
-      category = {
+      topic = {
         title: "",
         words: [],
       };
     }
 
-    this.category = category;
+    this.topic = topic;
     this.isEditable = isEditable;
   },
   methods: {

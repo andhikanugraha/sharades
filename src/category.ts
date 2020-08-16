@@ -36,7 +36,7 @@ export function stringToCategory(categoryString: string): Category {
 async function compressCategory(categoryObj: Category): Promise<Uint8Array> {
   const { deflate } = await import("pako");
   const categoryString = categoryToString(categoryObj);
-  const compressedCategoryString = new Buffer(deflate(categoryString));
+  const compressedCategoryString = deflate(categoryString);
   return compressedCategoryString;
 }
 
@@ -45,20 +45,39 @@ async function decompressCategory(
 ): Promise<Category> {
   const { inflate } = await import("pako");
   const decompressedBuffer = inflate(compressedCategoryString);
-  const decompressedString = new Buffer(decompressedBuffer).toString();
+  const decompressedString = new TextDecoder("utf-8").decode(
+    decompressedBuffer
+  );
   return stringToCategory(decompressedString);
 }
 
+function btoaUrl(binaryArray: Uint8Array) {
+  const binaryString = String.fromCharCode(...binaryArray);
+  return btoa(binaryString)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/\=+$/, "");
+}
+
+function atobUrl(asciiString: string) {
+  const binaryString = atob(asciiString.replace(/\-/g, "+").replace(/_/g, "/"));
+  const buffer = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; ++i) {
+    buffer[i] = binaryString.charCodeAt(i);
+  }
+
+  return buffer;
+}
+
 export async function encodeCategory(categoryObj: Category): Promise<string> {
-  const { encode } = (await import("base64url")).default;
-  return encode(new Buffer(await compressCategory(categoryObj)));
+  return btoaUrl(await compressCategory(categoryObj));
 }
 
 export async function decodeCategory(
   encodedCategory: string
 ): Promise<Category> {
-  const { toBuffer } = (await import("base64url")).default;
-  const base64decoded = toBuffer(encodedCategory);
+  const base64decoded = atobUrl(encodedCategory);
+
   return await decompressCategory(base64decoded);
 }
 

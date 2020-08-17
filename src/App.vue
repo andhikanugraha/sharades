@@ -21,20 +21,20 @@ const App = defineComponent({
     const builtInTopicTitles = ref<string[]>([]);
     const isFullScreen = ref(false);
 
-    async function loadBuiltInTopics() {
+    const loadBuiltInTopics = async () => {
       builtInTopicTitles.value = await getBuiltInTopicTitles();
-    }
-    async function loadStoredTopics() {
+    };
+    const loadStoredTopics = async () => {
       storedTopics.value = await loadTopicIndex();
-    }
-    async function requestFullScreen() {
+    };
+    const requestFullScreen = async () => {
       await document.body.requestFullscreen();
       isFullScreen.value = true;
-    }
-    async function exitFullScreen() {
+    };
+    const exitFullScreen = async () => {
       await document.exitFullscreen();
       isFullScreen.value = false;
-    }
+    };
 
     return {
       storedTopics,

@@ -101,11 +101,7 @@ const TheEditor = defineComponent({
 
     watch(props, () => {
       wordList.splice(0);
-      wordList.splice(
-        0,
-        0,
-        ...props.words.map((word, key) => ({ key, word }))
-      );
+      wordList.splice(0, 0, ...props.words.map((word, key) => ({ key, word })));
       maxKey.value = props.words.length;
       newTitle.value = props.title;
     });

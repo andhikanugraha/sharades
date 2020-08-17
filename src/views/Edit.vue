@@ -9,11 +9,7 @@
 </template>
 
 <script lang="ts">
-import {
-  defineComponent,
-  ref,
-  reactive,
-} from "@vue/composition-api";
+import { defineComponent, ref, reactive } from "@vue/composition-api";
 import { Topic } from "../topic";
 import {
   TopicIndex,

@@ -29,12 +29,14 @@
           <hr />
           <div class="label">Choose a topic:</div>
           <p v-for="topicTitle in builtInTopicTitles" :key="topicTitle">
-            <button @click="openTopic(topicTitle)">
+            <button @click="openBuiltInTopic(topicTitle)">
               {{ topicTitle }}
             </button>
           </p>
           <hr />
-          <p><button id="random" @click="random">Random</button></p>
+          <p>
+            <button id="random" @click="openRandomTopic">Random</button>
+          </p>
         </div>
       </div>
     </main>
@@ -43,7 +45,8 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "@vue/composition-api";
-import { getBuiltInTopicTitles, Topic } from "../topic";
+import { getBuiltInTopicTitles } from "../topic";
+import type { TopicIndex } from "../lib/TopicStore";
 import router from "../router";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
@@ -55,7 +58,7 @@ const Home = defineComponent({
     FontAwesomeIcon,
   },
   props: {
-    storedTopics: Array as { new (): Topic[] },
+    storedTopics: Array as { new (): TopicIndex },
     builtInTopicTitles: Array as { new (): string[] },
     isFullScreen: Boolean,
   },
@@ -63,44 +66,39 @@ const Home = defineComponent({
     const autoFullScreen = ref(props.isFullScreen);
     library.add(faExpand, faCompress);
 
-    if (props.builtInTopicTitles.length === 0) {
-      emit("load-built-in-topics");
-      emit("load-stored-topics");
-      autoFullScreen.value = true;
-    }
-
-    async function openTopic(topicTitle: string) {
-      try {
-        if (autoFullScreen) {
-          await requestFullscreen();
-        }
-      } finally {
-        router.push({
-          name: "game-built-in",
-          params: {
-            builtInTopicTitle: topicTitle,
-          },
-        });
+    const openBuiltInTopic = (topicTitle: string) => {
+      if (autoFullScreen.value) {
+        requestFullscreen();
       }
-    }
+      router.push({
+        name: "game-built-in",
+        params: {
+          builtInTopicTitle: topicTitle,
+        },
+      });
+    };
 
-    const openStoredTopic = async (id: string) => {
-      try {
-        if (autoFullScreen.value) {
-          await requestFullscreen();
-        }
-      } finally {
-        router.push({
-          name: "game-stored-topic",
-          params: { id },
-        });
+    const openStoredTopic = (id: string) => {
+      if (autoFullScreen.value) {
+        requestFullscreen();
       }
+      router.push({
+        name: "game-stored-topic",
+        params: { id },
+      });
     };
 
     const createNewTopic = () => {
       router.push({
         name: "edit-new",
       });
+    };
+
+    const openRandomTopic = () => {
+      const randomIndex = Math.round(
+        Math.random() * (props.builtInTopicTitles.length - 1)
+      );
+      openBuiltInTopic(props.builtInTopicTitles[randomIndex]);
     };
 
     const requestFullscreen = () => {
@@ -112,12 +110,11 @@ const Home = defineComponent({
       emit("exit-full-screen");
     };
 
-    const random = () => {
-      const randomIndex = Math.round(
-        Math.random() * (props.builtInTopicTitles.length - 1)
-      );
-      openTopic(props.builtInTopicTitles[randomIndex]);
-    };
+    if (props.builtInTopicTitles.length === 0) {
+      emit("load-built-in-topics");
+      emit("load-stored-topics");
+      autoFullScreen.value = true;
+    }
 
     return {
       autoFullScreen,
@@ -125,8 +122,8 @@ const Home = defineComponent({
       requestFullscreen,
       exitFullscreen,
       openStoredTopic,
-      openTopic,
-      random,
+      openBuiltInTopic,
+      openRandomTopic,
     };
   },
 });

@@ -23,7 +23,7 @@ export async function loadTopicIndex(): Promise<TopicIndex> {
   if (!index) {
     return [];
   }
-  
+
   return index;
 }
 

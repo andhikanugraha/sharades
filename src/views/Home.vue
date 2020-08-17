@@ -17,7 +17,7 @@
     </header>
     <main>
       <div class="scrollable">
-        <div class="info" v-if="isLoaded">
+        <div class="info">
           <p v-for="item in storedTopics" :key="item.id">
             <button @click="openStoredTopic(item.id)">{{ item.title }}</button>
           </p>
@@ -42,109 +42,96 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent, ref } from "@vue/composition-api";
 import { getBuiltInTopicTitles, Topic } from "../topic";
-import { TopicIndex, loadTopic } from "../lib/TopicStore";
+import router from "../router";
+
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { faExpand, faCompress } from "@fortawesome/free-solid-svg-icons";
-import { encodeTopic } from "@/lib/TopicEncoding";
+import { library } from "@fortawesome/fontawesome-svg-core";
 
-interface HomeData {
-  builtInTopicTitles: string[];
-  storedTopics: Topic[];
-  autoFullScreen: boolean;
-  isLoaded: boolean;
-}
-interface HomeParams {
-  builtInTopicTitles: string[];
-  storedTopics: Topic[];
-  autoFullScreen: boolean;
-}
-interface ComputedTopicLink {
-  title: string;
-  encodedTopic: string;
-}
-
-export default Vue.extend({
+const Home = defineComponent({
   components: {
-    FontAwesomeIcon: async () =>
-      (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
+    FontAwesomeIcon,
   },
-  props: ["storedTopics", "builtInTopicTitles", "isFullScreen"],
-  data() {
-    const { autoFullScreen = false } = (this.$route
-      .params as unknown) as HomeParams;
-    return {
-      autoFullScreen: this.isFullScreen,
-      isLoaded: true,
-    };
+  props: {
+    storedTopics: Array as { new (): Topic[] },
+    builtInTopicTitles: Array as { new (): string[] },
+    isFullScreen: Boolean,
   },
-  async created() {
-    const { library } = await import("@fortawesome/fontawesome-svg-core");
+  setup(props, { emit }) {
+    const autoFullScreen = ref(props.isFullScreen);
     library.add(faExpand, faCompress);
 
-    if (this.builtInTopicTitles.length === 0) {
-      this.$emit("load-built-in-topics");
-      this.$emit("load-stored-topics");
-      this.autoFullScreen = true;
+    if (props.builtInTopicTitles.length === 0) {
+      emit("load-built-in-topics");
+      emit("load-stored-topics");
+      autoFullScreen.value = true;
     }
-  },
-  methods: {
-    async openTopic(topicTitle: string) {
+
+    async function openTopic(topicTitle: string) {
       try {
-        if (this.autoFullScreen) {
-          await this.requestFullscreen();
+        if (autoFullScreen) {
+          await requestFullscreen();
         }
       } finally {
-        this.$router.push({
+        router.push({
           name: "game-built-in",
           params: {
             builtInTopicTitle: topicTitle,
-            homeParams: {
-              builtInTopicTitles: this.builtInTopicTitles,
-              storedTopics: this.storedTopics,
-              autoFullScreen: this.autoFullScreen,
-            },
           },
         });
       }
-    },
+    }
 
-    async openStoredTopic(id: string) {
+    const openStoredTopic = async (id: string) => {
       try {
-        if (this.autoFullScreen) {
-          await this.requestFullscreen();
+        if (autoFullScreen.value) {
+          await requestFullscreen();
         }
       } finally {
-        this.$router.push({
+        router.push({
           name: "game-stored-topic",
           params: { id },
         });
       }
-    },
+    };
 
-    createNewTopic() {
-      this.$router.push({
+    const createNewTopic = () => {
+      router.push({
         name: "edit-new",
       });
-    },
+    };
 
-    async requestFullscreen() {
-      this.$emit("request-full-screen");
-    },
+    const requestFullscreen = () => {
+      emit("request-full-screen");
+    };
 
-    async exitFullscreen() {
-      this.autoFullScreen = false;
-      this.$emit("exit-full-screen");
-    },
+    const exitFullscreen = () => {
+      autoFullScreen.value = false;
+      emit("exit-full-screen");
+    };
 
-    random() {
+    const random = () => {
       const randomIndex = Math.round(
-        Math.random() * (this.builtInTopicTitles.length - 1)
+        Math.random() * (props.builtInTopicTitles.length - 1)
       );
-      this.openTopic(this.builtInTopicTitles[randomIndex]);
-    },
+      openTopic(props.builtInTopicTitles[randomIndex]);
+    };
+
+    return {
+      autoFullScreen,
+      createNewTopic,
+      requestFullscreen,
+      exitFullscreen,
+      openStoredTopic,
+      openTopic,
+      random,
+    };
   },
 });
+
+export default Home;
 </script>
 
 <style lang="scss">

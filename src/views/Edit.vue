@@ -1,7 +1,7 @@
 <template>
   <the-editor
-    :title="topic.title"
-    :words="topic.words"
+    :title="title"
+    :words="words"
     :id="id"
     @save="handleSave"
     @delete="handleDelete"
@@ -9,10 +9,20 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import {
+  defineComponent,
+  ref,
+  reactive,
+} from "@vue/composition-api";
 import { Topic } from "../topic";
-
-import { saveTopic, loadTopic, deleteTopic } from "../lib/TopicStore";
+import {
+  TopicIndex,
+  saveTopic,
+  loadTopic,
+  deleteTopic,
+} from "../lib/TopicStore";
+import TheEditor from "../components/TheEditor.vue";
+import router from "../router";
 
 interface WordListItem {
   key: number;
@@ -20,49 +30,57 @@ interface WordListItem {
   focus?: boolean;
 }
 
-export default Vue.extend({
-  components: {
-    TheEditor: () => import("../components/TheEditor.vue"),
-  },
-  props: ["id"],
-  data() {
-    const { encodedTopic } = this.$route.params;
+const Edit = defineComponent({
+  components: { TheEditor },
+  props: { id: String, storedTopics: Array as { new (): TopicIndex } },
+  setup(props, { emit }) {
+    const getStartingTopic = () => {
+      if (props.storedTopics && props.id) {
+        return props.storedTopics.find((t) => t.id === props.id);
+      }
+    };
+    const title = ref(getStartingTopic()?.title);
+    const words = reactive<string[]>([]);
+    const existing = ref(false);
+    const _id = ref(props.id);
+
+    const handleSave = async (updatedTopic: Topic) => {
+      _id.value = await saveTopic(updatedTopic, _id.value);
+      emit("load-stored-topics");
+
+      router.push({
+        name: "game-stored-topic",
+        params: { id: _id.value },
+      });
+    };
+
+    const handleDelete = async () => {
+      await deleteTopic(_id.value);
+      emit("load-stored-topics");
+      router.push({ name: "home" });
+    };
+
+    (async () => {
+      try {
+        const topic = await loadTopic(props.id);
+        title.value = topic.title;
+        words.splice(0);
+        words.splice(0, 0, ...topic.words);
+        existing.value = true;
+      } catch {
+        _id.value = "";
+      }
+    })();
+
     return {
-      topic: null,
-      originalEncodedTopic: encodedTopic,
-      existing: false,
+      title,
+      words,
+      existing,
+      handleSave,
+      handleDelete,
     };
   },
-  async created() {
-    const { id } = this;
-
-    if (id) {
-      this.topic = await loadTopic(id);
-      this.existing = true;
-    } else {
-      this.existing = false;
-      this.topic = {
-        title: "",
-        words: [],
-      };
-    }
-  },
-  methods: {
-    async handleSave(updatedTopic: Topic) {
-      this.id = await saveTopic(updatedTopic, this.id);
-      this.$emit("load-stored-topics");
-
-      this.$router.push({
-        name: "game-stored-topic",
-        params: { id: this.id },
-      });
-    },
-
-    async handleDelete() {
-      await deleteTopic(this.id);
-      this.$emit("load-stored-topics");
-      this.$router.push({ name: "home" });
-    },
-  },
 });
+
+export default Edit;
 </script>

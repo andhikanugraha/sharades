@@ -11,40 +11,44 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-import { Topic, getBuiltInTopicTitles } from "./topic";
-import { loadTopicIndex } from "./lib/TopicStore";
+import { defineComponent, ref } from "@vue/composition-api";
+import { getBuiltInTopicTitles } from "./topic";
+import { TopicIndex, loadTopicIndex } from "./lib/TopicStore";
 
-interface AppState {
-  storedTopics: Topic[];
-  builtInTopicTitles: string[];
-}
+const App = defineComponent({
+  setup() {
+    const storedTopics = ref<TopicIndex>([]);
+    const builtInTopicTitles = ref<string[]>([]);
+    const isFullScreen = ref(false);
 
-export default Vue.extend({
-  data() {
+    async function loadBuiltInTopics() {
+      builtInTopicTitles.value = await getBuiltInTopicTitles();
+    }
+    async function loadStoredTopics() {
+      storedTopics.value = await loadTopicIndex();
+    }
+    async function requestFullScreen() {
+      await document.body.requestFullscreen();
+      isFullScreen.value = true;
+    }
+    async function exitFullScreen() {
+      await document.exitFullscreen();
+      isFullScreen.value = false;
+    }
+
     return {
-      storedTopics: [] as Topic[],
-      builtInTopicTitles: [] as string[],
-      isFullScreen: false,
+      storedTopics,
+      builtInTopicTitles,
+      isFullScreen,
+      loadBuiltInTopics,
+      loadStoredTopics,
+      requestFullScreen,
+      exitFullScreen,
     };
   },
-  methods: {
-    async loadBuiltInTopics() {
-      this.builtInTopicTitles = await getBuiltInTopicTitles();
-    },
-    async loadStoredTopics() {
-      this.storedTopics = await loadTopicIndex();
-    },
-    async requestFullScreen() {
-      await document.body.requestFullscreen();
-      this.isFullScreen = true;
-    },
-    async exitFullScreen() {
-      await document.exitFullscreen();
-      this.isFullScreen = false;
-    },
-  },
 });
+
+export default App;
 </script>
 
 <style lang="scss">

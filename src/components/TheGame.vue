@@ -23,12 +23,12 @@
     <nav>
       <p>
         <button @click="bumper() && goHome()">
-          <font-awesome-icon icon="home" /> Home
+          <font-awesome-icon icon="home" />Home
         </button>
       </p>
       <p>
-        <button id="reset" @click="bumper() && reset()">
-          <font-awesome-icon icon="undo" /> Play again
+        <button id="reset" @click="reset">
+          <font-awesome-icon icon="undo" />Play again
         </button>
       </p>
     </nav>
@@ -49,12 +49,10 @@
     </main>
     <nav>
       <p @click="correctWord">
-        <button id="correct"><font-awesome-icon icon="check" /> Correct</button>
+        <button id="correct"><font-awesome-icon icon="check" />Correct</button>
       </p>
       <p @click="skipWord">
-        <button id="skip">
-          <font-awesome-icon icon="step-forward" /> Skip
-        </button>
+        <button id="skip"><font-awesome-icon icon="step-forward" />Skip</button>
       </p>
     </nav>
   </div>
@@ -105,7 +103,7 @@
     <nav>
       <p>
         <button id="start" @click="start">
-          <font-awesome-icon icon="play" /> Play
+          <font-awesome-icon icon="play" />Play
         </button>
       </p>
     </nav>
@@ -113,9 +111,13 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-const addSeconds = require("date-fns/add_seconds");
-const differenceInSeconds = require("date-fns/difference_in_seconds");
+import {
+  defineComponent,
+  ref,
+  reactive,
+  watch,
+  computed,
+} from "@vue/composition-api";
 import { Topic } from "../topic";
 import VFit from "../components/VFit.vue";
 import {
@@ -129,53 +131,180 @@ import {
   faTimes,
   faShare,
 } from "@fortawesome/free-solid-svg-icons";
-const shuffle = require("lodash.shuffle");
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { library } from "@fortawesome/fontawesome-svg-core";
 
-interface GameData {
-  isStarted: boolean;
-  isFinished: boolean;
-  shuffledWords: number[];
-  usedWordIndices: Set<number>;
-  correctIndices: Set<number>;
-  maxViewedIndex: number;
-  currentIndex: number;
-  remainingSeconds: number;
-  endTime: Date;
-  timer?: NodeJS.Timer;
-  timeLimit: number;
-}
+const addSeconds = require("date-fns/add_seconds");
+const differenceInSeconds = require("date-fns/difference_in_seconds");
+const shuffle = require("lodash.shuffle");
 
 interface Word {
   word: string;
   isCorrect: boolean;
 }
 
-export default Vue.extend({
+const TheGame = defineComponent({
   components: {
     VFit,
-    FontAwesomeIcon: async () =>
-      (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
+    FontAwesomeIcon,
   },
+  props: {
+    isEditable: Boolean,
+    words: Array as { new (): string[] },
+    title: String,
+  },
+  setup(props, { emit }) {
+    const title = ref(props.title);
+    const words = ref(props.words);
+    const isStarted = ref(false);
+    const endTime = ref(new Date());
+    const shuffledWords = reactive([]);
+    const usedWordIndices = reactive(new Set<number>());
+    const correctIndices = reactive(new Set<number>());
+    const maxViewedIndex = ref(0);
+    const currentIndex = ref(0);
+    const remainingSeconds = ref(0);
+    const isFinished = ref(false);
+    const timeLimit = ref(60);
+    const timer = ref<NodeJS.Timeout>(null);
 
-  props: ["isEditable", "words", "title"],
-
-  data(): GameData {
-    return {
-      isStarted: false,
-      endTime: new Date(),
-      shuffledWords: [],
-      usedWordIndices: new Set(),
-      correctIndices: new Set(),
-      maxViewedIndex: 0,
-      currentIndex: 0,
-      remainingSeconds: 0,
-      isFinished: false,
-      timeLimit: 60,
+    const bumper = () => {
+      return differenceInSeconds(new Date(), endTime.value) > 1;
     };
-  },
 
-  async created() {
-    const { library } = await import("@fortawesome/fontawesome-svg-core");
+    const setTimeLimit = (newTimeLimit: number) => {
+      timeLimit.value = newTimeLimit;
+    };
+
+    const share = () => {
+      const share: any = (navigator as any).share;
+      share({
+        title: `Sharades: ${title.value}`,
+        url: window.location,
+      });
+    };
+
+    const nextWord = () => {
+      // add current index to used words
+      usedWordIndices.add(currentIndex.value);
+
+      // find next unanswered word
+      const answeredSet = new Set<number>(correctIndices);
+
+      let i: number;
+      if (currentIndex.value + 1 >= shuffledWords.length) {
+        i = 0;
+      } else {
+        i = currentIndex.value + 1;
+      }
+
+      let nextIndex: number = -1;
+      while (i !== currentIndex.value && nextIndex === -1) {
+        if (!answeredSet.has(i)) {
+          nextIndex = i;
+        } else {
+          if (i + 1 >= shuffledWords.length) {
+            i = 0;
+          } else {
+            ++i;
+          }
+        }
+      }
+
+      if (nextIndex === -1) {
+        finish();
+      } else {
+        if (nextIndex < shuffledWords.length) {
+          currentIndex.value = nextIndex;
+        }
+      }
+
+      if (nextIndex > maxViewedIndex.value) {
+        maxViewedIndex.value = nextIndex;
+      }
+    };
+
+    const finish = () => {
+      isFinished.value = true;
+      endTime.value = new Date();
+      if (timer.value) {
+        clearTimeout(timer.value);
+        timer.value = null;
+      }
+    };
+
+    const reset = () => {
+      isStarted.value = false;
+      isFinished.value = false;
+      currentIndex.value = 0;
+      correctIndices.clear();
+      maxViewedIndex.value = 0;
+      if (timer.value) {
+        clearTimeout(timer.value);
+        timer.value = null;
+      }
+      shuffleWords();
+    };
+
+    const shuffleWords = () => {
+      const words = props.words;
+      if (words.length === 0) {
+        return;
+      }
+
+      const indices = [];
+      if (usedWordIndices.size < words.length) {
+        for (let i = 0; i < words.length; ++i) {
+          if (!usedWordIndices.has(i)) {
+            indices.push(i);
+          }
+        }
+      } else {
+        for (let i = 0; i < words.length; ++i) {
+          indices.push(i);
+        }
+        usedWordIndices.clear();
+      }
+      const shuffledLeft = shuffle(indices);
+      const shuffledRight = shuffle(Array.from(usedWordIndices.values()));
+      shuffledWords.splice(0);
+      shuffledWords.splice(0, 0, ...shuffledLeft, ...shuffledRight);
+    };
+
+    const start = () => {
+      isStarted.value = true;
+      endTime.value = addSeconds(new Date(), timeLimit.value);
+      const tick = () => {
+        updateRemainingSeconds();
+        if (remainingSeconds.value > 0) {
+          timer.value = setTimeout(() => tick(), 1000);
+        } else {
+          isFinished.value = true;
+        }
+      };
+
+      tick();
+    };
+
+    const edit = () => {
+      emit("edit-topic");
+    };
+
+    const goHome = () => {
+      emit("go-home");
+    };
+
+    const updateRemainingSeconds = () => {
+      remainingSeconds.value = differenceInSeconds(endTime.value, new Date());
+    };
+
+    const skipWord = nextWord;
+
+    const correctWord = () => {
+      correctIndices.add(currentIndex.value);
+      nextWord();
+    };
+
     library.add(
       faHome,
       faPlay,
@@ -187,181 +316,64 @@ export default Vue.extend({
       faShare
     );
 
-    this.shuffleWords();
-  },
+    watch(props, () => {
+      shuffleWords();
+      title.value = props.title;
+    });
 
-  computed: {
-    canShare(): boolean {
-      return !!(navigator as any).share;
-    },
-    currentWord(): string {
-      return this.words[this.shuffledWords[this.currentIndex]];
-    },
-
-    results(): Word[] {
+    const canShare = !!(navigator as any).share;
+    const currentWord = computed(
+      () => props.words[shuffledWords[currentIndex.value]]
+    );
+    const results = computed(() => {
       const results: Word[] = [];
-      for (let i = 0; i <= this.maxViewedIndex; ++i) {
+      for (let i = 0; i <= maxViewedIndex.value; ++i) {
         results.push({
-          word: this.words[this.shuffledWords[i]],
+          word: props.words[shuffledWords[i]],
           isCorrect: false,
         });
       }
 
-      for (const correctIndex of this.correctIndices) {
+      for (const correctIndex of correctIndices) {
         if (results[correctIndex]) {
           results[correctIndex].isCorrect = true;
         }
       }
 
       return results;
-    },
+    });
 
-    score(): number {
-      return this.correctIndices.size;
-    },
-  },
+    const score = computed(() => correctIndices.size);
 
-  methods: {
-    bumper() {
-      return differenceInSeconds(new Date(), this.endTime) > 1;
-    },
-
-    setTimeLimit(timeLimit) {
-      this.timeLimit = timeLimit;
-    },
-
-    share() {
-      const share: any = (navigator as any).share;
-      share({
-        title: `Sharades: ${this.title}`,
-        url: window.location,
-      });
-    },
-
-    nextWord() {
-      // add current index to used words
-      this.usedWordIndices.add(this.currentIndex);
-
-      // find next unanswered word
-      const answeredSet = new Set<number>(this.correctIndices);
-
-      let i: number;
-      if (this.currentIndex + 1 >= this.shuffledWords.length) {
-        i = 0;
-      } else {
-        i = this.currentIndex + 1;
-      }
-
-      let nextIndex: number = -1;
-      while (i !== this.currentIndex && nextIndex === -1) {
-        if (!answeredSet.has(i)) {
-          nextIndex = i;
-        } else {
-          if (i + 1 >= this.shuffledWords.length) {
-            i = 0;
-          } else {
-            ++i;
-          }
-        }
-      }
-
-      if (nextIndex === -1) {
-        this.finish();
-      } else {
-        if (nextIndex < this.shuffledWords.length) {
-          this.currentIndex = nextIndex;
-        }
-      }
-
-      if (nextIndex > this.maxViewedIndex) {
-        this.maxViewedIndex = nextIndex;
-      }
-    },
-
-    finish() {
-      this.isFinished = true;
-      this.endTime = new Date();
-      if (this.timer) {
-        clearTimeout(this.timer);
-      }
-    },
-
-    reset() {
-      this.isStarted = false;
-      this.isFinished = false;
-      this.currentIndex = 0;
-      this.correctIndices = new Set();
-      this.maxViewedIndex = 0;
-      this.shuffleWords();
-    },
-
-    shuffleWords() {
-      const { words } = this;
-      if (words.length === 0) {
-        return;
-      }
-
-      const indices = [];
-      if (this.usedWordIndices.size < words.length) {
-        for (let i = 0; i < words.length; ++i) {
-          if (!this.usedWordIndices.has(i)) {
-            indices.push(i);
-          }
-        }
-      } else {
-        for (let i = 0; i < words.length; ++i) {
-          indices.push(i);
-        }
-        this.usedWordIndices.clear();
-      }
-      const shuffledLeft = shuffle(indices);
-      const shuffledRight = shuffle(Array.from(this.usedWordIndices.values()));
-      this.shuffledWords = [...shuffledLeft, ...shuffledRight];
-    },
-
-    start() {
-      this.isStarted = true;
-      this.endTime = addSeconds(new Date(), this.timeLimit);
-      const tick = () => {
-        this.updateRemainingSeconds();
-        if (this.remainingSeconds > 0) {
-          this.timer = setTimeout(() => tick(), 1000);
-        } else {
-          this.isFinished = true;
-        }
-      };
-
-      tick();
-    },
-
-    edit() {
-      this.$emit("edit-topic");
-    },
-
-    goHome() {
-      this.$emit("go-home");
-    },
-
-    updateRemainingSeconds() {
-      this.remainingSeconds = differenceInSeconds(this.endTime, new Date());
-    },
-
-    skipWord() {
-      this.nextWord();
-    },
-
-    correctWord() {
-      this.correctIndices.add(this.currentIndex);
-      this.nextWord();
-    },
-  },
-
-  watch: {
-    words() {
-      this.shuffleWords();
-    },
+    return {
+      title,
+      words,
+      canShare,
+      currentWord,
+      results,
+      score,
+      bumper,
+      setTimeLimit,
+      share,
+      nextWord,
+      finish,
+      reset,
+      skipWord,
+      start,
+      edit,
+      goHome,
+      correctWord,
+      isStarted,
+      endTime,
+      shuffledWords,
+      remainingSeconds,
+      isFinished,
+      timeLimit,
+    };
   },
 });
+
+export default TheGame;
 </script>
 
 <style lang="scss">

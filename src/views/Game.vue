@@ -9,70 +9,95 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+import { defineComponent, ref, watch } from "@vue/composition-api";
 import { Topic, getDefaultTopicByTitle } from "../topic";
-import { loadTopic, findTopicId, saveTopic } from "../lib/TopicStore";
+import {
+  TopicIndex,
+  loadTopic,
+  findTopicId,
+  saveTopic,
+} from "../lib/TopicStore";
 import { encodeTopic, decodeTopic } from "../lib/TopicEncoding";
+import TheGame from "../components/TheGame.vue";
+import router from "../router";
 
-export default Vue.extend({
-  components: {
-    TheGame: () => import("../components/TheGame.vue"),
+const Game = defineComponent({
+  components: { TheGame },
+  props: {
+    id: String,
+    encodedTopic: String,
+    builtInTopicTitle: String,
+    storedTopics: Array as { new (): TopicIndex },
   },
-  props: ["id", "builtInTopicTitle", "encodedTopic"],
-  data() {
-    return {
-      title: "Loading...",
-      words: [],
-      isEditable: false,
-      newId: null,
+  setup(props, { emit }) {
+    const getStartingTitle = () => {
+      if (props.storedTopics && props.id) {
+        return props.storedTopics.find((t) => t.id === props.id)?.title;
+      } else if (props.builtInTopicTitle) {
+        return props.builtInTopicTitle;
+      }
     };
-  },
-  async mounted() {
-    const { encodedTopic, builtInTopicTitle, id } = this;
-    let topic: Topic;
-    let isEditable = false;
-    try {
-      if (builtInTopicTitle) {
-        topic = await getDefaultTopicByTitle(builtInTopicTitle);
-      }
-      if (id) {
-        topic = await loadTopic(id);
-        if (!encodedTopic) {
-          const encodedTopic = await encodeTopic(topic);
-          this.$router.replace({ name: "game", params: { encodedTopic, id } });
-        }
-        isEditable = true;
-      } else if (encodedTopic) {
-        topic = await decodeTopic(encodedTopic);
-        isEditable = true;
-        let id = await findTopicId(topic);
-        if (!id) {
-          id = await saveTopic(topic);
-          this.$emit('load-stored-topics');
-          this.newId = id;
-        }
-        this.id = id;
-      }
-    } catch (e) {
-      this.goHome();
-    }
+    const title = ref(getStartingTitle() || "Loading...");
+    const words = ref<string[]>([]);
+    const isEditable = ref(false);
+    const _id = ref(props.id);
 
-    this.title = topic.title;
-    this.words = topic.words;
-    this.isEditable = isEditable;
-  },
-  methods: {
-    goHome() {
-      this.$router.replace({
+    const goHome = () => {
+      router.push({
         name: "home",
       });
-    },
-    goEdit() {
-      this.$router.push({
+    };
+
+    const goEdit = () => {
+      router.push({
         name: "edit",
-        params: { id: this.newId || this.id },
+        params: { id: _id.value },
       });
-    },
+    };
+
+    (async () => {
+      let topic: Topic;
+      try {
+        if (props.builtInTopicTitle) {
+          topic = await getDefaultTopicByTitle(props.builtInTopicTitle);
+        }
+        if (props.id) {
+          topic = await loadTopic(props.id);
+          if (!props.encodedTopic) {
+            const encodedTopic = await encodeTopic(topic);
+            router.replace({
+              name: "game",
+              params: { encodedTopic, id: _id.value },
+            });
+          }
+          isEditable.value = true;
+        } else if (props.encodedTopic) {
+          topic = await decodeTopic(props.encodedTopic);
+          isEditable.value = true;
+          let theId = await findTopicId(topic);
+          if (!theId) {
+            theId = await saveTopic(topic);
+            emit("load-stored-topics");
+          }
+          _id.value = theId;
+        }
+
+        title.value = topic.title;
+        words.value = topic.words;
+      } catch (e) {
+        router.replace({ name: "home" });
+      }
+    })();
+
+    return {
+      title,
+      words,
+      isEditable,
+      goHome,
+      goEdit,
+    };
   },
 });
+
+export default Game;
 </script>

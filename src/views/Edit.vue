@@ -1,8 +1,8 @@
 <template>
   <the-editor
-    v-if="topic"
-    :topic="topic"
-    :originalEncodedTopic="originalEncodedTopic"
+    :title="topic.title"
+    :words="topic.words"
+    :id="id"
     @save="handleSave"
     @delete="handleDelete"
   />
@@ -10,14 +10,9 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  decodeTopic,
-  encodeTopic,
-  Topic,
-  compareTopic,
-  updateTopic,
-  removeTopic,
-} from "../topic";
+import { Topic } from "../topic";
+
+import { saveTopic, loadTopic, deleteTopic } from "../lib/TopicStore";
 
 interface WordListItem {
   key: number;
@@ -29,6 +24,7 @@ export default Vue.extend({
   components: {
     TheEditor: () => import("../components/TheEditor.vue"),
   },
+  props: ["id"],
   data() {
     const { encodedTopic } = this.$route.params;
     return {
@@ -38,50 +34,33 @@ export default Vue.extend({
     };
   },
   async created() {
-    const { encodedTopic } = this.$route.params;
-    let decodedTopic: Topic;
-    let existing: boolean;
-    if (encodedTopic) {
-      try {
-        decodedTopic = await decodeTopic(this.$route.params.encodedTopic);
-        existing = true;
-      } catch (e) {
-        this.$router.push({ name: "home" });
-      }
+    const { id } = this;
+
+    if (id) {
+      this.topic = await loadTopic(id);
+      this.existing = true;
     } else {
-      decodedTopic = {
+      this.existing = false;
+      this.topic = {
         title: "",
         words: [],
       };
-      existing = false;
     }
-
-    this.topic = decodedTopic;
-    this.existing = existing;
   },
   methods: {
     async handleSave(updatedTopic: Topic) {
-      // Logic:
-      // If editing a default topic, save it as new.
-      // If it's a new topic, save it as new.
-      //   If there's a name conflict, resolve it automatically.
-      // If editing a custom topic, see if there are any changes
-      //   If there are any changes, overwrite the old one
-      //   If there are no changes, do nothing
-
-      let treatAsNew = false;
-
-      const { originalEncodedTopic = "" } = this;
-      await updateTopic(originalEncodedTopic, updatedTopic);
+      this.id = await saveTopic(updatedTopic, this.id);
+      this.$emit("load-stored-topics");
 
       this.$router.push({
-        name: "game",
-        params: { encodedTopic: await encodeTopic(updatedTopic) },
+        name: "game-stored-topic",
+        params: { id: this.id },
       });
     },
 
-    async handleDelete(encodedTopic: string) {
-      await removeTopic(encodedTopic);
+    async handleDelete() {
+      await deleteTopic(this.id);
+      this.$emit("load-stored-topics");
       this.$router.push({ name: "home" });
     },
   },

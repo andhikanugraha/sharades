@@ -1,14 +1,19 @@
 <template>
   <router-view
-    :set-app-state="setState"
     :stored-topics="storedTopics"
     :built-in-topic-titles="builtInTopicTitles"
+    :is-full-screen="isFullScreen"
+    @load-built-in-topics="loadBuiltInTopics"
+    @load-stored-topics="loadStoredTopics"
+    @request-full-screen="requestFullScreen"
+    @exit-full-screen="exitFullScreen"
   />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { Topic } from "./topic";
+import { Topic, getBuiltInTopicTitles } from "./topic";
+import { loadTopicIndex } from "./lib/TopicStore";
 
 interface AppState {
   storedTopics: Topic[];
@@ -20,12 +25,23 @@ export default Vue.extend({
     return {
       storedTopics: [] as Topic[],
       builtInTopicTitles: [] as string[],
+      isFullScreen: false,
     };
   },
   methods: {
-    setState({ storedTopics, builtInTopicTitles }: AppState) {
-      this.storedTopics = storedTopics;
-      this.builtInTopicTitles = builtInTopicTitles;
+    async loadBuiltInTopics() {
+      this.builtInTopicTitles = await getBuiltInTopicTitles();
+    },
+    async loadStoredTopics() {
+      this.storedTopics = await loadTopicIndex();
+    },
+    async requestFullScreen() {
+      await document.body.requestFullscreen();
+      this.isFullScreen = true;
+    },
+    async exitFullScreen() {
+      await document.exitFullscreen();
+      this.isFullScreen = false;
     },
   },
 });

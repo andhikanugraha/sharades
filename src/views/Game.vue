@@ -1,61 +1,76 @@
 <template>
   <the-game
-    v-if="topic"
-    :encodedTopic="encodedTopic"
-    :topic="topic"
+    :title="title"
+    :words="words"
     :is-editable="isEditable"
-    :go-home="goHome"
+    @edit-topic="goEdit"
+    @go-home="goHome"
   />
 </template>
 
 <script lang="ts">
 import Vue from "vue";
-import { decodeTopic, Topic, getDefaultTopicByTitle } from "../topic";
+import { Topic, getDefaultTopicByTitle } from "../topic";
+import { loadTopic, findTopicId, saveTopic } from "../lib/TopicStore";
+import { encodeTopic, decodeTopic } from "../lib/TopicEncoding";
 
 export default Vue.extend({
   components: {
     TheGame: () => import("../components/TheGame.vue"),
   },
+  props: ["id", "builtInTopicTitle", "encodedTopic"],
   data() {
-    const { encodedTopic, builtInTopicTitle, homeParams } = this.$route.params;
-    let topic: Topic;
-    let isEditable = false;
-
     return {
-      topic,
-      encodedTopic,
-      isEditable,
-      homeParams,
+      title: "Loading...",
+      words: [],
+      isEditable: false,
+      newId: null,
     };
   },
-  async created() {
-    const { encodedTopic, builtInTopicTitle } = this.$route.params;
+  async mounted() {
+    const { encodedTopic, builtInTopicTitle, id } = this;
     let topic: Topic;
     let isEditable = false;
     try {
-      if (encodedTopic) {
-        topic = await decodeTopic(encodedTopic);
-        isEditable = true;
-      } else if (builtInTopicTitle) {
+      if (builtInTopicTitle) {
         topic = await getDefaultTopicByTitle(builtInTopicTitle);
       }
+      if (id) {
+        topic = await loadTopic(id);
+        if (!encodedTopic) {
+          const encodedTopic = await encodeTopic(topic);
+          this.$router.replace({ name: "game", params: { encodedTopic, id } });
+        }
+        isEditable = true;
+      } else if (encodedTopic) {
+        topic = await decodeTopic(encodedTopic);
+        isEditable = true;
+        let id = await findTopicId(topic);
+        if (!id) {
+          id = await saveTopic(topic);
+          this.$emit('load-stored-topics');
+          this.newId = id;
+        }
+        this.id = id;
+      }
     } catch (e) {
-      this.$router.replace({ name: "home" });
-
-      topic = {
-        title: "",
-        words: [],
-      };
+      this.goHome();
     }
 
-    this.topic = topic;
+    this.title = topic.title;
+    this.words = topic.words;
     this.isEditable = isEditable;
   },
   methods: {
     goHome() {
       this.$router.replace({
         name: "home",
-        params: this.homeParams,
+      });
+    },
+    goEdit() {
+      this.$router.push({
+        name: "edit",
+        params: { id: this.newId || this.id },
       });
     },
   },

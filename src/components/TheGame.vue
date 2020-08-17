@@ -73,7 +73,7 @@
       <div>
         <div class="info">
           <div class="label">Topic:</div>
-          <div class="value">{{ topic.title }}</div>
+          <div class="value">{{ title }}</div>
         </div>
         <div class="info">
           <div class="label">Time limit:</div>
@@ -157,7 +157,7 @@ export default Vue.extend({
       (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
 
-  props: ["encodedTopic", "topic", "isEditable", "goHome"],
+  props: ["isEditable", "words", "title"],
 
   data(): GameData {
     return {
@@ -186,6 +186,8 @@ export default Vue.extend({
       faTimes,
       faShare
     );
+
+    this.shuffleWords();
   },
 
   computed: {
@@ -193,14 +195,14 @@ export default Vue.extend({
       return !!(navigator as any).share;
     },
     currentWord(): string {
-      return this.topic.words[this.shuffledWords[this.currentIndex]];
+      return this.words[this.shuffledWords[this.currentIndex]];
     },
 
     results(): Word[] {
       const results: Word[] = [];
       for (let i = 0; i <= this.maxViewedIndex; ++i) {
         results.push({
-          word: this.topic.words[this.shuffledWords[i]],
+          word: this.words[this.shuffledWords[i]],
           isCorrect: false,
         });
       }
@@ -231,7 +233,7 @@ export default Vue.extend({
     share() {
       const share: any = (navigator as any).share;
       share({
-        title: `Sharades: ${this.topic.title}`,
+        title: `Sharades: ${this.title}`,
         url: window.location,
       });
     },
@@ -294,7 +296,11 @@ export default Vue.extend({
     },
 
     shuffleWords() {
-      const { words } = this.topic;
+      const { words } = this;
+      if (words.length === 0) {
+        return;
+      }
+
       const indices = [];
       if (this.usedWordIndices.size < words.length) {
         for (let i = 0; i < words.length; ++i) {
@@ -329,10 +335,11 @@ export default Vue.extend({
     },
 
     edit() {
-      this.$router.push({
-        name: "edit",
-        params: { encodedTopic: this.encodedTopic },
-      });
+      this.$emit("edit-topic");
+    },
+
+    goHome() {
+      this.$emit("go-home");
     },
 
     updateRemainingSeconds() {
@@ -349,8 +356,10 @@ export default Vue.extend({
     },
   },
 
-  mounted() {
-    this.reset();
+  watch: {
+    words() {
+      this.shuffleWords();
+    },
   },
 });
 </script>

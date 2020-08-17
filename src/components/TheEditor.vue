@@ -54,7 +54,7 @@
 
 <script lang="ts">
 import Vue from "vue";
-import { encodeTopic, Topic } from "../topic";
+import { Topic } from "../topic";
 import {
   faSave,
   faPlus,
@@ -70,19 +70,15 @@ interface WordListItem {
 }
 
 export default Vue.extend({
-  props: ["topic", "originalEncodedTopic"],
+  props: ["title", "words", "id"],
   components: {
     FontAwesomeIcon: async () =>
       (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
   data() {
-    const topic: Topic = this.topic || {
-      title: "",
-      words: [],
-    };
+    const words = this.words || [];
     return {
-      title: topic.title,
-      wordList: topic.words.map(
+      wordList: words.map(
         (word, i): WordListItem => {
           return {
             key: i,
@@ -90,7 +86,7 @@ export default Vue.extend({
           };
         }
       ),
-      maxKey: topic.words.length,
+      maxKey: words.length,
       emptyIndices: new Set<number>(),
     };
   },
@@ -98,19 +94,12 @@ export default Vue.extend({
     const { library } = await import("@fortawesome/fontawesome-svg-core");
     library.add(faSave, faPlus, faTimes, faTimesCircle, faTrashAlt);
   },
-  computed: {
-    isNew() {
-      return !this.originalEncodedTopic;
-    },
-  },
   methods: {
     cancel() {
-      if (this.originalEncodedTopic) {
+      if (this.id) {
         this.$router.push({
-          name: "game",
-          params: {
-            encodedTopic: this.originalEncodedTopic,
-          },
+          name: "game-stored-topic",
+          params: { id: this.id },
         });
       } else {
         this.$router.push({ name: "home" });
@@ -130,11 +119,10 @@ export default Vue.extend({
         title: this.title,
         words: this.wordList.map((item) => item.word),
       };
-      const encodedTopic = encodeTopic(updatedTopic);
       this.$emit("save", updatedTopic);
     },
     deleteTopic() {
-      this.$emit("delete", this.originalEncodedTopic);
+      this.$emit("delete");
     },
     onBlur(idx: number) {
       if (this.wordList[idx].word.trim() === "") {
@@ -151,6 +139,11 @@ export default Vue.extend({
     },
     deleteWordAtIndex(idx: number) {
       this.wordList.splice(idx, 1);
+    },
+  },
+  computed: {
+    isNew: function () {
+      return !this.id;
     },
   },
   directives: {

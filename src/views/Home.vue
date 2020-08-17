@@ -18,8 +18,8 @@
     <main>
       <div class="scrollable">
         <div class="info" v-if="isLoaded">
-          <p v-for="(item, index) in storedTopics" :key="item.title">
-            <button @click="openStoredTopic(index)">{{ item.title }}</button>
+          <p v-for="item in storedTopics" :key="item.id">
+            <button @click="openStoredTopic(item.id)">{{ item.title }}</button>
           </p>
           <p>
             <button id="create" @click="createNewTopic">
@@ -43,13 +43,10 @@
 
 <script lang="ts">
 import Vue from "vue";
-import {
-  encodeTopic,
-  getAvailableTopicTitles,
-  listStoredTopics,
-  Topic,
-} from "../topic";
+import { getBuiltInTopicTitles, Topic } from "../topic";
+import { TopicIndex, loadTopic } from "../lib/TopicStore";
 import { faExpand, faCompress } from "@fortawesome/free-solid-svg-icons";
+import { encodeTopic } from "@/lib/TopicEncoding";
 
 interface HomeData {
   builtInTopicTitles: string[];
@@ -72,14 +69,24 @@ export default Vue.extend({
     FontAwesomeIcon: async () =>
       (await import("@fortawesome/vue-fontawesome")).FontAwesomeIcon,
   },
-  props: ["storedTopics", "builtInTopicTitles", "setAppState"],
+  props: ["storedTopics", "builtInTopicTitles", "isFullScreen"],
   data() {
     const { autoFullScreen = false } = (this.$route
       .params as unknown) as HomeParams;
     return {
-      autoFullScreen,
+      autoFullScreen: this.isFullScreen,
       isLoaded: true,
     };
+  },
+  async created() {
+    const { library } = await import("@fortawesome/fontawesome-svg-core");
+    library.add(faExpand, faCompress);
+
+    if (this.builtInTopicTitles.length === 0) {
+      this.$emit("load-built-in-topics");
+      this.$emit("load-stored-topics");
+      this.autoFullScreen = true;
+    }
   },
   methods: {
     async openTopic(topicTitle: string) {
@@ -102,23 +109,15 @@ export default Vue.extend({
       }
     },
 
-    async openStoredTopic(index: number) {
+    async openStoredTopic(id: string) {
       try {
         if (this.autoFullScreen) {
           await this.requestFullscreen();
         }
       } finally {
-        const encodedTopic = await encodeTopic(this.storedTopics[index]);
         this.$router.push({
-          name: "game",
-          params: {
-            encodedTopic,
-            homeParams: {
-              builtInTopicTitles: this.builtInTopicTitles,
-              storedTopics: this.storedTopics,
-              autoFullScreen: this.autoFullScreen,
-            },
-          },
+          name: "game-stored-topic",
+          params: { id },
         });
       }
     },
@@ -130,13 +129,12 @@ export default Vue.extend({
     },
 
     async requestFullscreen() {
-      this.autoFullScreen = true;
-      return document.body.requestFullscreen();
+      this.$emit("request-full-screen");
     },
 
     async exitFullscreen() {
       this.autoFullScreen = false;
-      return document.exitFullscreen();
+      this.$emit("exit-full-screen");
     },
 
     random() {
@@ -145,20 +143,6 @@ export default Vue.extend({
       );
       this.openTopic(this.builtInTopicTitles[randomIndex]);
     },
-  },
-  async mounted() {
-    if (this.builtInTopicTitles.length > 0) {
-      return;
-    }
-    const storedTopics = await listStoredTopics();
-    const builtInTopicTitles = await getAvailableTopicTitles();
-    this.setAppState({
-      storedTopics,
-      builtInTopicTitles,
-    });
-
-    const { library } = await import("@fortawesome/fontawesome-svg-core");
-    library.add(faExpand, faCompress);
   },
 });
 </script>

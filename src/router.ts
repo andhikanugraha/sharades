@@ -1,8 +1,5 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Home from "./views/Home.vue";
-import Game from "./views/Game.vue";
-import Edit from "./views/Edit.vue";
 
 Vue.use(Router);
 
@@ -11,27 +8,37 @@ export default new Router({
     {
       path: "/",
       name: "home",
-      component: Home,
+      component: () => import("./views/Home.vue"),
     },
     {
       path: "/g/:encodedTopic",
       name: "game",
-      component: Game,
+      component: () => import("./views/Game.vue"),
+      props: true,
     },
     {
-      path: "/g/b/:builtInTopicTitle",
+      path: "/b/:builtInTopicTitle",
       name: "game-built-in",
-      component: Game,
+      component: () => import("./views/Game.vue"),
+      props: true,
+    },
+    {
+      path: "/u/:id",
+      name: "game-stored-topic",
+      component: () => import("./views/Game.vue"),
+      props: true,
     },
     {
       path: "/e",
       name: "edit-new",
-      component: Edit,
+      component: () => import("./views/Edit.vue"),
+      props: true,
     },
     {
-      path: "/e/:encodedTopic",
+      path: "/e/:id",
       name: "edit",
-      component: Edit,
+      component: () => import("./views/Edit.vue"),
+      props: true,
     },
   ],
 });

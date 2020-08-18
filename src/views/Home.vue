@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/composition-api";
+import { defineComponent, ref, watchEffect } from "@vue/composition-api";
 import { getBuiltInTopicTitles } from "../topic";
 import type { TopicIndex } from "../lib/TopicStore";
 import router from "../router";
@@ -95,6 +95,9 @@ const Home = defineComponent({
     };
 
     const openRandomTopic = () => {
+      if (!props.builtInTopicTitles) {
+        return;
+      }
       const randomIndex = Math.round(
         Math.random() * (props.builtInTopicTitles.length - 1)
       );
@@ -110,11 +113,13 @@ const Home = defineComponent({
       emit("exit-full-screen");
     };
 
-    if (props.builtInTopicTitles.length === 0) {
-      emit("load-built-in-topics");
-      emit("load-stored-topics");
-      autoFullScreen.value = true;
-    }
+    watchEffect(() => {
+      if (!props.builtInTopicTitles || props.builtInTopicTitles.length === 0) {
+        emit("load-built-in-topics");
+        emit("load-stored-topics");
+        autoFullScreen.value = true;
+      }
+    });
 
     return {
       autoFullScreen,

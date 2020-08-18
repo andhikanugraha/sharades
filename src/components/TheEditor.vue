@@ -23,7 +23,7 @@
           <p>
             <input
               type="text"
-              v-model.trim.lazy="newTitle"
+              v-model.trim.lazy="_title"
               @keyup.enter="addWord"
             />
           </p>
@@ -60,7 +60,7 @@ import {
   ref,
   computed,
   reactive,
-  watch,
+  watchEffect,
 } from "@vue/composition-api";
 import { Topic } from "../topic";
 import {
@@ -90,27 +90,28 @@ const TheEditor = defineComponent({
   },
   components: { FontAwesomeIcon },
   setup(props, { emit }) {
-    const newTitle = ref(props.title);
+    const _title = ref(props.title || "");
     const wordList = reactive<WordListItem[]>(
-      props.words.map((word, key) => ({ key, word }))
+      props.words?.map((word, key) => ({ key, word })) || []
     );
-    const maxKey = ref(props.words.length);
+    const maxKey = ref<number>(props.words?.length || 0);
     const emptyIndices = reactive(new Set<number>());
-    const newId = ref(props.id);
-    const isNew = computed(() => !newId.value);
+    const _id = ref(props.id || "");
+    const isNew = computed(() => !_id.value);
 
-    watch(props, () => {
+    watchEffect(() => {
+      const words = props.words || [];
       wordList.splice(0);
-      wordList.splice(0, 0, ...props.words.map((word, key) => ({ key, word })));
-      maxKey.value = props.words.length;
-      newTitle.value = props.title;
+      wordList.splice(0, 0, ...words.map((word, key) => ({ key, word })));
+      maxKey.value = words.length;
+      _title.value = props.title || "";
     });
 
     const cancel = () => {
-      if (newId.value) {
+      if (_id.value) {
         router.push({
           name: "game-stored-topic",
-          params: { id: newId.value },
+          params: { id: _id.value },
         });
       } else {
         router.push({ name: "home" });
@@ -127,7 +128,7 @@ const TheEditor = defineComponent({
     };
     const save = () => {
       const updatedTopic: Topic = {
-        title: newTitle.value,
+        title: _title.value,
         words: wordList.map((item) => item.word),
       };
       emit("save", updatedTopic);
@@ -155,7 +156,7 @@ const TheEditor = defineComponent({
     library.add(faSave, faPlus, faTimes, faTimesCircle, faTrashAlt);
 
     return {
-      newTitle,
+      _title,
       wordList,
       maxKey,
       emptyIndices,

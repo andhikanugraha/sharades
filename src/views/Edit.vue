@@ -9,7 +9,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive } from "@vue/composition-api";
+import {
+  defineComponent,
+  ref,
+  reactive,
+  watchEffect,
+} from "@vue/composition-api";
 import { Topic } from "../topic";
 import {
   TopicIndex,
@@ -51,22 +56,31 @@ const Edit = defineComponent({
     };
 
     const handleDelete = async () => {
+      if (!_id.value) return;
+
       await deleteTopic(_id.value);
       emit("load-stored-topics");
       router.push({ name: "home" });
     };
 
-    (async () => {
-      try {
-        const topic = await loadTopic(props.id);
-        title.value = topic.title;
-        words.splice(0);
-        words.splice(0, 0, ...topic.words);
-        existing.value = true;
-      } catch {
+    watchEffect(async () => {
+      if (!props.id) {
         _id.value = "";
+        return;
       }
-    })();
+
+      const topic = await loadTopic(props.id);
+      if (!topic) {
+        _id.value = "";
+        return;
+      }
+
+      title.value = topic.title;
+      words.splice(0);
+      words.splice(0, 0, ...topic.words);
+      existing.value = true;
+      _id.value = props.id;
+    });
 
     return {
       title,

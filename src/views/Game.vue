@@ -9,7 +9,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch } from "@vue/composition-api";
+import { defineComponent, ref, watch, watchEffect } from "@vue/composition-api";
 import { Topic, getDefaultTopicByTitle } from "../topic";
 import {
   TopicIndex,
@@ -37,7 +37,7 @@ const Game = defineComponent({
         return props.builtInTopicTitle;
       }
     };
-    const title = ref(getStartingTitle() || "Loading...");
+    const title = ref(getStartingTitle() || "\xa0");
     const words = ref<string[]>([]);
     const isEditable = ref(false);
     const _id = ref(props.id);
@@ -51,43 +51,58 @@ const Game = defineComponent({
     const goEdit = () => {
       router.push({
         name: "edit",
-        params: { id: _id.value },
+        params: { id: _id.value || "" },
       });
     };
 
-    (async () => {
-      let topic: Topic;
-      try {
-        if (props.builtInTopicTitle) {
-          topic = await getDefaultTopicByTitle(props.builtInTopicTitle);
-        }
-        if (props.id) {
-          topic = await loadTopic(props.id);
-          if (!props.encodedTopic) {
-            const encodedTopic = await encodeTopic(topic);
-            router.replace({
-              name: "game",
-              params: { encodedTopic, id: _id.value },
-            });
-          }
-          isEditable.value = true;
-        } else if (props.encodedTopic) {
-          topic = await decodeTopic(props.encodedTopic);
-          isEditable.value = true;
-          let theId = await findTopicId(topic);
-          if (!theId) {
-            theId = await saveTopic(topic);
-            emit("load-stored-topics");
-          }
-          _id.value = theId;
-        }
+    watchEffect(
+      async (): Promise<void> => {
+        let topic: Topic = {
+          title: "",
+          words: [],
+        };
 
-        title.value = topic.title;
-        words.value = topic.words;
-      } catch (e) {
-        router.replace({ name: "home" });
+        try {
+          if (props.builtInTopicTitle) {
+            const testTopic = await getDefaultTopicByTitle(
+              props.builtInTopicTitle
+            );
+            if (!testTopic) throw true;
+
+            Object.assign(topic, testTopic);
+          } else if (props.id) {
+            const testTopic = await loadTopic(props.id);
+            if (!testTopic) throw true;
+            Object.assign(topic, testTopic);
+
+            if (!props.encodedTopic) {
+              const encodedTopic = await encodeTopic(topic);
+              router.replace({
+                name: "game",
+                params: { encodedTopic, id: props.id },
+              });
+              return;
+            }
+
+            isEditable.value = true;
+          } else if (props.encodedTopic) {
+            topic = await decodeTopic(props.encodedTopic);
+            isEditable.value = true;
+            let theId = await findTopicId(topic);
+            if (!theId) {
+              theId = await saveTopic(topic);
+              emit("load-stored-topics");
+            }
+            _id.value = theId;
+          }
+        } catch (e) {
+          router.replace({ name: "home" });
+        } finally {
+          title.value = topic.title;
+          words.value = topic.words;
+        }
       }
-    })();
+    );
 
     return {
       title,

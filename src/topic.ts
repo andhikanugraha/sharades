@@ -9,9 +9,11 @@ export async function getDefaultTopicTitles(): Promise<string[]> {
   return defaultTitles.sort();
 }
 
-export async function getDefaultTopicByTitle(title: string): Promise<Topic> {
+export async function getDefaultTopicByTitle(
+  title: string
+): Promise<Topic | null> {
   const defaultTopics: Topic[] = (await import("./builtInTopics")).default;
-  return defaultTopics.find((v) => v.title === title);
+  return defaultTopics.find((v) => v.title === title) || null;
 }
 
 export async function getBuiltInTopicTitles(): Promise<string[]> {

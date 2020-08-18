@@ -36,27 +36,29 @@ export async function saveTopicIndex(newTopicIndex: TopicIndex) {
   }
 }
 
-export async function loadTopic(id: string): Promise<Topic> {
+export async function loadTopic(id: string): Promise<Topic | null> {
   const { inflateTopicWords } = await import("./TopicEncoding");
-  let title: string;
-  let words: string[];
+  let title: string = "";
+  let words: string[] = [];
   const topicIndex = await loadTopicIndex();
-  try {
-    title = topicIndex.find((t) => t.id === id).title;
-  } catch (e) {
-    throw new Error(`Topic id ${id} does not exist.`);
+
+  const testTopic = topicIndex.find((t) => t.id === id);
+  if (testTopic) {
+    title = testTopic.title;
+  } else {
+    return null;
   }
 
   const store = await getStore();
   const deflatedWordsBuffer = await store.getItem<DeflatedWordsBuffer>(id);
   if (!deflatedWordsBuffer) {
-    throw new Error(`Topic id ${id} does not exist.`);
+    return null;
   }
 
   try {
     words = await inflateTopicWords(deflatedWordsBuffer);
   } catch {
-    throw new Error(`Topic id ${id} does not exist.`);
+    return null;
   }
 
   return {
@@ -119,29 +121,24 @@ export async function deleteTopic(id: string): Promise<void> {
   saveTopicIndex(topicIndex);
 }
 
-export async function findTopicId(topic: Topic): Promise<string> {
+export async function findTopicId(topic: Topic): Promise<string | null> {
   const topicIndex = await loadTopicIndex();
   // find by title
   const { title, words } = topic;
   const id = topicIndex.find((t) => t.title === title)?.id;
-  if (!id) {
+  if (!id) return null;
+
+  const topicInStore = await loadTopic(id);
+  if (!topicInStore) return null;
+
+  if (topicInStore.words.length !== words.length) {
     return null;
   }
-
-  try {
-    const topicInStore = await loadTopic(id);
-    if (topicInStore.words.length !== words.length) {
+  for (let i = 0; i < words.length; ++i) {
+    if (topicInStore.words[i] !== words[i]) {
       return null;
     }
-    for (let i = 0; i < words.length; ++i) {
-      if (topicInStore.words[i] !== words[i]) {
-        return null;
-      }
-    }
-
-    return id;
-  } catch {
-    // topic list of words not found
-    return null;
   }
+
+  return id;
 }

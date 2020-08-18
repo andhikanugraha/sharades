@@ -22,7 +22,7 @@
     </main>
     <nav>
       <p>
-        <button @click="bumper() && goHome()">
+        <button @click="bumper(goHome)">
           <font-awesome-icon icon="home" />Home
         </button>
       </p>
@@ -43,7 +43,7 @@
     <main>
       <div class="overlay">
         <div class="half" @click="correctWord"></div>
-        <div class="half" @click="skipWord"></div>
+        <div class="half" @click="nextWord"></div>
       </div>
       <v-fit :text="currentWord" />
     </main>
@@ -51,7 +51,7 @@
       <p @click="correctWord">
         <button id="correct"><font-awesome-icon icon="check" />Correct</button>
       </p>
-      <p @click="skipWord">
+      <p @click="nextWord">
         <button id="skip"><font-awesome-icon icon="step-forward" />Skip</button>
       </p>
     </nav>
@@ -71,7 +71,7 @@
       <div>
         <div class="info">
           <div class="label">Topic:</div>
-          <div class="value">{{ title }}</div>
+          <div class="value">{{ _title }}</div>
         </div>
         <div class="info">
           <div class="label">Time limit:</div>
@@ -117,6 +117,7 @@ import {
   reactive,
   watch,
   computed,
+  watchEffect,
 } from "@vue/composition-api";
 import { Topic } from "../topic";
 import VFit from "../components/VFit.vue";
@@ -134,13 +135,15 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { library } from "@fortawesome/fontawesome-svg-core";
 
-const addSeconds = require("date-fns/add_seconds");
-const differenceInSeconds = require("date-fns/difference_in_seconds");
-const shuffle = require("lodash.shuffle");
+import shuffle from "lodash/shuffle";
 
 interface Word {
   word: string;
   isCorrect: boolean;
+}
+
+function nowSeconds(): number {
+  return Math.floor(Date.now() / 1000);
 }
 
 const TheGame = defineComponent({
@@ -154,11 +157,11 @@ const TheGame = defineComponent({
     title: String,
   },
   setup(props, { emit }) {
-    const title = ref(props.title);
+    const _title = ref(props.title);
     const words = ref(props.words);
     const isStarted = ref(false);
-    const endTime = ref(new Date());
-    const shuffledWords = reactive([]);
+    const endTime = ref(nowSeconds());
+    const shuffledWords = reactive<number[]>([]);
     const usedWordIndices = reactive(new Set<number>());
     const correctIndices = reactive(new Set<number>());
     const maxViewedIndex = ref(0);
@@ -166,10 +169,12 @@ const TheGame = defineComponent({
     const remainingSeconds = ref(0);
     const isFinished = ref(false);
     const timeLimit = ref(60);
-    const timer = ref<NodeJS.Timeout>(null);
+    const timer = ref<NodeJS.Timeout | undefined>(undefined);
 
-    const bumper = () => {
-      return differenceInSeconds(new Date(), endTime.value) > 1;
+    const bumper = (next: Function) => {
+      if (nowSeconds() - endTime.value > 1) {
+        next();
+      }
     };
 
     const setTimeLimit = (newTimeLimit: number) => {
@@ -177,11 +182,14 @@ const TheGame = defineComponent({
     };
 
     const share = () => {
-      const share: any = (navigator as any).share;
-      share({
-        title: `Sharades: ${title.value}`,
-        url: window.location,
-      });
+      try {
+        (navigator as any).share({
+          title: `Sharades: ${_title.value}`,
+          url: window.location,
+        });
+      } catch {
+        alert("Sharing not supported");
+      }
     };
 
     const nextWord = () => {
@@ -226,10 +234,10 @@ const TheGame = defineComponent({
 
     const finish = () => {
       isFinished.value = true;
-      endTime.value = new Date();
+      endTime.value = nowSeconds();
       if (timer.value) {
         clearTimeout(timer.value);
-        timer.value = null;
+        timer.value = undefined;
       }
     };
 
@@ -241,14 +249,14 @@ const TheGame = defineComponent({
       maxViewedIndex.value = 0;
       if (timer.value) {
         clearTimeout(timer.value);
-        timer.value = null;
+        timer.value = undefined;
       }
       shuffleWords();
     };
 
     const shuffleWords = () => {
       const words = props.words;
-      if (words.length === 0) {
+      if (!words || words.length === 0) {
         return;
       }
 
@@ -273,7 +281,7 @@ const TheGame = defineComponent({
 
     const start = () => {
       isStarted.value = true;
-      endTime.value = addSeconds(new Date(), timeLimit.value);
+      endTime.value = nowSeconds() + timeLimit.value;
       const tick = () => {
         updateRemainingSeconds();
         if (remainingSeconds.value > 0) {
@@ -295,10 +303,8 @@ const TheGame = defineComponent({
     };
 
     const updateRemainingSeconds = () => {
-      remainingSeconds.value = differenceInSeconds(endTime.value, new Date());
+      remainingSeconds.value = endTime.value - nowSeconds();
     };
-
-    const skipWord = nextWord;
 
     const correctWord = () => {
       correctIndices.add(currentIndex.value);
@@ -316,17 +322,21 @@ const TheGame = defineComponent({
       faShare
     );
 
-    watch(props, () => {
+    watchEffect(() => {
       shuffleWords();
-      title.value = props.title;
+      _title.value = props.title;
     });
 
     const canShare = !!(navigator as any).share;
-    const currentWord = computed(
-      () => props.words[shuffledWords[currentIndex.value]]
+    const currentWord = computed<string>(() =>
+      props.words ? props.words[shuffledWords[currentIndex.value]] : ""
     );
-    const results = computed(() => {
+    const results = computed<Word[]>(() => {
       const results: Word[] = [];
+      if (!props.words) {
+        return results;
+      }
+
       for (let i = 0; i <= maxViewedIndex.value; ++i) {
         results.push({
           word: props.words[shuffledWords[i]],
@@ -343,30 +353,29 @@ const TheGame = defineComponent({
       return results;
     });
 
-    const score = computed(() => correctIndices.size);
+    const score = computed<number>(() => correctIndices.size);
 
     return {
-      title,
+      _title,
       words,
       canShare,
+      share,
       currentWord,
       results,
       score,
       bumper,
       setTimeLimit,
-      share,
       nextWord,
       finish,
       reset,
-      skipWord,
       start,
       edit,
       goHome,
       correctWord,
-      isStarted,
       endTime,
       shuffledWords,
       remainingSeconds,
+      isStarted,
       isFinished,
       timeLimit,
     };

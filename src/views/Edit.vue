@@ -63,7 +63,7 @@ const Edit = defineComponent({
       router.push({ name: "home" });
     };
 
-    watchEffect(async () => {
+    (async () => {
       if (!props.id) {
         _id.value = "";
         return;
@@ -80,7 +80,7 @@ const Edit = defineComponent({
       words.splice(0, 0, ...topic.words);
       existing.value = true;
       _id.value = props.id;
-    });
+    })();
 
     return {
       title,

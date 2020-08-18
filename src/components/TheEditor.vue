@@ -60,7 +60,7 @@ import {
   ref,
   computed,
   reactive,
-  watchEffect,
+  watch,
 } from "@vue/composition-api";
 import { Topic } from "../topic";
 import {
@@ -99,7 +99,7 @@ const TheEditor = defineComponent({
     const _id = ref(props.id || "");
     const isNew = computed(() => !_id.value);
 
-    watchEffect(() => {
+    watch(props, (props) => {
       const words = props.words || [];
       wordList.splice(0);
       wordList.splice(0, 0, ...words.map((word, key) => ({ key, word })));

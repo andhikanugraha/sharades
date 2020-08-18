@@ -3,16 +3,23 @@
 </template>
 
 <script lang="ts">
-import Vue from "vue";
-export default Vue.extend({
-  props: ["text", "width"],
-  computed: {
-    fontSize() {
-      const width: number = (this.width || 100) * 1.3;
-      const characters: number = this.text.length;
+import { defineComponent, ref, computed } from "@vue/composition-api";
+const VFit = defineComponent({
+  props: {
+    text: String,
+    width: Number,
+  },
+  setup(props) {
+    const fontSize = computed(() => {
+      const width = (props.width || 100) * 1.3;
+      const characters = props.text?.length || 1;
       const size: number = Math.min(Math.max(width / characters, 8), 22);
       return `${size}vw`;
-    },
+    });
+
+    return { fontSize };
   },
 });
+
+export default VFit;
 </script>

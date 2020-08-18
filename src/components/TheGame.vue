@@ -314,7 +314,11 @@ const TheGame = defineComponent({
       faShare
     );
 
-    watchEffect(() => {
+    watch(props, () => {
+      _words.splice(0);
+      if (props.words) {
+        _words.splice(0, 0, ...props.words);
+      }
       shuffleWords();
       _title.value = props.title;
     });

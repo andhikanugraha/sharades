@@ -57,7 +57,7 @@ const Game = defineComponent({
 
     watchEffect(
       async (): Promise<void> => {
-        let topic: Topic = {
+        const topic: Topic = {
           title: "",
           words: [],
         };
@@ -73,6 +73,7 @@ const Game = defineComponent({
           } else if (props.id) {
             const testTopic = await loadTopic(props.id);
             if (!testTopic) throw true;
+            isEditable.value = true;
             Object.assign(topic, testTopic);
 
             if (!props.encodedTopic) {
@@ -81,13 +82,13 @@ const Game = defineComponent({
                 name: "game",
                 params: { encodedTopic, id: props.id },
               });
-              return;
             }
-
-            isEditable.value = true;
           } else if (props.encodedTopic) {
-            topic = await decodeTopic(props.encodedTopic);
+            const testTopic = await decodeTopic(props.encodedTopic);
+            if (!testTopic) throw true;
             isEditable.value = true;
+            Object.assign(topic, testTopic);
+
             let theId = await findTopicId(topic);
             if (!theId) {
               theId = await saveTopic(topic);

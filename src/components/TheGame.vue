@@ -22,9 +22,7 @@
     </main>
     <nav>
       <p>
-        <button @click="bumper(goHome)">
-          <font-awesome-icon icon="home" />Home
-        </button>
+        <button @click="goHome"><font-awesome-icon icon="home" />Home</button>
       </p>
       <p>
         <button id="reset" @click="reset">
@@ -158,7 +156,7 @@ const TheGame = defineComponent({
   },
   setup(props, { emit }) {
     const _title = ref(props.title);
-    const words = ref(props.words);
+    const _words = reactive(props.words || []);
     const isStarted = ref(false);
     const endTime = ref(nowSeconds());
     const shuffledWords = reactive<number[]>([]);
@@ -169,13 +167,7 @@ const TheGame = defineComponent({
     const remainingSeconds = ref(0);
     const isFinished = ref(false);
     const timeLimit = ref(60);
-    const timer = ref<NodeJS.Timeout | undefined>(undefined);
-
-    const bumper = (next: Function) => {
-      if (nowSeconds() - endTime.value > 1) {
-        next();
-      }
-    };
+    const timer = ref<NodeJS.Timeout | undefined>();
 
     const setTimeLimit = (newTimeLimit: number) => {
       timeLimit.value = newTimeLimit;
@@ -255,7 +247,7 @@ const TheGame = defineComponent({
     };
 
     const shuffleWords = () => {
-      const words = props.words;
+      const words = _words;
       if (!words || words.length === 0) {
         return;
       }
@@ -327,7 +319,6 @@ const TheGame = defineComponent({
       _title.value = props.title;
     });
 
-    const canShare = !!(navigator as any).share;
     const currentWord = computed<string>(() =>
       props.words ? props.words[shuffledWords[currentIndex.value]] : ""
     );
@@ -357,13 +348,11 @@ const TheGame = defineComponent({
 
     return {
       _title,
-      words,
-      canShare,
       share,
       currentWord,
       results,
       score,
-      bumper,
+      timeLimit,
       setTimeLimit,
       nextWord,
       finish,
@@ -372,12 +361,10 @@ const TheGame = defineComponent({
       edit,
       goHome,
       correctWord,
-      endTime,
       shuffledWords,
       remainingSeconds,
       isStarted,
       isFinished,
-      timeLimit,
     };
   },
 });

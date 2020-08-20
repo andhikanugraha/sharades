@@ -1,10 +1,10 @@
+import { createInstance as createStore } from 'localforage';
 import { Topic } from './topic';
 
 const KEY_INDEX = '_index';
 
 async function getStore(): Promise<LocalForage> {
-  const localForage = await import('localforage');
-  return localForage.createInstance({
+  return createStore({
     name: 'charades',
   });
 }

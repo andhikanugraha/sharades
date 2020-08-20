@@ -9,16 +9,15 @@
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
+    "@progress/pako-esm": "^1.0.0",
     "localforage": "^1.9.0",
     "lodash": "^4.17.20",
-    "pako": "^1.0.11",
     "register-service-worker": "^1.7.1",
     "vue": "^3.0.0-0",
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.159",
-    "@types/pako": "^1.0.1",
     "@typescript-eslint/eslint-plugin": "^2.33.0",
     "@typescript-eslint/parser": "^2.33.0",
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -30,9 +29,9 @@
     "@vue/compiler-sfc": "^3.0.0-0",
     "@vue/eslint-config-airbnb": "^5.0.2",
     "@vue/eslint-config-typescript": "^5.0.2",
-    "eslint-plugin-vue": "^7.0.0-beta.2",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-vue": "^7.0.0-beta.2",
     "typescript": "~3.9.3",
     "vue-cli-plugin-webpack-bundle-analyzer": "~2.0.0"
   },

@@ -1,3 +1,4 @@
+import { inflate, deflate } from '@progress/pako-esm';
 import { Topic } from './topic';
 import { btoaUrl, atobUrl } from './base64url';
 
@@ -7,14 +8,12 @@ const textEncoder = new TextEncoder();
 const textDecoder = new TextDecoder('utf-8');
 
 export async function deflateTopicWords(words: string[]): Promise<Uint8Array> {
-  const { deflate } = await import('pako');
   return deflate(textEncoder.encode(words.join(SEPARATOR)));
 }
 
 export async function inflateTopicWords(
   wordsBuffer: Uint8Array,
 ): Promise<string[]> {
-  const { inflate } = await import('pako');
   return textDecoder.decode(inflate(wordsBuffer)).split(SEPARATOR);
 }
 

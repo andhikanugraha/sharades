@@ -39,7 +39,7 @@
               @keyup.enter="addWord"
             />
             <span class="item-delete" @click="deleteWordAtIndex(i)">
-              <font-awesome-icon icon="times-circle" />
+              <v-icon :icon="faTimesCircle" />
             </span>
           </p>
           <p>
@@ -61,6 +61,8 @@ import {
   reactive,
   watch,
 } from 'vue';
+import { useRouter } from 'vue-router';
+
 import {
   faSave,
   faPlus,
@@ -72,8 +74,6 @@ import {
 import VIcon from './VIcon.vue';
 import VEditorInput from './VEditorInput.vue';
 import { Topic } from '../lib/topic';
-
-import router from '../router';
 
 interface WordListItem {
   key: number;
@@ -90,6 +90,8 @@ export default defineComponent({
   },
   components: { VIcon, VEditorInput },
   setup(props, { emit }) {
+    const router = useRouter();
+
     const viewTitle = ref(props.title || '');
     const wordList = reactive<WordListItem[]>(
       props.words?.map((word, key) => ({ key, word })) || [],

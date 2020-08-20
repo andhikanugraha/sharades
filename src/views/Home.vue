@@ -45,10 +45,10 @@
 
 <script lang="ts">
 import { defineComponent, ref, watchEffect } from 'vue';
+import { useRouter } from 'vue-router';
 import { faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
 import VIcon from '../components/VIcon.vue';
 import type { TopicIndex } from '../lib/TopicStore';
-import router from '../router';
 
 export default defineComponent({
   name: 'Home',
@@ -61,6 +61,7 @@ export default defineComponent({
     isFullScreen: Boolean,
   },
   setup(props, { emit }) {
+    const router = useRouter();
     const autoFullScreen = ref(props.isFullScreen);
 
     const requestFullscreen = () => {

@@ -14,6 +14,7 @@ import {
   ref,
   reactive,
 } from 'vue';
+import { useRouter } from 'vue-router';
 import { Topic } from '../lib/topic';
 import {
   TopicIndex,
@@ -22,7 +23,6 @@ import {
   deleteTopic,
 } from '../lib/TopicStore';
 import TheEditor from '../components/TheEditor.vue';
-import router from '../router';
 
 interface WordListItem {
   key: number;
@@ -35,6 +35,8 @@ export default defineComponent({
   components: { TheEditor },
   props: { id: String, storedTopics: Array as { new (): TopicIndex } },
   setup(props, { emit }) {
+    const router = useRouter();
+
     const getStartingTopic = () => {
       if (props.storedTopics && props.id) {
         return props.storedTopics.find((t) => t.id === props.id);

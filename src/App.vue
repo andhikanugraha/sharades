@@ -12,8 +12,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { getBuiltInTopicTitles } from './lib/topic';
-import { TopicIndex, loadTopicIndex } from './lib/TopicStore';
+import type { TopicIndex } from './lib/TopicStore';
 
 export default defineComponent({
   name: 'App',
@@ -23,9 +22,11 @@ export default defineComponent({
     const isFullScreen = ref(false);
 
     const loadBuiltInTopics = async () => {
+      const { getBuiltInTopicTitles } = await import('./lib/topic');
       builtInTopicTitles.value = await getBuiltInTopicTitles();
     };
     const loadStoredTopics = async () => {
+      const { loadTopicIndex } = await import('./lib/TopicStore');
       storedTopics.value = await loadTopicIndex();
     };
     const requestFullScreen = async () => {
@@ -256,7 +257,9 @@ button .icon {
 }
 
 #start, #correct {
-  /* no styles needed; follows primary button color */
+  --button-color: var(--color-primary);
+  --button-color-hover: var(--color-primary-dark);
+  --button-color-focus: var(--color-primary-darker);
 }
 #skip, #reset, #random {
   --button-color: var(--color-secondary);

@@ -4,6 +4,7 @@ module.exports = {
       '@vue/app',
       {
         useBuiltIns: false,
+        exclude: ['@babel/plugin-transform-regenerator'],
       },
     ],
   ],

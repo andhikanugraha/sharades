@@ -4,15 +4,15 @@ export interface Topic {
 }
 
 export async function getDefaultTopicTitles(): Promise<string[]> {
-  const defaultTopics: Topic[] = (await import("./builtInTopics")).default;
+  const defaultTopics: Topic[] = (await import('./builtInTopics')).default;
   const defaultTitles = defaultTopics.map((cat) => cat.title);
   return defaultTitles.sort();
 }
 
 export async function getDefaultTopicByTitle(
-  title: string
+  title: string,
 ): Promise<Topic | null> {
-  const defaultTopics: Topic[] = (await import("./builtInTopics")).default;
+  const defaultTopics: Topic[] = (await import('./builtInTopics')).default;
   return defaultTopics.find((v) => v.title === title) || null;
 }
 

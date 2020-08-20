@@ -3,8 +3,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from "@vue/composition-api";
-const VFit = defineComponent({
+import { defineComponent, computed } from 'vue';
+
+export default defineComponent({
+  name: 'VFit',
   props: {
     text: String,
     width: Number,
@@ -20,6 +22,4 @@ const VFit = defineComponent({
     return { fontSize };
   },
 });
-
-export default VFit;
 </script>

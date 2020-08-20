@@ -1,0 +1,1 @@
+:-webkit-full-screen .expand-button{display:none}:-ms-fullscreen .expand-button{display:none}:fullscreen .expand-button{display:none}body:not(:-webkit-full-screen) .compress-button{display:none}body:not(:-ms-fullscreen) .compress-button{display:none}body:not(:fullscreen) .compress-button{display:none}

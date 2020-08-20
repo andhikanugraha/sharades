@@ -1,12 +1,11 @@
-import { Topic } from "../topic";
-import { btoaUrl } from "./base64url";
+import { Topic } from './topic';
 
-const KEY_INDEX = "_index";
+const KEY_INDEX = '_index';
 
 async function getStore(): Promise<LocalForage> {
-  const localForage = await import("localforage");
+  const localForage = await import('localforage');
   return localForage.createInstance({
-    name: "charades",
+    name: 'charades',
   });
 }
 
@@ -31,14 +30,13 @@ export async function saveTopicIndex(newTopicIndex: TopicIndex) {
   const store = await getStore();
   if (newTopicIndex.length > 0) {
     return store.setItem<TopicIndex>(KEY_INDEX, newTopicIndex);
-  } else {
-    return store.clear();
   }
+  return store.clear();
 }
 
 export async function loadTopic(id: string): Promise<Topic | null> {
-  const { inflateTopicWords } = await import("./TopicEncoding");
-  let title: string = "";
+  const { inflateTopicWords } = await import('./TopicEncoding');
+  let title = '';
   let words: string[] = [];
   const topicIndex = await loadTopicIndex();
 
@@ -73,17 +71,18 @@ function generateRandomId(): string {
 }
 
 function sanitiseTopic(topicObj: Topic): Topic {
-  topicObj.title = topicObj.title.trim();
-  topicObj.words = topicObj.words
+  const sanitisedTopic = topicObj;
+  sanitisedTopic.title = topicObj.title.trim();
+  sanitisedTopic.words = topicObj.words
     .map((word) => word.trim())
     .filter((x) => !!x)
     .filter((e, i, a) => a.indexOf(e) === i) // dedupe
     .sort();
-  return topicObj;
+  return sanitisedTopic;
 }
 
 export async function saveTopic(topicObj: Topic, id?: string): Promise<string> {
-  const { deflateTopicWords } = await import("./TopicEncoding");
+  const { deflateTopicWords } = await import('./TopicEncoding');
 
   const store = await getStore();
   const { title, words } = sanitiseTopic(topicObj);
@@ -96,17 +95,16 @@ export async function saveTopic(topicObj: Topic, id?: string): Promise<string> {
     topicIndex[key].title = title;
     saveTopicIndex(topicIndex);
     return id;
-  } else {
-    const newId = generateRandomId();
-    await store.setItem(newId, wordsBuffer);
-    topicIndex.push({
-      id: newId,
-      title: title,
-    });
-    saveTopicIndex(topicIndex);
-
-    return newId;
   }
+  const newId = generateRandomId();
+  await store.setItem(newId, wordsBuffer);
+  topicIndex.push({
+    id: newId,
+    title,
+  });
+  saveTopicIndex(topicIndex);
+
+  return newId;
 }
 
 export async function deleteTopic(id: string): Promise<void> {
@@ -116,7 +114,7 @@ export async function deleteTopic(id: string): Promise<void> {
   const topicIndex = await loadTopicIndex();
   topicIndex.splice(
     topicIndex.findIndex((t) => t.id === id),
-    1
+    1,
   );
   saveTopicIndex(topicIndex);
 }
@@ -134,7 +132,7 @@ export async function findTopicId(topic: Topic): Promise<string | null> {
   if (topicInStore.words.length !== words.length) {
     return null;
   }
-  for (let i = 0; i < words.length; ++i) {
+  for (let i = 0; i < words.length; i += 1) {
     if (topicInStore.words[i] !== words[i]) {
       return null;
     }

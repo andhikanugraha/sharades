@@ -2,19 +2,15 @@
   <div class="root" id="finished" v-if="isFinished">
     <header>
       <div class="close-button" @click="reset">
-        <font-awesome-icon icon="times" fixed-width />
+        <v-icon :icon="faTimes" fixed-width />
       </div>
       <h3>Score: {{ score }}</h3>
     </header>
     <main>
       <div>
         <ol>
-          <li
-            v-for="(result, i) in results"
-            :key="i"
-            :class="{ correct: result.isCorrect }"
-          >
-            <font-awesome-icon :icon="result.isCorrect ? 'check' : 'times'" />
+          <li v-for="(result, i) in results" :key="i" :class="{ correct: result.isCorrect }">
+            <v-icon :icon="result.isCorrect ? faCheck : faTimes" />
             {{ result.word }}
           </li>
         </ol>
@@ -22,11 +18,13 @@
     </main>
     <nav>
       <p>
-        <button @click="goHome"><font-awesome-icon icon="home" />Home</button>
+        <button @click="goHome">
+          <v-icon :icon="faHome" />Home
+        </button>
       </p>
       <p>
         <button id="reset" @click="reset">
-          <font-awesome-icon icon="undo" />Play again
+          <v-icon :icon="faUndo" />Play again
         </button>
       </p>
     </nav>
@@ -34,7 +32,7 @@
   <div class="root" id="active" v-else-if="isStarted">
     <header>
       <div class="close-button" @click="reset">
-        <font-awesome-icon icon="times" fixed-width />
+        <v-icon :icon="faTimes" fixed-width />
       </div>
       <h3 id="timer">{{ remainingSeconds }}</h3>
     </header>
@@ -47,21 +45,25 @@
     </main>
     <nav>
       <p @click="correctWord">
-        <button id="correct"><font-awesome-icon icon="check" />Correct</button>
+        <button id="correct">
+          <v-icon :icon="faCheck" />Correct
+        </button>
       </p>
       <p @click="nextWord">
-        <button id="skip"><font-awesome-icon icon="step-forward" />Skip</button>
+        <button id="skip">
+          <v-icon :icon="faStepForward" />Skip
+        </button>
       </p>
     </nav>
   </div>
   <div class="root" id="initial" v-else>
     <header>
       <div class="close-button" @click="goHome">
-        <font-awesome-icon icon="home" />
+        <v-icon :icon="faHome" />
       </div>
       <div class="pull-right">
-        <font-awesome-icon @click="edit" icon="edit" v-if="isEditable" />
-        <font-awesome-icon @click="share" icon="share" />
+        <v-icon @click="edit" :icon="faEdit" v-if="isEditable" />
+        <v-icon @click="share" :icon="faShare" />
       </div>
       <h3>Sharades</h3>
     </header>
@@ -69,31 +71,16 @@
       <div>
         <div class="info">
           <div class="label">Topic:</div>
-          <div class="value">{{ _title }}</div>
+          <div class="value">{{ viewTitle }}</div>
         </div>
         <div class="info">
           <div class="label">Time limit:</div>
           <div class="value">
             <span
-              @click="setTimeLimit(30)"
-              :class="{ option: true, selected: timeLimit === 30 }"
-              >30</span
-            >
-            <span
-              @click="setTimeLimit(60)"
-              :class="{ option: true, selected: timeLimit === 60 }"
-              >60</span
-            >
-            <span
-              @click="setTimeLimit(90)"
-              :class="{ option: true, selected: timeLimit === 90 }"
-              >90</span
-            >
-            <span
-              @click="setTimeLimit(120)"
-              :class="{ option: true, selected: timeLimit === 120 }"
-              >120</span
-            >
+              v-for="(opt) in [30, 60, 90, 120]"
+              :key="opt"
+              :class="{option: true, selected: timeLimit === opt }"
+              @click="setTimeLimit(opt)">{{ opt }}</span>
           </div>
         </div>
       </div>
@@ -101,7 +88,7 @@
     <nav>
       <p>
         <button id="start" @click="start">
-          <font-awesome-icon icon="play" />Play
+          <v-icon :icon="faPlay" />Play
         </button>
       </p>
     </nav>
@@ -110,30 +97,22 @@
 
 <script lang="ts">
 import {
-  defineComponent,
-  ref,
-  reactive,
-  watch,
-  computed,
-  watchEffect,
-} from "@vue/composition-api";
-import { Topic } from "../topic";
-import VFit from "../components/VFit.vue";
+  defineComponent, ref, reactive, watch, computed,
+} from 'vue';
 import {
   faHome,
   faPlay,
   faStepForward,
   faCheck,
   faUndo,
-  faPencilAlt,
   faEdit,
   faTimes,
   faShare,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { library } from "@fortawesome/fontawesome-svg-core";
+} from '@fortawesome/free-solid-svg-icons';
+import shuffle from 'lodash/shuffle';
+import VIcon from './VIcon.vue';
 
-import shuffle from "lodash/shuffle";
+import VFit from './VFit.vue';
 
 interface Word {
   word: string;
@@ -144,10 +123,11 @@ function nowSeconds(): number {
   return Math.floor(Date.now() / 1000);
 }
 
-const TheGame = defineComponent({
+export default defineComponent({
+  name: 'TheGame',
   components: {
     VFit,
-    FontAwesomeIcon,
+    VIcon,
   },
   props: {
     isEditable: Boolean,
@@ -155,8 +135,8 @@ const TheGame = defineComponent({
     title: String,
   },
   setup(props, { emit }) {
-    const _title = ref(props.title);
-    const _words = reactive(props.words || []);
+    const viewTitle = ref(props.title);
+    const viewWords = reactive(props.words || []);
     const isStarted = ref(false);
     const endTime = ref(nowSeconds());
     const shuffledWords = reactive<number[]>([]);
@@ -167,7 +147,7 @@ const TheGame = defineComponent({
     const remainingSeconds = ref(0);
     const isFinished = ref(false);
     const timeLimit = ref(60);
-    const timer = ref<NodeJS.Timeout | undefined>();
+    const timer = ref<number | undefined>();
 
     const setTimeLimit = (newTimeLimit: number) => {
       timeLimit.value = newTimeLimit;
@@ -175,12 +155,21 @@ const TheGame = defineComponent({
 
     const share = () => {
       try {
-        (navigator as any).share({
-          title: `Sharades: ${_title.value}`,
-          url: window.location,
+        (navigator as Navigator).share({
+          title: `Sharades: ${viewTitle.value}`,
+          url: window.location.toString(),
         });
-      } catch {
-        alert("Sharing not supported");
+      } finally {
+        // do nothing
+      }
+    };
+
+    const finish = () => {
+      isFinished.value = true;
+      endTime.value = nowSeconds();
+      if (timer.value) {
+        clearTimeout(timer.value);
+        timer.value = undefined;
       }
     };
 
@@ -198,25 +187,21 @@ const TheGame = defineComponent({
         i = currentIndex.value + 1;
       }
 
-      let nextIndex: number = -1;
+      let nextIndex = -1;
       while (i !== currentIndex.value && nextIndex === -1) {
         if (!answeredSet.has(i)) {
           nextIndex = i;
+        } else if (i + 1 >= shuffledWords.length) {
+          i = 0;
         } else {
-          if (i + 1 >= shuffledWords.length) {
-            i = 0;
-          } else {
-            ++i;
-          }
+          i += 1;
         }
       }
 
       if (nextIndex === -1) {
         finish();
-      } else {
-        if (nextIndex < shuffledWords.length) {
-          currentIndex.value = nextIndex;
-        }
+      } else if (nextIndex < shuffledWords.length) {
+        currentIndex.value = nextIndex;
       }
 
       if (nextIndex > maxViewedIndex.value) {
@@ -224,13 +209,29 @@ const TheGame = defineComponent({
       }
     };
 
-    const finish = () => {
-      isFinished.value = true;
-      endTime.value = nowSeconds();
-      if (timer.value) {
-        clearTimeout(timer.value);
-        timer.value = undefined;
+    const shuffleWords = () => {
+      const words = viewWords;
+      if (!words || words.length === 0) {
+        return;
       }
+
+      const indices = [];
+      if (usedWordIndices.size < words.length) {
+        for (let i = 0; i < words.length; i += 1) {
+          if (!usedWordIndices.has(i)) {
+            indices.push(i);
+          }
+        }
+      } else {
+        for (let i = 0; i < words.length; i += 1) {
+          indices.push(i);
+        }
+        usedWordIndices.clear();
+      }
+      const shuffledLeft = shuffle(indices);
+      const shuffledRight = shuffle(Array.from(usedWordIndices.values()));
+      shuffledWords.splice(0);
+      shuffledWords.splice(0, 0, ...shuffledLeft, ...shuffledRight);
     };
 
     const reset = () => {
@@ -246,56 +247,31 @@ const TheGame = defineComponent({
       shuffleWords();
     };
 
-    const shuffleWords = () => {
-      const words = _words;
-      if (!words || words.length === 0) {
-        return;
-      }
+    const updateRemainingSeconds = () => {
+      remainingSeconds.value = endTime.value - nowSeconds();
+    };
 
-      const indices = [];
-      if (usedWordIndices.size < words.length) {
-        for (let i = 0; i < words.length; ++i) {
-          if (!usedWordIndices.has(i)) {
-            indices.push(i);
-          }
-        }
+    const tick = () => {
+      updateRemainingSeconds();
+      if (remainingSeconds.value > 0) {
+        timer.value = setTimeout(() => tick(), 1000);
       } else {
-        for (let i = 0; i < words.length; ++i) {
-          indices.push(i);
-        }
-        usedWordIndices.clear();
+        isFinished.value = true;
       }
-      const shuffledLeft = shuffle(indices);
-      const shuffledRight = shuffle(Array.from(usedWordIndices.values()));
-      shuffledWords.splice(0);
-      shuffledWords.splice(0, 0, ...shuffledLeft, ...shuffledRight);
     };
 
     const start = () => {
       isStarted.value = true;
       endTime.value = nowSeconds() + timeLimit.value;
-      const tick = () => {
-        updateRemainingSeconds();
-        if (remainingSeconds.value > 0) {
-          timer.value = setTimeout(() => tick(), 1000);
-        } else {
-          isFinished.value = true;
-        }
-      };
-
       tick();
     };
 
     const edit = () => {
-      emit("edit-topic");
+      emit('edit-topic');
     };
 
     const goHome = () => {
-      emit("go-home");
-    };
-
-    const updateRemainingSeconds = () => {
-      remainingSeconds.value = endTime.value - nowSeconds();
+      emit('go-home');
     };
 
     const correctWord = () => {
@@ -303,55 +279,42 @@ const TheGame = defineComponent({
       nextWord();
     };
 
-    library.add(
-      faHome,
-      faPlay,
-      faStepForward,
-      faCheck,
-      faUndo,
-      faEdit,
-      faTimes,
-      faShare
-    );
-
     watch(props, () => {
-      _words.splice(0);
+      viewWords.splice(0);
       if (props.words) {
-        _words.splice(0, 0, ...props.words);
+        viewWords.splice(0, 0, ...props.words);
       }
       shuffleWords();
-      _title.value = props.title;
+      viewTitle.value = props.title;
     });
 
-    const currentWord = computed<string>(() =>
-      props.words ? props.words[shuffledWords[currentIndex.value]] : ""
-    );
+    const currentWord = computed<string>(() => (props.words ? props.words[shuffledWords[currentIndex.value]] : ''));
     const results = computed<Word[]>(() => {
-      const results: Word[] = [];
+      const words: Word[] = [];
       if (!props.words) {
-        return results;
+        return words;
       }
 
-      for (let i = 0; i <= maxViewedIndex.value; ++i) {
-        results.push({
+      for (let i = 0; i <= maxViewedIndex.value; i += 1) {
+        words.push({
           word: props.words[shuffledWords[i]],
           isCorrect: false,
         });
       }
 
-      for (const correctIndex of correctIndices) {
-        if (results[correctIndex]) {
-          results[correctIndex].isCorrect = true;
+      correctIndices.forEach((correctIndex) => {
+        if (words[correctIndex]) {
+          words[correctIndex].isCorrect = true;
         }
-      }
+      });
 
-      return results;
+      return words;
     });
 
     const score = computed<number>(() => correctIndices.size);
 
     return {
-      _title,
+      viewTitle,
       share,
       currentWord,
       results,
@@ -369,14 +332,21 @@ const TheGame = defineComponent({
       remainingSeconds,
       isStarted,
       isFinished,
+      // icons
+      faHome,
+      faPlay,
+      faStepForward,
+      faCheck,
+      faUndo,
+      faEdit,
+      faTimes,
+      faShare,
     };
   },
 });
-
-export default TheGame;
 </script>
 
-<style lang="scss">
+<style>
 .overlay {
   position: absolute;
   top: 0;
@@ -384,10 +354,10 @@ export default TheGame;
   width: 100%;
   height: 100%;
   display: flex;
-  .half {
-    height: 100%;
-    flex-grow: 1;
-  }
+}
+.overlay .half {
+  height: 100%;
+  flex-grow: 1;
 }
 @media (orientation: portrait) {
   .overlay {

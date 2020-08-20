@@ -13,17 +13,16 @@ import {
   defineComponent,
   ref,
   reactive,
-  watchEffect,
-} from "@vue/composition-api";
-import { Topic } from "../topic";
+} from 'vue';
+import { Topic } from '../lib/topic';
 import {
   TopicIndex,
   saveTopic,
   loadTopic,
   deleteTopic,
-} from "../lib/TopicStore";
-import TheEditor from "../components/TheEditor.vue";
-import router from "../router";
+} from '../lib/TopicStore';
+import TheEditor from '../components/TheEditor.vue';
+import router from '../router';
 
 interface WordListItem {
   key: number;
@@ -31,7 +30,8 @@ interface WordListItem {
   focus?: boolean;
 }
 
-const Edit = defineComponent({
+export default defineComponent({
+  name: 'Edit',
   components: { TheEditor },
   props: { id: String, storedTopics: Array as { new (): TopicIndex } },
   setup(props, { emit }) {
@@ -39,39 +39,42 @@ const Edit = defineComponent({
       if (props.storedTopics && props.id) {
         return props.storedTopics.find((t) => t.id === props.id);
       }
+
+      return undefined;
     };
+
     const title = ref(getStartingTopic()?.title);
     const words = reactive<string[]>([]);
     const existing = ref(false);
-    const _id = ref(props.id);
+    const topicId = ref(props.id);
 
     const handleSave = async (updatedTopic: Topic) => {
-      _id.value = await saveTopic(updatedTopic, _id.value);
-      emit("load-stored-topics");
+      topicId.value = await saveTopic(updatedTopic, topicId.value);
+      emit('load-stored-topics');
 
       router.push({
-        name: "game-stored-topic",
-        params: { id: _id.value },
+        name: 'game-stored-topic',
+        params: { id: topicId.value },
       });
     };
 
     const handleDelete = async () => {
-      if (!_id.value) return;
+      if (!topicId.value) return;
 
-      await deleteTopic(_id.value);
-      emit("load-stored-topics");
-      router.push({ name: "home" });
+      await deleteTopic(topicId.value);
+      emit('load-stored-topics');
+      router.push({ name: 'home' });
     };
 
     (async () => {
       if (!props.id) {
-        _id.value = "";
+        topicId.value = '';
         return;
       }
 
       const topic = await loadTopic(props.id);
       if (!topic) {
-        _id.value = "";
+        topicId.value = '';
         return;
       }
 
@@ -79,7 +82,7 @@ const Edit = defineComponent({
       words.splice(0);
       words.splice(0, 0, ...topic.words);
       existing.value = true;
-      _id.value = props.id;
+      topicId.value = props.id;
     })();
 
     return {
@@ -91,6 +94,4 @@ const Edit = defineComponent({
     };
   },
 });
-
-export default Edit;
 </script>

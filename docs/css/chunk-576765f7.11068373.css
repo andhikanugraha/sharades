@@ -1,1 +1,0 @@
-.overlay{position:absolute;top:0;left:0;width:100%;height:100%;display:flex}.overlay .half{height:100%;flex-grow:1}@media (orientation:portrait){.overlay{display:none}}

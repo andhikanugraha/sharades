@@ -1,33 +1,39 @@
 <template>
-  <span>
-    <input
-      type="text"
-      ref="input"
-      v-model.trim.lazy="value"
-      @blur="blur"
-      @focus="focus"
-      @keyup="keyup"
-    />
-  </span>
+  <input
+    type="text"
+    ref="input"
+    v-model.trim.lazy="value"
+    @blur="blur"
+    @focus="focus"
+    @keyup="keyup($event)"
+  />
 </template>
 
 <script lang="ts">
-import { defineComponent, watch, ref, onMounted } from "@vue/composition-api";
+import {
+  defineComponent, watch, ref, onMounted, watchEffect,
+} from 'vue';
 
-const VEditorInput = defineComponent({
+export default defineComponent({
+  name: 'VEditorInput',
   props: {
     modelValue: String,
-    index: Number,
+    autoFocus: Boolean,
   },
   setup(props, { emit }) {
     const value = ref(props.modelValue);
     const input = ref<HTMLInputElement>();
-    const blur = () => emit("blur");
-    const focus = () => emit("focus");
-    const keyup = () => emit("keyup");
+    const blur = () => emit('blur');
+    const focus = () => emit('focus');
+    const keyup = (e: KeyboardEvent) => emit('keyup', e);
+    const doDelete = () => emit('delete');
 
-    onMounted(() => input.value?.focus());
-    watch(value, (v) => emit("update:modelValue", v));
+    watchEffect(() => {
+      if (props.autoFocus) {
+        onMounted(() => input.value?.focus());
+      }
+    });
+    watch(value, (v) => emit('update:modelValue', v));
 
     return {
       value,
@@ -35,9 +41,8 @@ const VEditorInput = defineComponent({
       blur,
       focus,
       keyup,
+      doDelete,
     };
   },
 });
-
-export default VEditorInput;
 </script>

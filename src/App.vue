@@ -11,11 +11,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/composition-api";
-import { getBuiltInTopicTitles } from "./topic";
-import { TopicIndex, loadTopicIndex } from "./lib/TopicStore";
+import { defineComponent, ref } from 'vue';
+import { getBuiltInTopicTitles } from './lib/topic';
+import { TopicIndex, loadTopicIndex } from './lib/TopicStore';
 
-const App = defineComponent({
+export default defineComponent({
+  name: 'App',
   setup() {
     const storedTopics = ref<TopicIndex>([]);
     const builtInTopicTitles = ref<string[]>([]);
@@ -47,26 +48,31 @@ const App = defineComponent({
     };
   },
 });
-
-export default App;
 </script>
 
-<style lang="scss">
-$font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-  Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-  "Segoe UI Symbol";
-$font-family-base: "Inter", $font-family-system;
-$font-size-base: 16pt;
-$font-size-secondary: 1.5 * $font-size-base;
-$font-size-tertiary: $font-size-base;
+<style>
+:root {
+  --font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
+  --font-family-base: "Inter", var(--font-family-system);
+  --font-size-base: 16pt;
+  --font-size-secondary: calc(1.5 * var(--font-size-base));
+  --font-size-tertiary: var(--font-size-base);
 
-$spacer: $font-size-secondary / 2;
-$color-background: #1a5d63;
-$color-dark: darken($color-background, 5%);
-$color-foreground: #fef0d5;
-$color-primary: #00beb2;
-$color-secondary: #d81e5b;
-$border-width: 0.2 * $spacer;
+  --spacer: calc(var(--font-size-secondary) / 2);
+  --color-background: #1a5d63;
+  --color-background-dark: #154a4f;
+  --color-background-darker: #0f373b;
+  --color-foreground: #fef0d5;
+  --color-primary: #00beb2;
+  --color-primary-dark: #00a49a;
+  --color-primary-darker: #008b82;
+  --color-secondary: #d81e5b;
+  --color-secondary-dark: #c21b52;
+  --color-secondary-darker: #ab1848;
+  --border-width: calc(0.2 * var(--spacer));
+}
 
 @font-face {
   font-family: "Inter";
@@ -86,9 +92,9 @@ $border-width: 0.2 * $spacer;
 }
 html {
   height: 100%;
-  background: $color-background;
-  color: $color-foreground;
-  font-family: $font-family-base;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-family-base);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   letter-spacing: -0.03em;
@@ -98,11 +104,14 @@ html {
 body {
   margin: 0;
   height: 100%;
-  background: $color-background;
+  background: var(--color-background);
 }
 
+#app {
+  height: 100%;
+}
 .root {
-  background: $color-background;
+  background: var(--color-background);
   display: flex;
   width: 100%;
   height: 100%;
@@ -114,27 +123,27 @@ body {
 .pull-left {
   position: absolute;
   left: 0;
-  font-size: $font-size-secondary;
-  padding: 0 ($spacer * 2);
-  color: $color-primary;
-  &.close-button {
-    color: $color-secondary;
-  }
+  font-size: var(--font-size-secondary);
+  padding: 0 calc(var(--spacer) * 2);
+  color: var(--color-primary);
+}
+.close-button {
+  color: var(--color-secondary);
 }
 .pull-right {
   position: absolute;
   right: 0;
-  color: $color-primary;
-  font-size: $font-size-secondary;
-  padding: 0 ($spacer * 2);
-  svg {
-    margin-left: ($spacer * 2);
-  }
+  color: var(--color-primary);
+  font-size: var(--font-size-secondary);
+  padding: 0 calc(var(--spacer) * 2);
+}
+.pull-right svg {
+  margin-left: calc(var(--spacer) * 2);
 }
 
 header {
-  padding: ($spacer * 2) $spacer;
-  background: darken($color-background, 5%);
+  padding: calc(var(--spacer) * 2) var(--spacer);
+  background: var(--color-background-dark);
 }
 main {
   position: relative;
@@ -151,114 +160,117 @@ nav {
   display: flex;
   flex-direction: row-reverse;
   width: 100%;
+}
+nav p {
+  padding: (var(--spacer) / 2);
+}
 
-  p {
-    padding: ($spacer / 2);
-  }
-
-  @media (orientation: landscape) {
+@media (orientation: landscape) {
+  nav {
     flex-direction: row-reverse;
   }
-  @media (orientation: portrait) {
+}
+@media (orientation: portrait) {
+  nav {
     flex-direction: column;
   }
 }
 
 h1 {
   margin: 0;
-  // font-size will be dynamic using VFit
+  /* font-size will be dynamic using VFit */
 }
 h3 {
   margin: 0;
-  font-size: $font-size-secondary;
-  // font-weight: normal;
+  font-size: var(--font-size-secondary);
 }
 
 #timer {
-  color: $color-primary;
+  color: var(--color-primary);
   font-weight: 400;
 }
 
 p {
   position: relative;
-  margin: ($spacer / 2);
+  margin: calc(var(--spacer) / 2);
   flex-basis: 0;
   flex-grow: 1;
   align-content: center;
-
-  main & {
-    margin: $spacer;
-    flex-grow: 0;
-  }
+}
+main p {
+  margin: var(--spacer);
+  flex-grow: 0;
 }
 
 .item-delete {
   display: block;
   position: absolute;
-  right: $spacer + $border-width;
-  top: $spacer + $border-width;
-  font-size: $font-size-secondary;
-  color: $color-primary;
-  input:focus + & {
-    color: $color-secondary;
-  }
-  button + & {
-    color: $color-dark;
-  }
+  right: calc(var(--spacer) + var(--border-width));
+  top: calc(var(--spacer) + var(--border-width));
+  font-size: var(--font-size-secondary);
+  color: var(--color-primary);
 }
 
-@mixin btn($color) {
-  background-color: $color;
-  color: $color-foreground;
-
-  &:hover {
-    background-color: darken($color, 5%);
-  }
-
-  &:active,
-  &:focus {
-    background-color: darken($color, 10%);
-    border: none;
-  }
+input:focus + .item-delete {
+  color: var(--color-secondary);
+}
+button + .item-delete {
+  color: var(--color-background-dark);
 }
 
 button {
+  --button-color: var(--color-primary);
+  --button-color-hover: var(--color-primary-dark);
+  --button-color-focus: var(--color-primary-darker);
   display: block;
   width: 100%;
-  padding: $spacer;
-  font-family: $font-family-base;
+  padding: var(--spacer);
+  font-family: var(--font-family-base);
   font-weight: bold;
-  font-size: $font-size-secondary;
+  font-size: var(--font-size-secondary);
   line-height: 1;
   border: none;
-  border-radius: ($spacer * 2 + $font-size-secondary) / 2;
+  border-radius: calc((var(--spacer) * 2 + var(--font-size-secondary)) / 2);
   outline: none;
   touch-action: manipulation;
   cursor: pointer;
-  @include btn($color-primary);
   -webkit-appearance: button;
   -webkit-tap-highlight-color: transparent;
+  color: var(--color-foreground);
+  background: var(--button-color);
+}
+button:hover {
+  background-color: var(--button-color-hover);
+}
+button:active, button:focus {
+  background-color: var(--button-color-focus);
+  border: none;
+  outline: 0;
+}
+button::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+button .icon {
+  margin-right: .2em;
+}
 
-  &::-moz-focus-inner {
-    border-style: none;
-    padding: 0;
-  }
+#start, #correct {
+  /* no styles needed; follows primary button color */
 }
-#start,
-#correct {
-  @include btn($color-primary);
-}
-#skip,
-#reset,
-#random {
-  @include btn($color-secondary);
+#skip, #reset, #random {
+  --button-color: var(--color-secondary);
+  --button-color-hover: var(--color-secondary-dark);
+  --butotn-color-focus: var(--color-secondary-darker);
 }
 #create {
-  @include btn($color-dark);
+  --button-color: var(--color-background-dark);
+  --button-color-hover: var(--color-background-darker);
+  --butotn-color-focus: var(--color-background-darker);
 }
 
 .delete-button {
-  color: $color-secondary;
+  color: var(--color-secondary);
 }
 
 input {
@@ -266,75 +278,69 @@ input {
   display: block;
   width: 100%;
   font: inherit;
-  font-size: $font-size-secondary;
+  font-size: var(--font-size-secondary);
   font-weight: bold;
   text-align: center;
-  background: darken($color-background, 5%);
-  color: $color-foreground;
-  border: $border-width solid transparent;
-  padding: $spacer;
+  background: var(--color-background-dark);
+  color: var(--color-foreground);
+  border: var(--border-width) solid transparent;
+  padding: var(--spacer);
   border-radius: 4vmax;
-  &:focus {
-    background: $color-foreground;
-    color: $color-background;
-    border: $border-width solid $color-primary;
-  }
+}
+input:focus {
+  background: var(--color-foreground);
+  color: var(--color-background);
+  border: var(--border-width) solid var(--color-primary);
 }
 
 main > div.scrollable {
-  // position: absolute;
-  // top: 0;
-  // left: 0;
-  // width: 100%;
-  // height: 100%;
   overflow-y: auto;
 }
 
 div.info {
-  margin: ($spacer * 2) 0;
-
-  .label {
-    font-size: $font-size-tertiary;
-    color: $color-primary;
-    padding-bottom: $spacer / 2;
-  }
-  .value {
-    font-weight: bold;
-    font-size: 1.5 * $font-size-secondary;
-    .option {
-      display: inline-block;
-      padding: 0 $spacer;
-      color: $color-primary;
-      &.selected {
-        color: $color-foreground;
-      }
-    }
-  }
+  margin: calc(var(--spacer) * 2) 0;
+}
+div.info .label {
+  font-size: var(--font-size-tertiary);
+  color: var(--color-primary);
+  padding-bottom: calc(var(--spacer) / 2);
+}
+div.info .value {
+  font-weight: bold;
+  font-size: calc(1.5 * var(--font-size-secondary));
+}
+div.info .option {
+  display: inline-block;
+  padding: 0 var(--spacer);
+  color: var(--color-primary);
+}
+div.info .option.selected {
+  color: var(--color-foreground);
 }
 
 ol {
-  margin: 0 $spacer;
-  column-width: 8 * $font-size-tertiary;
-  column-gap: $spacer;
+  margin: 0 var(--spacer);
+  column-width: calc(8 * var(--font-size-tertiary));
+  column-gap: var(--spacer);
   list-style: none outside;
   padding: 0;
-  font-size: $font-size-tertiary;
+  font-size: var(--font-size-tertiary);
 }
 li {
-  padding-bottom: $spacer;
-  color: $color-primary;
+  padding-bottom: var(--spacer);
+  color: var(--color-primary);
   font-weight: bold;
   break-inside: avoid;
 }
 .correct {
-  color: $color-foreground;
+  color: var(--color-foreground);
 }
 
 hr {
   box-sizing: content-box;
   height: 0;
-  margin: $spacer;
-  border: solid $color-dark;
-  border-width: $border-width 0 0 0;
+  margin: var(--spacer);
+  border: solid var(--color-background-dark);
+  border-width: var(--border-width) 0 0 0;
 }
 </style>

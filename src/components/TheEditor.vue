@@ -2,16 +2,16 @@
   <div class="root">
     <header>
       <div class="close-button" @click="cancel">
-        <font-awesome-icon icon="times" fixed-width />
+        <v-icon :icon="faTimes" fixed-width />
       </div>
       <div class="pull-right">
-        <font-awesome-icon
-          icon="trash-alt"
+        <v-icon
+          :icon="faTrashAlt"
           class="delete-button"
           @click="deleteTopic"
           v-if="!isNew"
         />
-        <font-awesome-icon icon="save" @click="save" />
+        <v-icon :icon="faSave" @click="save" />
       </div>
       <h3 v-if="isNew">New Topic</h3>
       <h3 v-else>Edit Topic</h3>
@@ -23,7 +23,7 @@
           <p>
             <input
               type="text"
-              v-model.trim.lazy="_title"
+              v-model.trim.lazy="viewTitle"
               @keyup.enter="addWord"
             />
           </p>
@@ -31,12 +31,11 @@
         <div class="info">
           <div class="label">Words:</div>
           <p v-for="(item, i) in wordList" :key="item.key" class="item">
-            <input
-              type="text"
-              v-model.trim.lazy="item.word"
+            <v-editor-input
+              v-model="item.word"
+              :auto-focus="item.focus"
               @blur="onBlur(i)"
               @focus="onFocus(i)"
-              v-focus="item.focus"
               @keyup.enter="addWord"
             />
             <span class="item-delete" @click="deleteWordAtIndex(i)">
@@ -45,7 +44,7 @@
           </p>
           <p>
             <button @click="addWord">
-              <font-awesome-icon icon="plus" />
+              <v-icon :icon="faPlus" />
             </button>
           </p>
         </div>
@@ -61,20 +60,20 @@ import {
   computed,
   reactive,
   watch,
-} from "@vue/composition-api";
-import { Topic } from "../topic";
+} from 'vue';
 import {
   faSave,
   faPlus,
   faTimes,
   faTimesCircle,
   faTrashAlt,
-} from "@fortawesome/free-solid-svg-icons";
+} from '@fortawesome/free-solid-svg-icons';
 
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { library } from "@fortawesome/fontawesome-svg-core";
+import VIcon from './VIcon.vue';
+import VEditorInput from './VEditorInput.vue';
+import { Topic } from '../lib/topic';
 
-import router from "../router";
+import router from '../router';
 
 interface WordListItem {
   key: number;
@@ -82,44 +81,45 @@ interface WordListItem {
   focus?: boolean;
 }
 
-const TheEditor = defineComponent({
+export default defineComponent({
+  name: 'TheEditor',
   props: {
     title: String,
     words: Array as { new (): string[] },
     id: String,
   },
-  components: { FontAwesomeIcon },
+  components: { VIcon, VEditorInput },
   setup(props, { emit }) {
-    const _title = ref(props.title || "");
+    const viewTitle = ref(props.title || '');
     const wordList = reactive<WordListItem[]>(
-      props.words?.map((word, key) => ({ key, word })) || []
+      props.words?.map((word, key) => ({ key, word })) || [],
     );
     const maxKey = ref<number>(props.words?.length || 0);
     const emptyIndices = reactive(new Set<number>());
-    const _id = ref(props.id || "");
-    const isNew = computed(() => !_id.value);
+    const viewId = ref(props.id || '');
+    const isNew = computed(() => !viewId.value);
 
-    watch(props, (props) => {
-      const words = props.words || [];
+    watch(props, (p) => {
+      const words = p.words || [];
       wordList.splice(0);
       wordList.splice(0, 0, ...words.map((word, key) => ({ key, word })));
       maxKey.value = words.length;
-      _title.value = props.title || "";
+      viewTitle.value = p.title || '';
     });
 
     const cancel = () => {
-      if (_id.value) {
+      if (viewId.value) {
         router.push({
-          name: "game-stored-topic",
-          params: { id: _id.value },
+          name: 'game-stored-topic',
+          params: { id: viewId.value },
         });
       } else {
-        router.push({ name: "home" });
+        router.push({ name: 'home' });
       }
     };
     const addWord = () => {
       wordList.push({
-        word: "",
+        word: '',
         key: maxKey.value,
         focus: true,
       });
@@ -128,35 +128,31 @@ const TheEditor = defineComponent({
     };
     const save = () => {
       const updatedTopic: Topic = {
-        title: _title.value,
+        title: viewTitle.value,
         words: wordList.map((item) => item.word),
       };
-      emit("save", updatedTopic);
+      emit('save', updatedTopic);
     };
     const deleteTopic = () => {
-      emit("delete");
-    };
-    const onBlur = (idx: number) => {
-      if (wordList[idx].word.trim() === "") {
-        emptyIndices.add(idx);
-      }
-    };
-    const onFocus = (idx: number) => {
-      if (emptyIndices.size > 0) {
-        for (let emptyIndex of emptyIndices) {
-          deleteWordAtIndex(emptyIndex);
-        }
-        emptyIndices.clear();
-      }
+      emit('delete');
     };
     const deleteWordAtIndex = (idx: number) => {
       wordList.splice(idx, 1);
     };
-
-    library.add(faSave, faPlus, faTimes, faTimesCircle, faTrashAlt);
+    const onBlur = (idx: number) => {
+      if (wordList[idx].word.trim() === '') {
+        emptyIndices.add(idx);
+      }
+    };
+    const onFocus = () => {
+      if (emptyIndices.size > 0) {
+        emptyIndices.forEach((emptyIndex) => deleteWordAtIndex(emptyIndex));
+        emptyIndices.clear();
+      }
+    };
 
     return {
-      _title,
+      viewTitle,
       wordList,
       maxKey,
       emptyIndices,
@@ -168,18 +164,13 @@ const TheEditor = defineComponent({
       onBlur,
       onFocus,
       deleteWordAtIndex,
+      // icons
+      faSave,
+      faPlus,
+      faTimes,
+      faTimesCircle,
+      faTrashAlt,
     };
   },
-  directives: {
-    focus: {
-      inserted(el, binding) {
-        if (binding.value) {
-          el.focus();
-        }
-      },
-    },
-  },
 });
-
-export default TheEditor;
 </script>

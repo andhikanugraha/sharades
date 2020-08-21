@@ -20,9 +20,10 @@
       <div class="info">
         <div class="label">Title:</div>
         <p>
-          <input
+          <v-editor-input
             type="text"
-            v-model.trim.lazy="viewTitle"
+            v-model="viewTitle"
+            :auto-focus="!existing"
             @keyup.enter="addWord"
           />
         </p>

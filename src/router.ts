@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 const Home = () => import('./views/Home.vue');
 const BuiltInTopic = () => import('./views/BuiltInTopic.vue');
 const StoredTopic = () => import('./views/StoredTopic.vue');
-const NewTopic = () => import('./views/Edit.vue');
+const NewTopic = () => import('./views/NewTopic.vue');
 const Edit = () => import('./views/Edit.vue');
 
 const routes: Array<RouteRecordRaw> = [

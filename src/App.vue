@@ -138,7 +138,6 @@ nav p {
   }
   nav {
     flex-direction: column-reverse;
-    padding-bottom: 10vh;
     padding-bottom: calc(env(safe-area-inset-bottom) + (var(--spacer) * 2));
   }
   nav button {

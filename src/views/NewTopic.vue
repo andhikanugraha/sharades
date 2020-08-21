@@ -16,7 +16,7 @@ import {
 import { useRouter } from 'vue-router';
 import { requestFullscreen } from '../lib/fullscreen';
 import { Topic } from '../lib/topic';
-import { saveTopic, goToTopicPage } from '../lib/TopicStore';
+import { saveTopic, goToTopicPage, clearCache } from '../lib/TopicStore';
 import TheEditor from '../components/TheEditor.vue';
 
 interface WordListItem {
@@ -36,6 +36,7 @@ export default defineComponent({
 
     const handleSave = async (updatedTopic: Topic) => {
       const id = await saveTopic(updatedTopic);
+      console.log(id);
 
       if (id) {
         goToTopicPage(router, id);
@@ -44,6 +45,7 @@ export default defineComponent({
     };
 
     const handleCancel = async () => {
+      clearCache();
       router.push({ name: 'home' });
       await requestFullscreen();
     };

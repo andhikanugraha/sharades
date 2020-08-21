@@ -263,12 +263,12 @@ export default defineComponent({
 
     const share = async () => {
       try {
+        await exitFullscreen(false);
         await navigator.share({
           title: `Sharades: ${viewTitle.value}`,
           text: `Play the topic ${viewTitle.value} on Sharades`,
           url: window.location.toString(),
         });
-        viewTitle.value = props.title;
       } finally {
         // nvm
       }
@@ -286,19 +286,23 @@ export default defineComponent({
       }
     };
 
-    const goHome = () => {
+    const goHome = async () => {
       router.push({ name: 'home' });
+      await exitFullscreen(false);
     };
 
-    const correctWord = throttle((e: MouseEvent) => {
+    const correctWordInner = throttle(() => {
       correctIndices.add(currentIndex.value);
       nextWord();
-      if (e.target) e.target.blur();
-    }, 1000);
+    }, 500);
+    const correctWord = ({ target }: { target: HTMLInputElement }) => {
+      correctWordInner();
+      if (target) target.blur();
+    };
 
-    const skipWord = (e: MouseEvent) => {
+    const skipWord = ({ target }: { target: HTMLInputElement }) => {
       nextWord();
-      if (e.target) e.target.blur();
+      if (target) target.blur();
     }
 
     watch(props, () => {

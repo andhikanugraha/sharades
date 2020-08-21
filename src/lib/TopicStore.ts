@@ -22,15 +22,12 @@ const isInitiallyLoaded = ref(false);
 const topicIndexState = reactive<TopicIndex>([]);
 
 type LoadedTopic = {
-  id: string;
-  topic: Topic;
+  id?: string | null;
+  topic?: Topic | null;
 }
 const loadedTopicCache = reactive<LoadedTopic>({
   id: '',
-  topic: {
-    title: '',
-    words: [],
-  },
+  topic: null,
 });
 
 function replaceTopicIndex(updatedIndex: TopicIndex) {
@@ -208,4 +205,9 @@ export async function goToTopicPage(router: Router, id: string): Promise<void> {
     name: 'game',
     params: { encodedTopic, id },
   });
+}
+
+export function clearCache() {
+  loadedTopicCache.id = null;
+  loadedTopicCache.topic = null;
 }

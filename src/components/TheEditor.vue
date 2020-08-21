@@ -45,8 +45,16 @@
         <p>
           <button @click="addWord">
             <v-icon :icon="faPlus" />
+            Add Word
           </button>
         </p>
+        <p v-if="canSave">
+          <button @click="save">
+            <v-icon :icon="faSave" />
+            Save
+          </button>
+        </p>
+        <p class="label" v-else>You need a title and at least 2 words</p>
       </div>
     </div>
   </main>

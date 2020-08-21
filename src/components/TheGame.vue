@@ -4,10 +4,13 @@
       <div class="close-button" @click="reset">
         <v-icon :icon="faTimes" fixed-width />
       </div>
+      <div class="pull-right">
+        <v-icon :icon="faUndo" @click="playAgain" />
+      </div>
       <h3>Score: {{ score }}</h3>
     </header>
     <main>
-      <div>
+      <div class="scrollable">
         <ol>
           <li v-for="(result, i) in results" :key="i" :class="{ correct: result.isCorrect }">
             <v-icon :icon="result.isCorrect ? faCheck : faTimes" />
@@ -23,7 +26,7 @@
         </button>
       </p>
       <p>
-        <button id="reset" @click="reset">
+        <button id="reset" @click="playAgain">
           <v-icon :icon="faUndo" />Play again
         </button>
       </p>
@@ -303,7 +306,13 @@ export default defineComponent({
     const skipWord = ({ target }: { target: HTMLInputElement }) => {
       nextWord();
       if (target) target.blur();
-    }
+    };
+
+    const playAgain = () => {
+      if (nowSeconds() - endTime.value > 2) {
+        reset();
+      }
+    };
 
     watch(props, () => {
       viewWords.splice(0);
@@ -357,6 +366,7 @@ export default defineComponent({
       skipWord,
       shuffledWords,
       remainingSeconds,
+      playAgain,
       isStarted,
       isFinished,
       canShare,

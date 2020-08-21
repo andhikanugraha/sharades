@@ -129,7 +129,7 @@ nav p {
   }
   header, nav {
     padding-left: calc(env(safe-area-inset-left) + (var(--spacer)));
-    padding-right: calc(env(safe-area-inset-left) + (var(--spacer)))
+    padding-right: calc(env(safe-area-inset-left) + (var(--spacer)));
   }
 }
 @media (orientation: portrait) {
@@ -292,14 +292,12 @@ div.info .option.selected {
 
 ol {
   margin: 0 var(--spacer);
-  column-width: calc(8 * var(--font-size-tertiary));
-  column-gap: var(--spacer);
   list-style: none outside;
   padding: 0;
-  font-size: var(--font-size-tertiary);
 }
 li {
-  padding-bottom: var(--spacer);
+  font-size: var(--font-size-secondary);
+  margin-bottom: var(--spacer);
   color: var(--color-primary);
   font-weight: bold;
   break-inside: avoid;

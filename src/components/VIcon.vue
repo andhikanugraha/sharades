@@ -39,7 +39,7 @@ export default defineComponent({
     const viewBox = computed(() => `0 0 ${icon[0]} ${icon[1]}`);
     const svgPathData = computed(() => icon[4]);
 
-    const combinedClass = computed(() => `${props.class} icon ${props.fixedWidth && 'fw'}`);
+    const combinedClass = computed(() => `${props.class || ''} icon`.trim());
 
     return {
       prefix,

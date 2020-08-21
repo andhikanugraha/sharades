@@ -23,7 +23,7 @@
           <v-editor-input
             type="text"
             v-model="viewTitle"
-            :auto-focus="!existing"
+            :auto-focus="isNew"
             @keyup.enter="addWord"
           />
         </p>

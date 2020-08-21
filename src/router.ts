@@ -1,9 +1,10 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 
-const Home = () => import(/* webpackChunkName: "home" */ './views/Home.vue');
-const BuiltInTopic = () => import(/* webpackChunkName: "built-in" */ './views/BuiltInTopic.vue');
-const StoredTopic = () => import(/* webpackChunkName: "by-string" */ './views/StoredTopic.vue');
-const Edit = () => import(/* webpackChunkName: "edit" */ './views/Edit.vue');
+const Home = () => import('./views/Home.vue');
+const BuiltInTopic = () => import('./views/BuiltInTopic.vue');
+const StoredTopic = () => import('./views/StoredTopic.vue');
+const NewTopic = () => import('./views/Edit.vue');
+const Edit = () => import('./views/Edit.vue');
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -26,7 +27,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/e',
     name: 'edit-new',
-    component: Edit,
+    component: NewTopic,
     props: true,
   },
   {

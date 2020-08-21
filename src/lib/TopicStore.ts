@@ -21,6 +21,18 @@ type DeflatedWordsBuffer = Uint8Array;
 const isInitiallyLoaded = ref(false);
 const topicIndexState = reactive<TopicIndex>([]);
 
+type LoadedTopic = {
+  id: string;
+  topic: Topic;
+}
+const loadedTopicCache = reactive<LoadedTopic>({
+  id: '',
+  topic: {
+    title: '',
+    words: [],
+  },
+});
+
 function replaceTopicIndex(updatedIndex: TopicIndex) {
   topicIndexState.splice(0);
   topicIndexState.splice(0, 0, ...updatedIndex);
@@ -53,12 +65,16 @@ export async function saveTopicIndex(updatedIndex: TopicIndex): Promise<void> {
     await store.setItem<TopicIndex>(KEY_INDEX, updatedIndex);
     replaceTopicIndex(updatedIndex);
   } else {
+    loadedTopicCache.id = '';
     store.clear();
   }
 }
 
 export async function loadTopic(id: string): Promise<Topic | null> {
-  const { inflateTopicWords } = await import('./TopicEncoding');
+  if (loadedTopicCache.id === id && loadedTopicCache.topic) {
+    return loadedTopicCache.topic;
+  }
+
   let title = '';
   let words: string[] = [];
   const topicIndex = await loadTopicIndex();
@@ -77,10 +93,14 @@ export async function loadTopic(id: string): Promise<Topic | null> {
   }
 
   try {
+    const { inflateTopicWords } = await import('./TopicEncoding');
     words = await inflateTopicWords(deflatedWordsBuffer);
   } catch {
     return null;
   }
+
+  loadedTopicCache.id = id;
+  loadedTopicCache.topic = { title, words };
 
   return {
     title,
@@ -112,22 +132,26 @@ export async function saveTopic(topicObj: Topic, id?: string): Promise<string> {
   const wordsBuffer = await deflateTopicWords(words);
   const topicIndex = await loadTopicIndex();
 
+  let newId = '';
   if (id) {
+    // existing topic
     await store.setItem(id, wordsBuffer);
     const key = topicIndex.findIndex((t) => t.id === id);
     topicIndex[key].title = title;
-    saveTopicIndex(topicIndex);
-    return id;
+  } else {
+    // new topic
+    newId = generateRandomId();
+    await store.setItem(newId, wordsBuffer);
+    topicIndex.push({
+      id: newId,
+      title,
+    });
   }
-  const newId = generateRandomId();
-  await store.setItem(newId, wordsBuffer);
-  topicIndex.push({
-    id: newId,
-    title,
-  });
-  saveTopicIndex(topicIndex);
 
-  return newId;
+  loadedTopicCache.id = id || newId;
+  loadedTopicCache.topic = { title, words };
+  saveTopicIndex(topicIndex);
+  return id || newId;
 }
 
 export async function deleteTopic(id: string): Promise<void> {
@@ -139,6 +163,8 @@ export async function deleteTopic(id: string): Promise<void> {
     topicIndex.findIndex((t) => t.id === id),
     1,
   );
+
+  loadedTopicCache.id = '';
   saveTopicIndex(topicIndex);
 }
 

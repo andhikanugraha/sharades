@@ -2,7 +2,7 @@
   <the-editor
     :title="title"
     :words="words"
-    :id="id"
+    :id="topicId"
     @save="handleSave"
     @delete="handleDelete"
     @cancel="handleCancel"
@@ -19,7 +19,7 @@ import {
 import { useRouter } from 'vue-router';
 import { Topic } from '../lib/topic';
 import {
-  TopicIndex,
+  useTopicIndex,
   saveTopic,
   loadTopic,
   deleteTopic,
@@ -36,53 +36,34 @@ interface WordListItem {
 export default defineComponent({
   name: 'Edit',
   components: { TheEditor },
-  props: { id: String, storedTopics: Array as { new (): TopicIndex } },
+  props: {
+    id: {
+      type: String,
+      required: true,
+    },
+  },
   setup(props) {
     const router = useRouter();
 
-    const getStartingTopic = () => {
-      if (props.storedTopics && props.id) {
-        return props.storedTopics.find((t) => t.id === props.id);
-      }
-
-      return undefined;
-    };
-
-    const title = ref(getStartingTopic()?.title);
+    const storedTopics = useTopicIndex();
+    const title = ref(storedTopics.find((t) => t.id === props.id)?.title || '');
     const words = reactive<string[]>([]);
     const existing = ref(false);
     const topicId = ref(props.id);
 
     const handleSave = async (updatedTopic: Topic) => {
-      const id = await saveTopic(updatedTopic, topicId.value);
-
-      if (id) {
-        topicId.value = id;
-        goToTopicPage(router, topicId.value);
-      }
+      await saveTopic(updatedTopic, topicId.value);
+      goToTopicPage(router, topicId.value);
     };
 
     const handleDelete = async () => {
-      if (!topicId.value) return;
-
       await deleteTopic(topicId.value);
       router.push({ name: 'home' });
     };
 
-    const handleCancel = () => {
-      if (topicId.value) {
-        goToTopicPage(router, topicId.value);
-      } else {
-        router.push({ name: 'home' });
-      }
-    };
+    const handleCancel = () => goToTopicPage(router, topicId.value);
 
     watchEffect(async () => {
-      if (!props.id) {
-        topicId.value = '';
-        return;
-      }
-
       const topic = await loadTopic(props.id);
       if (!topic) {
         topicId.value = '';
@@ -99,7 +80,7 @@ export default defineComponent({
     return {
       title,
       words,
-      existing,
+      topicId,
       handleSave,
       handleDelete,
       handleCancel,

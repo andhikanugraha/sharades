@@ -1,3 +1,14 @@
+<template>
+  <the-game
+    title="..."
+    :words="['']"
+    :is-editable="false"
+    @edit-topic="goEdit"
+    @go-home="goHome"
+  />
+</template>
+
+<script lang="ts">
 import {
   defineComponent, watchEffect, PropType,
 } from 'vue';
@@ -45,3 +56,5 @@ export default defineComponent({
     return () => null;
   },
 });
+
+</script>

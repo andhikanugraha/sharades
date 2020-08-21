@@ -1,10 +1,10 @@
-import { createInstance as createStore } from 'localforage';
+import localForage from 'localforage';
 import { Topic } from './topic';
 
 const KEY_INDEX = '_index';
 
 async function getStore(): Promise<LocalForage> {
-  return createStore({
+  return localForage.createInstance({
     name: 'charades',
   });
 }
@@ -26,7 +26,7 @@ export async function loadTopicIndex(): Promise<TopicIndex> {
   return index;
 }
 
-export async function saveTopicIndex(newTopicIndex: TopicIndex) {
+export async function saveTopicIndex(newTopicIndex: TopicIndex): Promise<TopicIndex | void> {
   const store = await getStore();
   if (newTopicIndex.length > 0) {
     return store.setItem<TopicIndex>(KEY_INDEX, newTopicIndex);

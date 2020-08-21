@@ -1,4 +1,4 @@
-export function btoaUrl(binaryArray: Uint8Array) {
+export function btoaUrl(binaryArray: Uint8Array): string {
   const binaryString = String.fromCharCode(...binaryArray);
 
   return btoa(binaryString)
@@ -7,7 +7,7 @@ export function btoaUrl(binaryArray: Uint8Array) {
     .replace(/=+$/, '');
 }
 
-export function atobUrl(asciiString: string) {
+export function atobUrl(asciiString: string): Uint8Array {
   const binaryString = atob(asciiString.replace(/-/g, '+').replace(/_/g, '/'));
   const buffer = new Uint8Array(binaryString.length);
   for (let i = 0; i < binaryString.length; i += 1) {

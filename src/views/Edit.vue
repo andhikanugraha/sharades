@@ -13,6 +13,7 @@ import {
   defineComponent,
   ref,
   reactive,
+  watchEffect,
 } from 'vue';
 import { useRouter } from 'vue-router';
 import { Topic } from '../lib/topic';
@@ -68,7 +69,7 @@ export default defineComponent({
       router.push({ name: 'home' });
     };
 
-    (async () => {
+    watchEffect(async () => {
       if (!props.id) {
         topicId.value = '';
         return;

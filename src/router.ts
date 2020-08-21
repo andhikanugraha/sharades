@@ -3,7 +3,7 @@ import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 const Home = () => import(/* webpackChunkName: "home" */ './views/Home.vue');
 const GameBuiltIn = () => import(/* webpackChunkName: "built-in" */ './views/GameBuiltIn.vue');
 const GameByEncodedTopic = () => import(/* webpackChunkName: "by-string" */ './views/GameByEncodedTopic.vue');
-const GameById = () => import(/* webpackChunkName: "by-id" */ './views/GameById');
+const GameById = () => import(/* webpackChunkName: "by-id" */ './views/GameById.vue');
 const Edit = () => import(/* webpackChunkName: "edit" */ './views/Edit.vue');
 
 const routes: Array<RouteRecordRaw> = [

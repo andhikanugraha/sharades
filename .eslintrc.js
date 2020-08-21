@@ -1,24 +1,50 @@
 module.exports = {
-  root: true,
   env: {
-    node: true,
+    browser: true,
+    es6: true,
   },
   extends: [
+    'airbnb-base',
     'plugin:vue/vue3-essential',
-    '@vue/airbnb',
-    '@vue/typescript/recommended',
+    'plugin:@typescript-eslint/recommended',
+    'plugin:import/typescript',
   ],
+  globals: {
+    Atomics: 'readonly',
+    SharedArrayBuffer: 'readonly',
+  },
+  parser: 'vue-eslint-parser',
   parserOptions: {
     ecmaVersion: 2020,
+    parser: '@typescript-eslint/parser',
+    sourceType: 'module',
+  },
+  plugins: [
+    'vue',
+    '@typescript-eslint',
+  ],
+  ignorePatterns: [
+    'dist/**',
+    'docs/**',
+  ],
+  settings: {
+    'import/extensions': [
+      '.js',
+      '.jsx',
+      '.mjs',
+      '.ts',
+      '.tsx',
+    ],
   },
   rules: {
+    'import/extensions': ['error', 'ignorePackages', {
+      js: 'never',
+      mjs: 'never',
+      jsx: 'never',
+      ts: 'never',
+      tsx: 'never',
+    }],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
   },
-  overrides: [
-    {
-      files: ['*.ts'],
-      parser: '@typescript-eslint/parser',
-    },
-  ],
 };

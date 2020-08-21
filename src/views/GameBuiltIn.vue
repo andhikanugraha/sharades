@@ -36,24 +36,22 @@ export default defineComponent({
       router.replace({ name: 'home' });
     };
 
-    watchEffect(
-      async (): Promise<void> => {
-        const { builtInTopicTitle } = props;
-        if (!builtInTopicTitle) {
-          notFound();
-          return;
-        }
+    watchEffect(async () => {
+      const { builtInTopicTitle } = props;
+      if (!builtInTopicTitle) {
+        notFound();
+        return;
+      }
 
-        const topic = await getBuiltInTopicByTitle(builtInTopicTitle);
-        if (!topic) {
-          notFound();
-          return;
-        }
+      const topic = await getBuiltInTopicByTitle(builtInTopicTitle);
+      if (!topic) {
+        notFound();
+        return;
+      }
 
-        title.value = topic.title;
-        words.value = topic.words;
-      },
-    );
+      title.value = topic.title;
+      words.value = topic.words;
+    });
 
     return {
       title,

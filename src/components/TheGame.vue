@@ -109,7 +109,7 @@ import {
   faTimes,
   faShare,
 } from '@fortawesome/free-solid-svg-icons';
-import shuffle from 'lodash/shuffle';
+import { shuffle } from 'lodash-es';
 import VIcon from './VIcon.vue';
 
 import VFit from './VFit.vue';
@@ -147,7 +147,7 @@ export default defineComponent({
     const remainingSeconds = ref(0);
     const isFinished = ref(false);
     const timeLimit = ref(60);
-    const timer = ref<number | undefined>();
+    const timer = ref<NodeJS.Timeout | undefined>();
 
     const setTimeLimit = (newTimeLimit: number) => {
       timeLimit.value = newTimeLimit;

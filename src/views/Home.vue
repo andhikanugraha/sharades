@@ -102,7 +102,5 @@ export default defineComponent({
 #app:fullscreen #expand {
   display: none;
 }
-#app:not(:fullscreen) #compress {
-  display: none;
-}
+/* the inverse styles are defined in index.html due to minifier bug */
 </style>

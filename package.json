@@ -3,9 +3,10 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
+    "lint": "eslint --fix . src/**",
     "serve": "vite",
-    "build": "vite build && workbox generateSW workbox-config.js",
-    "lint": "eslint --fix . src/**"
+    "build": "vite build --assetsDir assets && workbox generateSW workbox-config.js",
+    "deploy": "npm run build && netlify deploy -d dist"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
@@ -25,6 +26,7 @@
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-vue": "^7.0.0-beta.2",
+    "netlify-cli": "^2.59.1",
     "typescript": "~3.9.3",
     "vite": "^1.0.0-rc.4",
     "workbox-cli": "^5.1.3"

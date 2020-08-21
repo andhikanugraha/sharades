@@ -14,7 +14,7 @@ export default defineComponent({});
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol";
   --font-family-base: "Inter", var(--font-family-system);
-  --font-size-base: 16pt;
+  --font-size-base: 1rem;
   --font-size-secondary: calc(1.5 * var(--font-size-base));
   --font-size-tertiary: var(--font-size-base);
 
@@ -70,7 +70,6 @@ body {
   display: flex;
   width: 100%;
   height: 100%;
-  margin-top: env(safe-area-inset-top);
   flex-direction: column;
   text-align: center;
 }
@@ -125,11 +124,17 @@ nav p {
 }
 
 @media (orientation: landscape) {
+  header {
+    padding: var(--spacer);
+  }
   nav {
     flex-direction: row-reverse;
   }
 }
 @media (orientation: portrait) {
+  #app:fullscreen header {
+    padding-top: calc(env(safe-area-inset-top) + (var(--spacer) * 2));
+  }
   nav {
     flex-direction: column;
   }

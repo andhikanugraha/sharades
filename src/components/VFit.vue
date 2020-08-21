@@ -13,9 +13,10 @@ export default defineComponent({
   },
   setup(props) {
     const fontSize = computed(() => {
-      const width = (props.width || 100) * 1.3;
+      const zoom = 1.1;
+      const width = (props.width || 100);
       const characters = props.text?.length || 1;
-      const size: number = Math.min(Math.max(width / characters, 8), 22);
+      const size: number = Math.min(Math.max(width / characters, 8), 22) * zoom;
       return `${size}vw`;
     });
 

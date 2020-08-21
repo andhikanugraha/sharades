@@ -2,9 +2,7 @@
   <the-game
     :title="title"
     :words="words"
-    :is-editable="isEditable"
-    @edit-topic="goEdit"
-    @go-home="goHome"
+    :id="topicId"
   />
 </template>
 
@@ -27,7 +25,7 @@ export default defineComponent({
     encodedTopic: String,
     storedTopics: Array as PropType<TopicIndex>,
   },
-  setup(props, { emit }) {
+  setup(props) {
     const router = useRouter();
     const getStartingTitle = () => {
       if (props.storedTopics && props.id) {
@@ -38,21 +36,7 @@ export default defineComponent({
     };
     const title = ref(getStartingTitle() || '\xa0');
     const words = ref<string[]>([]);
-    const isEditable = ref(true);
     const topicId = ref(props.id);
-
-    const goHome = () => {
-      router.push({
-        name: 'home',
-      });
-    };
-
-    const goEdit = () => {
-      router.push({
-        name: 'edit',
-        params: { id: topicId.value || '' },
-      });
-    };
 
     const notFound = () => {
       router.replace({ name: 'home' });
@@ -77,7 +61,6 @@ export default defineComponent({
             let theId = await findTopicId(topic);
             if (!theId) {
               theId = await saveTopic(topic);
-              emit('load-stored-topics');
             }
             topicId.value = theId;
           }
@@ -92,9 +75,7 @@ export default defineComponent({
     return {
       title,
       words,
-      isEditable,
-      goHome,
-      goEdit,
+      topicId,
     };
   },
 });

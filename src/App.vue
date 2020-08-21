@@ -1,54 +1,11 @@
 <template>
-  <router-view
-    :stored-topics="storedTopics"
-    :built-in-topic-titles="builtInTopicTitles"
-    :is-full-screen="isFullScreen"
-    @load-built-in-topics="loadBuiltInTopics"
-    @load-stored-topics="loadStoredTopics"
-    @request-full-screen="requestFullScreen"
-    @exit-full-screen="exitFullScreen"
-  />
+  <router-view/>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import type { TopicIndex } from './lib/TopicStore';
+import { defineComponent } from 'vue';
 
-export default defineComponent({
-  name: 'App',
-  setup() {
-    const storedTopics = ref<TopicIndex>([]);
-    const builtInTopicTitles = ref<string[]>([]);
-    const isFullScreen = ref(false);
-
-    const loadBuiltInTopics = async () => {
-      const { getBuiltInTopicTitles } = await import('./lib/topic');
-      builtInTopicTitles.value = await getBuiltInTopicTitles();
-    };
-    const loadStoredTopics = async () => {
-      const { loadTopicIndex } = await import('./lib/TopicStore');
-      storedTopics.value = await loadTopicIndex();
-    };
-    const requestFullScreen = async () => {
-      await document.body.requestFullscreen();
-      isFullScreen.value = true;
-    };
-    const exitFullScreen = async () => {
-      await document.exitFullscreen();
-      isFullScreen.value = false;
-    };
-
-    return {
-      storedTopics,
-      builtInTopicTitles,
-      isFullScreen,
-      loadBuiltInTopics,
-      loadStoredTopics,
-      requestFullScreen,
-      exitFullScreen,
-    };
-  },
-});
+export default defineComponent({});
 </script>
 
 <style>
@@ -113,8 +70,12 @@ body {
   display: flex;
   width: 100%;
   height: 100%;
+  margin-top: env(safe-area-inset-top);
   flex-direction: column;
   text-align: center;
+}
+#app::backdrop {
+  background: var(--color-background);
 }
 
 .close-button,
@@ -288,6 +249,7 @@ input {
   border-radius: 4vmax;
 }
 input:focus {
+  outline: 0;
   background: var(--color-foreground);
   color: var(--color-background);
   border: var(--border-width) solid var(--color-primary);

@@ -35,7 +35,7 @@ export default defineComponent({
   name: 'Edit',
   components: { TheEditor },
   props: { id: String, storedTopics: Array as { new (): TopicIndex } },
-  setup(props, { emit }) {
+  setup(props) {
     const router = useRouter();
 
     const getStartingTopic = () => {
@@ -53,7 +53,6 @@ export default defineComponent({
 
     const handleSave = async (updatedTopic: Topic) => {
       topicId.value = await saveTopic(updatedTopic, topicId.value);
-      emit('load-stored-topics');
 
       router.push({
         name: 'game-stored-topic',
@@ -65,7 +64,6 @@ export default defineComponent({
       if (!topicId.value) return;
 
       await deleteTopic(topicId.value);
-      emit('load-stored-topics');
       router.push({ name: 'home' });
     };
 

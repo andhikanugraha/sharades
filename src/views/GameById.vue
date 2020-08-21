@@ -2,9 +2,6 @@
   <the-game
     title="..."
     :words="['']"
-    :is-editable="false"
-    @edit-topic="goEdit"
-    @go-home="goHome"
   />
 </template>
 

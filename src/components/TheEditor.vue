@@ -87,6 +87,10 @@ export default defineComponent({
     words: Array as { new (): string[] },
     id: String,
   },
+  emits: {
+    save: (topic: Topic) => !!topic,
+    delete: () => true,
+  },
   components: { VIcon, VEditorInput },
   setup(props, { emit }) {
     const router = useRouter();

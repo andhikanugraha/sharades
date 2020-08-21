@@ -1,3 +1,4 @@
+import { ref, reactive } from 'vue';
 import localForage from 'localforage';
 import { Topic } from './topic';
 
@@ -16,22 +17,43 @@ export type TopicIndex = {
 
 type DeflatedWordsBuffer = Uint8Array;
 
+const isInitiallyLoaded = ref(false);
+const topicIndexState = reactive<TopicIndex>([]);
+
+function replaceTopicIndex(updatedIndex: TopicIndex) {
+  topicIndexState.splice(0);
+  topicIndexState.splice(0, 0, ...updatedIndex);
+}
+
 export async function loadTopicIndex(): Promise<TopicIndex> {
   const store = await getStore();
-  const index = await store.getItem<TopicIndex>(KEY_INDEX);
-  if (!index) {
+  const loadedIndex = await store.getItem<TopicIndex>(KEY_INDEX);
+  if (!loadedIndex) {
+    await store.clear();
     return [];
   }
 
-  return index;
+  replaceTopicIndex(loadedIndex);
+  return loadedIndex;
 }
 
-export async function saveTopicIndex(newTopicIndex: TopicIndex): Promise<TopicIndex | void> {
-  const store = await getStore();
-  if (newTopicIndex.length > 0) {
-    return store.setItem<TopicIndex>(KEY_INDEX, newTopicIndex);
+export function useTopicIndex(): TopicIndex {
+  if (!isInitiallyLoaded.value) {
+    loadTopicIndex().then(() => {
+      isInitiallyLoaded.value = true;
+    });
   }
-  return store.clear();
+  return topicIndexState;
+}
+
+export async function saveTopicIndex(updatedIndex: TopicIndex): Promise<void> {
+  const store = await getStore();
+  if (updatedIndex.length > 0) {
+    await store.setItem<TopicIndex>(KEY_INDEX, updatedIndex);
+    replaceTopicIndex(updatedIndex);
+  } else {
+    store.clear();
+  }
 }
 
 export async function loadTopic(id: string): Promise<Topic | null> {

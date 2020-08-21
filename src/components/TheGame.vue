@@ -62,8 +62,8 @@
         <v-icon :icon="faHome" />
       </div>
       <div class="pull-right">
-        <v-icon @click="edit" :icon="faEdit" v-if="isEditable" />
-        <v-icon @click="share" :icon="faShare" />
+        <v-icon v-if="isEditable" @click="edit" :icon="faEdit" />
+        <v-icon v-if="canShare" @click="share($event)" :icon="faShare" />
       </div>
       <h3>Sharades</h3>
     </header>
@@ -97,8 +97,9 @@
 
 <script lang="ts">
 import {
-  defineComponent, ref, reactive, watch, computed,
+  defineComponent, ref, reactive, watch, computed, PropType,
 } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   faHome,
   faPlay,
@@ -111,7 +112,6 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { shuffle } from 'lodash-es';
 import VIcon from './VIcon.vue';
-
 import VFit from './VFit.vue';
 
 interface Word {
@@ -130,13 +130,16 @@ export default defineComponent({
     VIcon,
   },
   props: {
-    isEditable: Boolean,
-    words: Array as { new (): string[] },
     title: String,
+    words: Array as PropType<string[]>,
+    id: String,
   },
-  setup(props, { emit }) {
+  setup(props) {
+    const router = useRouter();
+
     const viewTitle = ref(props.title);
     const viewWords = reactive(props.words || []);
+
     const isStarted = ref(false);
     const endTime = ref(nowSeconds());
     const shuffledWords = reactive<number[]>([]);
@@ -151,17 +154,6 @@ export default defineComponent({
 
     const setTimeLimit = (newTimeLimit: number) => {
       timeLimit.value = newTimeLimit;
-    };
-
-    const share = () => {
-      try {
-        (navigator as Navigator).share({
-          title: `Sharades: ${viewTitle.value}`,
-          url: window.location.toString(),
-        });
-      } finally {
-        // do nothing
-      }
     };
 
     const finish = () => {
@@ -266,12 +258,34 @@ export default defineComponent({
       tick();
     };
 
+    const canShare = computed(() => !!navigator.share);
+
+    const share = async () => {
+      try {
+        await navigator.share({
+          title: `Sharades: ${viewTitle.value}`,
+          text: `Play the topic ${viewTitle.value} on Sharades`,
+          url: window.location.toString(),
+        });
+        viewTitle.value = props.title;
+      } finally {
+        // nvm
+      }
+    };
+
+    const isEditable = computed(() => !!props.id);
+
     const edit = () => {
-      emit('edit-topic');
+      if (props.id) {
+        router.push({
+          name: 'edit',
+          params: { id: props.id },
+        });
+      }
     };
 
     const goHome = () => {
-      emit('go-home');
+      router.push({ name: 'home' });
     };
 
     const correctWord = () => {
@@ -315,7 +329,6 @@ export default defineComponent({
 
     return {
       viewTitle,
-      share,
       currentWord,
       results,
       score,
@@ -325,6 +338,7 @@ export default defineComponent({
       finish,
       reset,
       start,
+      isEditable,
       edit,
       goHome,
       correctWord,
@@ -332,6 +346,8 @@ export default defineComponent({
       remainingSeconds,
       isStarted,
       isFinished,
+      canShare,
+      share,
       // icons
       faHome,
       faPlay,

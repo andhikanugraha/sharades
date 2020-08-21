@@ -2,8 +2,6 @@
   <the-game
     :title="title"
     :words="words"
-    :is-editable="false"
-    @go-home="goHome"
   />
 </template>
 
@@ -20,21 +18,14 @@ export default defineComponent({
   components: { TheGame },
   props: {
     builtInTopicTitle: String,
+    isFullScreen: Boolean,
   },
   setup(props) {
     const router = useRouter();
     const title = ref(props.builtInTopicTitle || '\xa0');
     const words = ref<string[]>([]);
 
-    const goHome = () => {
-      router.push({
-        name: 'home',
-      });
-    };
-
-    const notFound = () => {
-      router.replace({ name: 'home' });
-    };
+    const notFound = () => router.replace({ name: 'home' });
 
     watchEffect(async () => {
       const { builtInTopicTitle } = props;
@@ -56,7 +47,6 @@ export default defineComponent({
     return {
       title,
       words,
-      goHome,
     };
   },
 });

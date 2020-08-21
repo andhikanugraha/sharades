@@ -1,16 +1,14 @@
 <template>
   <header>
     <div class="pull-left">
-      <v-icon
-        class="expand-button"
+      <span id="expand"><v-icon
         :icon="faExpand"
         @click="requestFullscreen"
-      />
-      <v-icon
-        class="compress-button"
+      /></span>
+      <span id="compress"><v-icon
         :icon="faCompress"
         @click="exitFullscreen"
-      />
+      /></span>
     </div>
     <h3>Sharades</h3>
   </header>
@@ -42,51 +40,34 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watchEffect } from 'vue';
+import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
 import VIcon from '../components/VIcon.vue';
-import type { TopicIndex } from '../lib/TopicStore';
+import { useBuiltInTopicTitles } from '../lib/topic';
+import { useTopicIndex } from '../lib/TopicStore';
+import { requestFullscreen, exitFullscreen } from '../lib/fullscreen';
 
 export default defineComponent({
   name: 'Home',
   components: {
     VIcon,
   },
-  props: {
-    storedTopics: Array as { new (): TopicIndex },
-    builtInTopicTitles: Array as { new (): string[] },
-    isFullScreen: Boolean,
-  },
-  setup(props, { emit }) {
+  setup() {
     const router = useRouter();
-    const autoFullScreen = ref(props.isFullScreen);
+    const storedTopics = useTopicIndex();
+    const builtInTopicTitles = useBuiltInTopicTitles();
 
-    const requestFullscreen = () => {
-      emit('request-full-screen');
-    };
-
-    const exitFullscreen = () => {
-      autoFullScreen.value = false;
-      emit('exit-full-screen');
-    };
-
-    const openBuiltInTopic = (topicTitle: string) => {
-      if (autoFullScreen.value) {
-        requestFullscreen();
-      }
+    const openBuiltInTopic = (builtInTopicTitle: string) => {
+      requestFullscreen(false);
       router.push({
         name: 'game-built-in',
-        params: {
-          builtInTopicTitle: topicTitle,
-        },
+        params: { builtInTopicTitle },
       });
     };
 
     const openStoredTopic = (id: string) => {
-      if (autoFullScreen.value) {
-        requestFullscreen();
-      }
+      requestFullscreen(false);
       router.push({
         name: 'game-stored-topic',
         params: { id },
@@ -94,31 +75,19 @@ export default defineComponent({
     };
 
     const createNewTopic = () => {
-      router.push({
-        name: 'edit-new',
-      });
+      router.push({ name: 'edit-new' });
     };
 
     const openRandomTopic = () => {
-      if (!props.builtInTopicTitles) {
-        return;
-      }
       const randomIndex = Math.round(
-        Math.random() * (props.builtInTopicTitles.length - 1),
+        Math.random() * (builtInTopicTitles.length - 1),
       );
-      openBuiltInTopic(props.builtInTopicTitles[randomIndex]);
+      openBuiltInTopic(builtInTopicTitles[randomIndex]);
     };
 
-    watchEffect(() => {
-      if (!props.builtInTopicTitles || props.builtInTopicTitles.length === 0) {
-        emit('load-built-in-topics');
-        emit('load-stored-topics');
-        autoFullScreen.value = true;
-      }
-    });
-
     return {
-      autoFullScreen,
+      storedTopics,
+      builtInTopicTitles,
       createNewTopic,
       requestFullscreen,
       exitFullscreen,
@@ -133,10 +102,10 @@ export default defineComponent({
 </script>
 
 <style>
-:fullscreen .expand-button {
+#app:fullscreen #expand {
   display: none;
 }
-body:not(:fullscreen) .compress-button {
+#app:not(:fullscreen) #compress {
   display: none;
 }
 </style>

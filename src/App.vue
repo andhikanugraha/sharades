@@ -124,19 +124,25 @@ nav p {
 }
 
 @media (orientation: landscape) {
-  header {
-    padding: var(--spacer);
-  }
   nav {
     flex-direction: row-reverse;
   }
+  header, nav {
+    padding-left: calc(env(safe-area-inset-left) + (var(--spacer)));
+    padding-right: calc(env(safe-area-inset-left) + (var(--spacer)))
+  }
 }
 @media (orientation: portrait) {
-  #app:fullscreen header {
+  header {
     padding-top: calc(env(safe-area-inset-top) + (var(--spacer) * 2));
   }
   nav {
-    flex-direction: column;
+    flex-direction: column-reverse;
+    padding-bottom: 10vh;
+    padding-bottom: calc(env(safe-area-inset-bottom) + (var(--spacer) * 2));
+  }
+  nav button {
+    padding: calc(var(--spacer) * 2) calc(var(--spacer));
   }
 }
 
@@ -227,12 +233,12 @@ button .icon {
 #skip, #reset, #random {
   --button-color: var(--color-secondary);
   --button-color-hover: var(--color-secondary-dark);
-  --butotn-color-focus: var(--color-secondary-darker);
+  --button-color-focus: var(--color-secondary-darker);
 }
 #create {
   --button-color: var(--color-background-dark);
   --button-color-hover: var(--color-background-darker);
-  --butotn-color-focus: var(--color-background-darker);
+  --button-color-focus: var(--color-background-darker);
 }
 
 .delete-button {

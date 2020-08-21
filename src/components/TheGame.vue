@@ -44,12 +44,12 @@
       <v-fit :text="currentWord" />
     </main>
     <nav>
-      <p @click="correctWord">
+      <p @click="correctWord($event)">
         <button id="correct">
           <v-icon :icon="faCheck" />Correct
         </button>
       </p>
-      <p @click="nextWord">
+      <p @click="skipWord($event)">
         <button id="skip">
           <v-icon :icon="faStepForward" />Skip
         </button>
@@ -110,7 +110,8 @@ import {
   faTimes,
   faShare,
 } from '@fortawesome/free-solid-svg-icons';
-import { shuffle } from 'lodash-es';
+import { shuffle, throttle } from 'lodash-es';
+import { exitFullscreen } from '../lib/fullscreen';
 import VIcon from './VIcon.vue';
 import VFit from './VFit.vue';
 
@@ -277,6 +278,7 @@ export default defineComponent({
 
     const edit = () => {
       if (props.id) {
+        exitFullscreen(false);
         router.push({
           name: 'edit',
           params: { id: props.id },
@@ -288,10 +290,16 @@ export default defineComponent({
       router.push({ name: 'home' });
     };
 
-    const correctWord = () => {
+    const correctWord = throttle((e: MouseEvent) => {
       correctIndices.add(currentIndex.value);
       nextWord();
-    };
+      if (e.target) e.target.blur();
+    }, 1000);
+
+    const skipWord = (e: MouseEvent) => {
+      nextWord();
+      if (e.target) e.target.blur();
+    }
 
     watch(props, () => {
       viewWords.splice(0);
@@ -342,6 +350,7 @@ export default defineComponent({
       edit,
       goHome,
       correctWord,
+      skipWord,
       shuffledWords,
       remainingSeconds,
       isStarted,

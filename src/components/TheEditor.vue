@@ -10,7 +10,7 @@
         @click="deleteTopic"
         v-if="!isNew"
       />
-      <v-icon :icon="faSave" @click="save" />
+      <v-icon :icon="faSave" @click="save" v-if="canSave" />
     </div>
     <h3 v-if="isNew">New Topic</h3>
     <h3 v-else>Edit Topic</h3>
@@ -123,7 +123,10 @@ export default defineComponent({
 
       maxKey.value += 1;
     };
+    const canSave = computed(() => viewTitle.value && wordList.length > 1);
     const save = () => {
+      if (!canSave.value) return;
+
       const updatedTopic: Topic = {
         title: viewTitle.value,
         words: wordList.map((item) => item.word),
@@ -156,6 +159,7 @@ export default defineComponent({
       isNew,
       cancel,
       addWord,
+      canSave,
       save,
       deleteTopic,
       onBlur,

@@ -48,12 +48,21 @@ import { useBuiltInTopicTitles } from '../lib/topic';
 import { useTopicIndex, goToTopicPage } from '../lib/TopicStore';
 import { requestFullscreen, exitFullscreen } from '../lib/fullscreen';
 
+async function preload() {
+  // eslint-disable-next-line
+  import('./BuiltInTopic.vue');
+  // eslint-disable-next-line
+  import('./StoredTopic.vue');
+}
+
 export default defineComponent({
   name: 'Home',
   components: {
     VIcon,
   },
   setup() {
+    preload();
+
     const router = useRouter();
     const storedTopics = useTopicIndex();
     const builtInTopicTitles = useBuiltInTopicTitles();
@@ -73,6 +82,7 @@ export default defineComponent({
 
     const createNewTopic = () => {
       router.push({ name: 'edit-new' });
+      exitFullscreen(false);
     };
 
     const openRandomTopic = () => {

@@ -66,7 +66,8 @@ export async function saveTopicIndex(updatedIndex: TopicIndex): Promise<void> {
     replaceTopicIndex(updatedIndex);
   } else {
     loadedTopicCache.id = '';
-    store.clear();
+    replaceTopicIndex([]);
+    await store.clear();
   }
 }
 
@@ -125,6 +126,10 @@ function sanitiseTopic(topicObj: Topic): Topic {
 }
 
 export async function saveTopic(topicObj: Topic, id?: string): Promise<string> {
+  if (!topicObj.title || topicObj.words.length === 0) {
+    throw new Error('Invalid Topic');
+  }
+
   const { deflateTopicWords } = await import('./TopicEncoding');
 
   const store = await getStore();
@@ -150,7 +155,7 @@ export async function saveTopic(topicObj: Topic, id?: string): Promise<string> {
 
   loadedTopicCache.id = id || newId;
   loadedTopicCache.topic = { title, words };
-  saveTopicIndex(topicIndex);
+  await saveTopicIndex(topicIndex);
   return id || newId;
 }
 
@@ -165,7 +170,7 @@ export async function deleteTopic(id: string): Promise<void> {
   );
 
   loadedTopicCache.id = '';
-  saveTopicIndex(topicIndex);
+  await saveTopicIndex(topicIndex);
 }
 
 export async function findTopicId(topic: Topic): Promise<string | null> {

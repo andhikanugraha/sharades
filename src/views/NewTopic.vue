@@ -14,6 +14,7 @@ import {
   reactive,
 } from 'vue';
 import { useRouter } from 'vue-router';
+import { requestFullscreen } from '../lib/fullscreen';
 import { Topic } from '../lib/topic';
 import { saveTopic, goToTopicPage } from '../lib/TopicStore';
 import TheEditor from '../components/TheEditor.vue';
@@ -38,10 +39,14 @@ export default defineComponent({
 
       if (id) {
         goToTopicPage(router, id);
+        await requestFullscreen(false);
       }
     };
 
-    const handleCancel = () => router.push({ name: 'home' });
+    const handleCancel = async () => {
+      router.push({ name: 'home' });
+      await requestFullscreen();
+    };
 
     return {
       title,

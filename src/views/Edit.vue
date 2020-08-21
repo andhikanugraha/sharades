@@ -17,6 +17,7 @@ import {
   watchEffect,
 } from 'vue';
 import { useRouter } from 'vue-router';
+import { requestFullscreen } from '../lib/fullscreen';
 import { Topic } from '../lib/topic';
 import {
   useTopicIndex,
@@ -54,14 +55,19 @@ export default defineComponent({
     const handleSave = async (updatedTopic: Topic) => {
       await saveTopic(updatedTopic, topicId.value);
       goToTopicPage(router, topicId.value);
+      await requestFullscreen(false);
     };
 
     const handleDelete = async () => {
       await deleteTopic(topicId.value);
       router.push({ name: 'home' });
+      await requestFullscreen(false);
     };
 
-    const handleCancel = () => goToTopicPage(router, topicId.value);
+    const handleCancel = async () => {
+      goToTopicPage(router, topicId.value);
+      await requestFullscreen(false);
+    };
 
     watchEffect(async () => {
       const topic = await loadTopic(props.id);

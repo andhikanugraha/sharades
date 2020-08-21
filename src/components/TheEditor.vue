@@ -59,8 +59,8 @@ import {
   computed,
   reactive,
   watch,
+  watchEffect,
 } from 'vue';
-import { useRouter } from 'vue-router';
 
 import {
   faSave,
@@ -90,11 +90,10 @@ export default defineComponent({
   emits: {
     save: (topic: Topic) => !!topic,
     delete: () => true,
+    cancel: () => true,
   },
   components: { VIcon, VEditorInput },
   setup(props, { emit }) {
-    const router = useRouter();
-
     const viewTitle = ref(props.title || '');
     const wordList = reactive<WordListItem[]>(
       props.words?.map((word, key) => ({ key, word })) || [],
@@ -104,24 +103,17 @@ export default defineComponent({
     const viewId = ref(props.id || '');
     const isNew = computed(() => !viewId.value);
 
+    watchEffect(() => {
+      viewTitle.value = props.title || '';
+    });
     watch(props, (p) => {
       const words = p.words || [];
       wordList.splice(0);
       wordList.splice(0, 0, ...words.map((word, key) => ({ key, word })));
       maxKey.value = words.length;
-      viewTitle.value = p.title || '';
     });
 
-    const cancel = () => {
-      if (viewId.value) {
-        router.push({
-          name: 'game-stored-topic',
-          params: { id: viewId.value },
-        });
-      } else {
-        router.push({ name: 'home' });
-      }
-    };
+    const cancel = () => emit('cancel');
     const addWord = () => {
       wordList.push({
         word: '',

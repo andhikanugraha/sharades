@@ -45,7 +45,7 @@ import { useRouter } from 'vue-router';
 import { faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
 import VIcon from '../components/VIcon.vue';
 import { useBuiltInTopicTitles } from '../lib/topic';
-import { useTopicIndex } from '../lib/TopicStore';
+import { useTopicIndex, goToTopicPage } from '../lib/TopicStore';
 import { requestFullscreen, exitFullscreen } from '../lib/fullscreen';
 
 export default defineComponent({
@@ -68,10 +68,7 @@ export default defineComponent({
 
     const openStoredTopic = (id: string) => {
       requestFullscreen(false);
-      router.push({
-        name: 'game-stored-topic',
-        params: { id },
-      });
+      goToTopicPage(router, id);
     };
 
     const createNewTopic = () => {

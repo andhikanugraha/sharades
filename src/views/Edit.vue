@@ -5,6 +5,7 @@
     :id="id"
     @save="handleSave"
     @delete="handleDelete"
+    @cancel="handleCancel"
   />
 </template>
 
@@ -22,6 +23,7 @@ import {
   saveTopic,
   loadTopic,
   deleteTopic,
+  goToTopicPage,
 } from '../lib/TopicStore';
 import TheEditor from '../components/TheEditor.vue';
 
@@ -52,12 +54,12 @@ export default defineComponent({
     const topicId = ref(props.id);
 
     const handleSave = async (updatedTopic: Topic) => {
-      topicId.value = await saveTopic(updatedTopic, topicId.value);
+      const id = await saveTopic(updatedTopic, topicId.value);
 
-      router.push({
-        name: 'game-stored-topic',
-        params: { id: topicId.value },
-      });
+      if (id) {
+        topicId.value = id;
+        goToTopicPage(router, topicId.value);
+      }
     };
 
     const handleDelete = async () => {
@@ -65,6 +67,14 @@ export default defineComponent({
 
       await deleteTopic(topicId.value);
       router.push({ name: 'home' });
+    };
+
+    const handleCancel = () => {
+      if (topicId.value) {
+        goToTopicPage(router, topicId.value);
+      } else {
+        router.push({ name: 'home' });
+      }
     };
 
     watchEffect(async () => {
@@ -92,6 +102,7 @@ export default defineComponent({
       existing,
       handleSave,
       handleDelete,
+      handleCancel,
     };
   },
 });

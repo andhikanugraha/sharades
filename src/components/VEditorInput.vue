@@ -29,6 +29,7 @@ export default defineComponent({
     const doDelete = () => emit('delete');
 
     watchEffect(() => {
+      value.value = props.modelValue;
       if (props.autoFocus) {
         onMounted(() => input.value?.focus());
       }

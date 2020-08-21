@@ -1,56 +1,54 @@
 <template>
-  <div class="root">
-    <header>
-      <div class="close-button" @click="cancel">
-        <v-icon :icon="faTimes" fixed-width />
+  <header>
+    <div class="close-button" @click="cancel">
+      <v-icon :icon="faTimes" fixed-width />
+    </div>
+    <div class="pull-right">
+      <v-icon
+        :icon="faTrashAlt"
+        class="delete-button"
+        @click="deleteTopic"
+        v-if="!isNew"
+      />
+      <v-icon :icon="faSave" @click="save" />
+    </div>
+    <h3 v-if="isNew">New Topic</h3>
+    <h3 v-else>Edit Topic</h3>
+  </header>
+  <main>
+    <div class="scrollable">
+      <div class="info">
+        <div class="label">Title:</div>
+        <p>
+          <input
+            type="text"
+            v-model.trim.lazy="viewTitle"
+            @keyup.enter="addWord"
+          />
+        </p>
       </div>
-      <div class="pull-right">
-        <v-icon
-          :icon="faTrashAlt"
-          class="delete-button"
-          @click="deleteTopic"
-          v-if="!isNew"
-        />
-        <v-icon :icon="faSave" @click="save" />
+      <div class="info">
+        <div class="label">Words:</div>
+        <p v-for="(item, i) in wordList" :key="item.key" class="item">
+          <v-editor-input
+            v-model="item.word"
+            :auto-focus="item.focus"
+            @blur="onBlur(i)"
+            @focus="onFocus(i)"
+            @keyup.enter="addWord"
+          />
+          <span class="item-delete" @click="deleteWordAtIndex(i)">
+            <v-icon :icon="faTimesCircle" />
+          </span>
+        </p>
+        <p>
+          <button @click="addWord">
+            <v-icon :icon="faPlus" />
+          </button>
+        </p>
       </div>
-      <h3 v-if="isNew">New Topic</h3>
-      <h3 v-else>Edit Topic</h3>
-    </header>
-    <main>
-      <div class="scrollable">
-        <div class="info">
-          <div class="label">Title:</div>
-          <p>
-            <input
-              type="text"
-              v-model.trim.lazy="viewTitle"
-              @keyup.enter="addWord"
-            />
-          </p>
-        </div>
-        <div class="info">
-          <div class="label">Words:</div>
-          <p v-for="(item, i) in wordList" :key="item.key" class="item">
-            <v-editor-input
-              v-model="item.word"
-              :auto-focus="item.focus"
-              @blur="onBlur(i)"
-              @focus="onFocus(i)"
-              @keyup.enter="addWord"
-            />
-            <span class="item-delete" @click="deleteWordAtIndex(i)">
-              <v-icon :icon="faTimesCircle" />
-            </span>
-          </p>
-          <p>
-            <button @click="addWord">
-              <v-icon :icon="faPlus" />
-            </button>
-          </p>
-        </div>
-      </div>
-    </main>
-  </div>
+    </div>
+  </main>
 </template>
 
 <script lang="ts">

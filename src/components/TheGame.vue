@@ -1,5 +1,5 @@
 <template>
-  <div class="root" id="finished" v-if="isFinished">
+  <template v-if="isFinished">
     <header>
       <div class="close-button" @click="reset">
         <v-icon :icon="faTimes" fixed-width />
@@ -28,8 +28,8 @@
         </button>
       </p>
     </nav>
-  </div>
-  <div class="root" id="active" v-else-if="isStarted">
+  </template>
+  <template v-else-if="isStarted">
     <header>
       <div class="close-button" @click="reset">
         <v-icon :icon="faTimes" fixed-width />
@@ -55,8 +55,8 @@
         </button>
       </p>
     </nav>
-  </div>
-  <div class="root" id="initial" v-else>
+  </template>
+  <template v-else>
     <header>
       <div class="close-button" @click="goHome">
         <v-icon :icon="faHome" />
@@ -92,7 +92,7 @@
         </button>
       </p>
     </nav>
-  </div>
+  </template>
 </template>
 
 <script lang="ts">

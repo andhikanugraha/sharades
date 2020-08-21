@@ -109,9 +109,6 @@ body {
 }
 
 #app {
-  height: 100%;
-}
-.root {
   background: var(--color-background);
   display: flex;
   width: 100%;

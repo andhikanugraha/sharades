@@ -1,46 +1,44 @@
 <template>
-  <div class="root">
-    <header>
-      <div class="pull-left">
-        <v-icon
-          class="expand-button"
-          :icon="faExpand"
-          @click="requestFullscreen"
-        />
-        <v-icon
-          class="compress-button"
-          :icon="faCompress"
-          @click="exitFullscreen"
-        />
+  <header>
+    <div class="pull-left">
+      <v-icon
+        class="expand-button"
+        :icon="faExpand"
+        @click="requestFullscreen"
+      />
+      <v-icon
+        class="compress-button"
+        :icon="faCompress"
+        @click="exitFullscreen"
+      />
+    </div>
+    <h3>Sharades</h3>
+  </header>
+  <main>
+    <div class="scrollable">
+      <div class="info">
+        <p v-for="item in storedTopics" :key="item.id">
+          <button @click="openStoredTopic(item.id)">{{ item.title }}</button>
+        </p>
+        <p>
+          <button id="create" @click="createNewTopic">
+            Make your own topic
+          </button>
+        </p>
+        <hr />
+        <div class="label">Choose a topic:</div>
+        <p v-for="topicTitle in builtInTopicTitles" :key="topicTitle">
+          <button @click="openBuiltInTopic(topicTitle)">
+            {{ topicTitle }}
+          </button>
+        </p>
+        <hr />
+        <p>
+          <button id="random" @click="openRandomTopic">Random</button>
+        </p>
       </div>
-      <h3>Sharades</h3>
-    </header>
-    <main>
-      <div class="scrollable">
-        <div class="info">
-          <p v-for="item in storedTopics" :key="item.id">
-            <button @click="openStoredTopic(item.id)">{{ item.title }}</button>
-          </p>
-          <p>
-            <button id="create" @click="createNewTopic">
-              Make your own topic
-            </button>
-          </p>
-          <hr />
-          <div class="label">Choose a topic:</div>
-          <p v-for="topicTitle in builtInTopicTitles" :key="topicTitle">
-            <button @click="openBuiltInTopic(topicTitle)">
-              {{ topicTitle }}
-            </button>
-          </p>
-          <hr />
-          <p>
-            <button id="random" @click="openRandomTopic">Random</button>
-          </p>
-        </div>
-      </div>
-    </main>
-  </div>
+    </div>
+  </main>
 </template>
 
 <script lang="ts">

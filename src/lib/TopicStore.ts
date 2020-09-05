@@ -207,7 +207,7 @@ export async function goToTopicPage(router: Router, id: string): Promise<void> {
   });
 }
 
-export function clearCache() {
+export function clearCache(): void {
   loadedTopicCache.id = null;
   loadedTopicCache.topic = null;
 }

@@ -3,7 +3,6 @@ module.exports = {
   globPatterns: [
     'assets/**',
     'fonts/**',
-    'img/**',
     '*.{ico,html,json}',
   ],
   swDest: 'dist/assets/sw.js',

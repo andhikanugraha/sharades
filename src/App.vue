@@ -3,9 +3,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted } from 'vue';
+import Font from 'fontfaceobserver-es';
 
-export default defineComponent({});
+export default defineComponent({
+  setup() {
+    onMounted(async () => {
+      const font = new Font('Inter');
+      await font.load();
+      const app = document.getElementById('app');
+      if (app) app.className = 'fonts-loaded';
+    });
+  },
+});
 </script>
 
 <style>
@@ -13,7 +23,7 @@ export default defineComponent({});
   --font-family-system: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol";
-  --font-family-base: "Inter", var(--font-family-system);
+  --font-family-base: var(--font-family-system);
   --font-size-base: 1rem;
   --font-size-secondary: calc(1.5 * var(--font-size-base));
   --font-size-tertiary: var(--font-size-base);
@@ -75,6 +85,10 @@ body {
 }
 #app::backdrop {
   background: var(--color-background);
+}
+#app.fonts-loaded {
+  --font-family-base: 'Inter', var(--font-family-system);
+  font-familY: var(--font-family-base);
 }
 
 .close-button,

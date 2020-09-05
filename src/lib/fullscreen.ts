@@ -29,7 +29,7 @@ function setPreference(pref: Pref) {
   }
 }
 
-async function requestFullscreen(updatePreference = true): Promise<void> {
+export async function requestFullscreen(updatePreference = true): Promise<void> {
   const el = document.getElementById('app');
   if (updatePreference) {
     setPreference(Pref.FULLSCREEN);
@@ -40,13 +40,12 @@ async function requestFullscreen(updatePreference = true): Promise<void> {
   if (el) el.requestFullscreen({ navigationUI: 'hide' });
 }
 
-async function exitFullscreen(updatePreference = true): Promise<void> {
-  if (updatePreference) setPreference(Pref.NOT_FULLSCREEN);
+export async function exitFullscreen(updatePreference = true): Promise<void> {
+  if (updatePreference) {
+    setPreference(Pref.NOT_FULLSCREEN);
+  }
 
-  if (document.fullscreenElement) document.exitFullscreen();
+  if (document.fullscreenElement && state.preference === Pref.NOT_FULLSCREEN) {
+    document.exitFullscreen();
+  }
 }
-
-export {
-  requestFullscreen,
-  exitFullscreen,
-};

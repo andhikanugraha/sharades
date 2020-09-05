@@ -3,31 +3,33 @@
   "version": "0.3.0",
   "private": true,
   "scripts": {
-    "lint": "eslint --fix . src/**",
+    "lint": "tsc --noEmit && eslint --fix . src/**",
     "serve": "vite",
-    "build": "vite build --assetsDir assets && workbox generateSW workbox-config.js",
+    "build": "tsc --noEmit && vite build --assetsDir assets && workbox generateSW workbox-config.js",
     "deploy": "npm run build && netlify deploy -d dist"
   },
   "dependencies": {
     "@fortawesome/free-solid-svg-icons": "^5.14.0",
-    "@progress/pako-esm": "^1.0.0",
+    "@progress/pako-esm": "^1.0.1",
+    "fontfaceobserver-es": "^3.3.3",
     "localforage": "^1.9.0",
     "lodash-es": "^4.17.15",
     "register-service-worker": "^1.7.1",
-    "vue": "^3.0.0-0",
-    "vue-router": "^4.0.0-0"
+    "vue": "^3.0.0-rc.10",
+    "vue-router": "^4.0.0-beta.9"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.3",
-    "@typescript-eslint/eslint-plugin": "^3.9.1",
-    "@typescript-eslint/parser": "^3.9.1",
+    "@typescript-eslint/eslint-plugin": "^3.10.1",
+    "@typescript-eslint/parser": "^3.10.1",
+    "@vue/compiler-sfc": "^3.0.0-rc.10",
     "autoprefixer": "^9.8.6",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-vue": "^7.0.0-beta.2",
-    "netlify-cli": "^2.59.1",
-    "typescript": "~3.9.3",
+    "eslint-plugin-vue": "^7.0.0-beta.3",
+    "netlify-cli": "^2.61.0",
+    "typescript": "^4.0.2",
     "vite": "^1.0.0-rc.4",
     "workbox-cli": "^5.1.3"
   },

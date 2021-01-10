@@ -13,25 +13,26 @@
     "@progress/pako-esm": "^1.0.1",
     "fontfaceobserver-es": "^3.3.3",
     "localforage": "^1.9.0",
-    "lodash-es": "^4.17.15",
+    "lodash-es": "^4.17.20",
     "register-service-worker": "^1.7.1",
-    "vue": "^3.0.0-rc.10",
-    "vue-router": "^4.0.0-beta.9"
+    "vue": "^3.0.5",
+    "vue-router": "^4.0.2"
   },
   "devDependencies": {
-    "@types/lodash-es": "^4.17.3",
-    "@typescript-eslint/eslint-plugin": "^3.10.1",
-    "@typescript-eslint/parser": "^3.10.1",
-    "@vue/compiler-sfc": "^3.0.0-rc.10",
+    "@types/lodash-es": "^4.17.4",
+    "@typescript-eslint/eslint-plugin": "^4.12.0",
+    "@typescript-eslint/parser": "^4.12.0",
+    "@vitejs/plugin-vue": "^1.0.5",
+    "@vue/compiler-sfc": "^3.0.5",
     "autoprefixer": "^9.8.6",
-    "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-plugin-import": "^2.22.0",
-    "eslint-plugin-vue": "^7.0.0-beta.3",
-    "netlify-cli": "^2.61.0",
-    "typescript": "^4.0.2",
-    "vite": "^1.0.0-rc.4",
-    "workbox-cli": "^5.1.3"
+    "eslint": "^7.17.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-vue": "^7.4.1",
+    "netlify-cli": "^2.71.0",
+    "typescript": "^4.1.3",
+    "vite": "^2.0.0-beta.16",
+    "workbox-cli": "^6.0.2"
   },
   "browserslist": [
     "last 2 versions"

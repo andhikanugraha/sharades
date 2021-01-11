@@ -19,12 +19,6 @@ import { Topic } from '../lib/topic';
 import { saveTopic, goToTopicPage, clearCache } from '../lib/TopicStore';
 import TheEditor from '../components/TheEditor.vue';
 
-interface WordListItem {
-  key: number;
-  word: string;
-  focus?: boolean;
-}
-
 export default defineComponent({
   name: 'NewTopic',
   components: { TheEditor },

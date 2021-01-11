@@ -42,7 +42,7 @@
     <main>
       <div class="overlay">
         <div class="half" @click="correctWord"></div>
-        <div class="half" @click="nextWord"></div>
+        <div class="half" @click="skipWord"></div>
       </div>
       <v-fit :text="currentWord" />
     </main>
@@ -65,8 +65,8 @@
         <v-icon :icon="faHome" />
       </div>
       <div class="pull-right">
-        <v-icon v-if="isEditable" @click="edit" :icon="faEdit" />
-        <v-icon v-if="canShare" @click="share($event)" :icon="faShare" />
+        <v-icon v-if="isEditable" @click="goEdit" :icon="faEdit" />
+        <v-icon v-if="canShare" @click="goShare" :icon="faShare" />
       </div>
       <h3>Sharades</h3>
     </header>
@@ -115,6 +115,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { shuffle, throttle } from 'lodash-es';
 import { exitFullscreen } from '../lib/fullscreen';
+import { canShare, useShare } from '../lib/share';
 import VIcon from './VIcon.vue';
 import VFit from './VFit.vue';
 
@@ -144,142 +145,15 @@ export default defineComponent({
     const viewTitle = ref(props.title);
     const viewWords = reactive(props.words || []);
 
-    const isStarted = ref(false);
-    const endTime = ref(nowSeconds());
-    const shuffledWords = reactive<number[]>([]);
-    const usedWordIndices = reactive(new Set<number>());
-    const correctIndices = reactive(new Set<number>());
-    const maxViewedIndex = ref(0);
-    const currentIndex = ref(0);
-    const remainingSeconds = ref(0);
-    const isFinished = ref(false);
-    const timeLimit = ref(60);
-    const timer = ref<NodeJS.Timeout | undefined>();
+    // NAVIGATION & START SCREEN
 
-    const setTimeLimit = (newTimeLimit: number) => {
-      timeLimit.value = newTimeLimit;
-    };
-
-    const finish = () => {
-      isFinished.value = true;
-      endTime.value = nowSeconds();
-      if (timer.value) {
-        clearTimeout(timer.value);
-        timer.value = undefined;
-      }
-    };
-
-    const nextWord = () => {
-      // add current index to used words
-      usedWordIndices.add(currentIndex.value);
-
-      // find next unanswered word
-      const answeredSet = new Set<number>(correctIndices);
-
-      let i: number;
-      if (currentIndex.value + 1 >= shuffledWords.length) {
-        i = 0;
-      } else {
-        i = currentIndex.value + 1;
-      }
-
-      let nextIndex = -1;
-      while (i !== currentIndex.value && nextIndex === -1) {
-        if (!answeredSet.has(i)) {
-          nextIndex = i;
-        } else if (i + 1 >= shuffledWords.length) {
-          i = 0;
-        } else {
-          i += 1;
-        }
-      }
-
-      if (nextIndex === -1) {
-        finish();
-      } else if (nextIndex < shuffledWords.length) {
-        currentIndex.value = nextIndex;
-      }
-
-      if (nextIndex > maxViewedIndex.value) {
-        maxViewedIndex.value = nextIndex;
-      }
-    };
-
-    const shuffleWords = () => {
-      const words = viewWords;
-      if (!words || words.length === 0) {
-        return;
-      }
-
-      const indices = [];
-      if (usedWordIndices.size < words.length) {
-        for (let i = 0; i < words.length; i += 1) {
-          if (!usedWordIndices.has(i)) {
-            indices.push(i);
-          }
-        }
-      } else {
-        for (let i = 0; i < words.length; i += 1) {
-          indices.push(i);
-        }
-        usedWordIndices.clear();
-      }
-      const shuffledLeft = shuffle(indices);
-      const shuffledRight = shuffle(Array.from(usedWordIndices.values()));
-      shuffledWords.splice(0);
-      shuffledWords.splice(0, 0, ...shuffledLeft, ...shuffledRight);
-    };
-
-    const reset = () => {
-      isStarted.value = false;
-      isFinished.value = false;
-      currentIndex.value = 0;
-      correctIndices.clear();
-      maxViewedIndex.value = 0;
-      if (timer.value) {
-        clearTimeout(timer.value);
-        timer.value = undefined;
-      }
-      shuffleWords();
-    };
-
-    const updateRemainingSeconds = () => {
-      remainingSeconds.value = endTime.value - nowSeconds();
-    };
-
-    const tick = () => {
-      updateRemainingSeconds();
-      if (remainingSeconds.value > 0) {
-        timer.value = setTimeout(() => tick(), 1000);
-      } else {
-        isFinished.value = true;
-      }
-    };
-
-    const start = () => {
-      isStarted.value = true;
-      endTime.value = nowSeconds() + timeLimit.value;
-      tick();
-    };
-
-    const canShare = computed(() => !!navigator.share);
-
-    const share = async () => {
-      try {
-        await exitFullscreen(false);
-        await navigator.share({
-          title: `Sharades: ${viewTitle.value}`,
-          text: `Play the topic ${viewTitle.value} on Sharades`,
-          url: window.location.toString(),
-        });
-      } finally {
-        // nvm
-      }
+    const goHome = async () => {
+      router.push({ name: 'home' });
+      await exitFullscreen(false);
     };
 
     const isEditable = computed(() => !!props.id);
-
-    const edit = () => {
+    const goEdit = () => {
       if (props.id) {
         exitFullscreen(false);
         router.push({
@@ -289,50 +163,155 @@ export default defineComponent({
       }
     };
 
-    const goHome = async () => {
-      router.push({ name: 'home' });
-      await exitFullscreen(false);
+    const goShare = useShare(viewTitle);
+
+    const timeLimit = ref(60);
+    const setTimeLimit = (newTimeLimit: number) => {
+      timeLimit.value = newTimeLimit;
     };
 
-    const correctWordInner = throttle(() => {
-      correctIndices.add(currentIndex.value);
+    // WORD SHUFFLING & RESETTING
+
+    // custom type to distinguish which variables refer to words
+    type WordIndex = number;
+    const shuffledWordIndices = reactive<WordIndex[]>([]);
+    const usedWordIndices = new Set<WordIndex>();
+    const correctIndices = new Set<WordIndex>();
+
+    const shuffleWords = () => {
+      const words = viewWords;
+      if (!words || words.length === 0) {
+        return;
+      }
+
+      const unusedWordIndices = [];
+      if (usedWordIndices.size < words.length) { // some words have not yet been used
+        for (let i = 0; i < words.length; i += 1) {
+          if (!usedWordIndices.has(i)) {
+            unusedWordIndices.push(i);
+          }
+        }
+      } else { // all words have been used
+        usedWordIndices.clear();
+        for (let i = 0; i < words.length; i += 1) {
+          unusedWordIndices.push(i);
+        }
+      }
+      const shuffledLeft = shuffle(unusedWordIndices);
+      const shuffledRight = shuffle([...usedWordIndices.values()]);
+      shuffledWordIndices.splice(0);
+      shuffledWordIndices.splice(0, 0, ...shuffledLeft, ...shuffledRight);
+    };
+
+    // GAME LOOP
+
+    const isStarted = ref(false);
+    const isFinished = ref(false);
+
+    type Cursor = number;
+    const currentCursor = ref<Cursor>(0); // the index of shuffledWordIndices to display
+    const lastCursor = ref<Cursor>(0); // the last word played to be used for scoring
+
+    const endTime = ref(nowSeconds());
+    const remainingSeconds = ref(0);
+    let timer: number | undefined;
+
+    const finish = () => {
+      isFinished.value = true;
+      endTime.value = nowSeconds();
+      if (timer) {
+        window.clearTimeout(timer);
+        timer = undefined;
+      }
+    };
+
+    const tick = () => {
+      remainingSeconds.value = endTime.value - nowSeconds();
+      if (remainingSeconds.value > 0) {
+        timer = window.setTimeout(() => tick(), 1000);
+      } else {
+        finish();
+      }
+    };
+
+    const start = () => {
+      isStarted.value = true;
+      endTime.value = nowSeconds() + timeLimit.value;
+      tick();
+    };
+
+    const currentWord = computed<string>(() => (
+      props.words
+        ? props.words[shuffledWordIndices[currentCursor.value]]
+        : ''
+    ));
+
+    const nextWord = () => {
+      // add current index to used words
+      usedWordIndices.add(shuffledWordIndices[currentCursor.value]);
+
+      // find next unanswered word
+      let i: number;
+      if (currentCursor.value + 1 >= shuffledWordIndices.length) {
+        i = 0;
+      } else {
+        i = currentCursor.value + 1;
+      }
+
+      let nextIndex = -1;
+      while (i !== currentCursor.value && nextIndex === -1) {
+        if (!correctIndices.has(i)) {
+          nextIndex = i;
+        } else if (i + 1 >= shuffledWordIndices.length) {
+          i = 0;
+        } else {
+          i += 1;
+        }
+      }
+
+      if (nextIndex === -1) {
+        finish();
+      } else if (nextIndex < shuffledWordIndices.length) {
+        currentCursor.value = nextIndex;
+      }
+
+      if (nextIndex > lastCursor.value) {
+        lastCursor.value = nextIndex;
+      }
+    };
+
+    // GAME CONTROLS
+
+    const correctWordThrottled = throttle(() => {
+      correctIndices.add(currentCursor.value);
       nextWord();
     }, 500);
+
     const correctWord = ({ target }: { target: HTMLInputElement }) => {
-      correctWordInner();
+      correctWordThrottled();
       if (target) target.blur();
     };
+
+    const skipWordThrottled = throttle(() => nextWord(), 500);
 
     const skipWord = ({ target }: { target: HTMLInputElement }) => {
-      nextWord();
+      skipWordThrottled();
       if (target) target.blur();
     };
 
-    const playAgain = () => {
-      if (nowSeconds() - endTime.value > 2) {
-        reset();
-      }
-    };
+    // SCORE SCREEN
 
-    watch(props, () => {
-      viewWords.splice(0);
-      if (props.words) {
-        viewWords.splice(0, 0, ...props.words);
-      }
-      shuffleWords();
-      viewTitle.value = props.title;
-    });
+    const score = computed<number>(() => correctIndices.size);
 
-    const currentWord = computed<string>(() => (props.words ? props.words[shuffledWords[currentIndex.value]] : ''));
     const results = computed<Word[]>(() => {
       const words: Word[] = [];
       if (!props.words) {
         return words;
       }
 
-      for (let i = 0; i <= maxViewedIndex.value; i += 1) {
+      for (let i = 0; i <= lastCursor.value; i += 1) {
         words.push({
-          word: props.words[shuffledWords[i]],
+          word: props.words[shuffledWordIndices[i]],
           isCorrect: false,
         });
       }
@@ -346,31 +325,64 @@ export default defineComponent({
       return words;
     });
 
-    const score = computed<number>(() => correctIndices.size);
+    const reset = () => {
+      isStarted.value = false;
+      isFinished.value = false;
+      currentCursor.value = 0;
+      correctIndices.clear();
+      lastCursor.value = 0;
+      if (timer) {
+        window.clearTimeout(timer);
+        timer = undefined;
+      }
+      shuffleWords();
+    };
+
+    const playAgain = () => {
+      if (nowSeconds() - endTime.value > 2) {
+        reset();
+      }
+    };
+
+    // INITIALISATION
+
+    watch(props, () => {
+      viewWords.splice(0);
+      if (props.words) {
+        viewWords.splice(0, 0, ...props.words);
+      }
+      viewTitle.value = props.title;
+
+      reset();
+      usedWordIndices.clear();
+    });
 
     return {
+      // START SCREEN
       viewTitle,
-      currentWord,
-      results,
-      score,
+      goHome,
+      isEditable,
+      goEdit,
+      canShare,
+      goShare,
       timeLimit,
       setTimeLimit,
-      nextWord,
-      finish,
-      reset,
-      start,
-      isEditable,
-      edit,
-      goHome,
-      correctWord,
-      skipWord,
-      shuffledWords,
-      remainingSeconds,
-      playAgain,
+
+      // GAME LOOP
       isStarted,
       isFinished,
-      canShare,
-      share,
+      currentWord,
+      reset,
+      start,
+      correctWord,
+      skipWord,
+      remainingSeconds,
+
+      // SCORE SCREEN
+      results,
+      score,
+      playAgain,
+
       // icons
       faHome,
       faPlay,

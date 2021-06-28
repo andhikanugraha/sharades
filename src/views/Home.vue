@@ -50,7 +50,7 @@ import { requestFullscreen, exitFullscreen } from '../lib/fullscreen';
   import('./BuiltInTopic.vue');
   // eslint-disable-next-line
   import('./StoredTopic.vue');
-})();
+}());
 
 const router = useRouter();
 const storedTopics = useTopicIndex();
@@ -70,24 +70,24 @@ function openBuiltInTopic(builtInTopicTitle: string) {
     name: 'game-built-in',
     params: { builtInTopicTitle },
   });
-};
+}
 
 function openStoredTopic(id: string) {
   requestFullscreen(false);
   goToTopicPage(router, id);
-};
+}
 
 function createNewTopic() {
   router.push({ name: 'edit-new' });
   exitFullscreen(false);
-};
+}
 
 function openRandomTopic() {
   const randomIndex = Math.round(
     Math.random() * (builtInTopicTitles.length - 1),
   );
   openBuiltInTopic(builtInTopicTitles[randomIndex]);
-};
+}
 </script>
 
 <style>

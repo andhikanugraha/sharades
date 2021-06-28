@@ -1,13 +1,11 @@
 <template>
   <header>
     <div class="pull-left">
-      <span id="expand"><v-icon
+      <span id="expand" @click="goFullscreen"><v-icon
         :icon="faExpand"
-        @click="requestFullscreen"
       /></span>
-      <span id="compress"><v-icon
+      <span id="compress" @click="goExitFullscreen"><v-icon
         :icon="faCompress"
-        @click="exitFullscreen"
       /></span>
     </div>
     <h3>Sharades</h3>
@@ -39,8 +37,7 @@
   </main>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import { faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
 import VIcon from '../components/VIcon.vue';
@@ -48,64 +45,49 @@ import { useBuiltInTopicTitles } from '../lib/topic';
 import { useTopicIndex, goToTopicPage } from '../lib/TopicStore';
 import { requestFullscreen, exitFullscreen } from '../lib/fullscreen';
 
-async function preload() {
+(async function preload() {
   // eslint-disable-next-line
   import('./BuiltInTopic.vue');
   // eslint-disable-next-line
   import('./StoredTopic.vue');
+})();
+
+const router = useRouter();
+const storedTopics = useTopicIndex();
+const builtInTopicTitles = useBuiltInTopicTitles();
+
+function goFullscreen() {
+  requestFullscreen(true);
 }
 
-export default defineComponent({
-  name: 'Home',
-  components: {
-    VIcon,
-  },
-  setup() {
-    preload();
+function goExitFullscreen() {
+  exitFullscreen(true);
+}
 
-    const router = useRouter();
-    const storedTopics = useTopicIndex();
-    const builtInTopicTitles = useBuiltInTopicTitles();
+function openBuiltInTopic(builtInTopicTitle: string) {
+  requestFullscreen(false);
+  router.push({
+    name: 'game-built-in',
+    params: { builtInTopicTitle },
+  });
+};
 
-    const openBuiltInTopic = (builtInTopicTitle: string) => {
-      requestFullscreen(false);
-      router.push({
-        name: 'game-built-in',
-        params: { builtInTopicTitle },
-      });
-    };
+function openStoredTopic(id: string) {
+  requestFullscreen(false);
+  goToTopicPage(router, id);
+};
 
-    const openStoredTopic = (id: string) => {
-      requestFullscreen(false);
-      goToTopicPage(router, id);
-    };
+function createNewTopic() {
+  router.push({ name: 'edit-new' });
+  exitFullscreen(false);
+};
 
-    const createNewTopic = () => {
-      router.push({ name: 'edit-new' });
-      exitFullscreen(false);
-    };
-
-    const openRandomTopic = () => {
-      const randomIndex = Math.round(
-        Math.random() * (builtInTopicTitles.length - 1),
-      );
-      openBuiltInTopic(builtInTopicTitles[randomIndex]);
-    };
-
-    return {
-      storedTopics,
-      builtInTopicTitles,
-      createNewTopic,
-      requestFullscreen,
-      exitFullscreen,
-      openStoredTopic,
-      openBuiltInTopic,
-      openRandomTopic,
-      faExpand,
-      faCompress,
-    };
-  },
-});
+function openRandomTopic() {
+  const randomIndex = Math.round(
+    Math.random() * (builtInTopicTitles.length - 1),
+  );
+  openBuiltInTopic(builtInTopicTitles[randomIndex]);
+};
 </script>
 
 <style>

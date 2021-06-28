@@ -22,7 +22,7 @@ let timeLimit = 60;
 type WordIndex = number;
 const shuffledWordIndices = reactive<WordIndex[]>([]);
 const usedWordIndices = new Set<WordIndex>();
-const correctIndices = new Set<WordIndex>();
+const correctIndices = reactive(new Set<WordIndex>());
 
 function shuffleWords() {
   const words = viewWords;

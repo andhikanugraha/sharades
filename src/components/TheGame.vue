@@ -98,10 +98,11 @@
   </template>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import {
-  defineComponent, ref, computed, PropType,
+  ref, computed, defineProps,
 } from 'vue';
+import type { PropType } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   faHome,
@@ -120,117 +121,70 @@ import { canShare, useShare } from '../lib/share';
 import VIcon from './VIcon.vue';
 import VFit from './VFit.vue';
 
-export default defineComponent({
-  name: 'TheGame',
-  components: {
-    VFit,
-    VIcon,
-  },
-  props: {
-    title: String,
-    words: Array as PropType<string[]>,
-    id: String,
-  },
-  setup(props) {
-    const router = useRouter();
-
-    const viewTitle = computed(() => props.title);
-
-    // NAVIGATION & START SCREEN
-
-    const goHome = async () => {
-      router.push({ name: 'home' });
-      await exitFullscreen(false);
-    };
-
-    const isEditable = computed(() => !!props.id);
-    const goEdit = () => {
-      if (props.id) {
-        exitFullscreen(false);
-        router.push({
-          name: 'edit',
-          params: { id: props.id },
-        });
-      }
-    };
-
-    const goShare = useShare(viewTitle);
-
-    const timeLimit = ref(60);
-    const setTimeLimit = (newTimeLimit: number) => {
-      timeLimit.value = newTimeLimit;
-    };
-
-    const {
-      isStarted, isFinished,
-      start,
-      remainingSeconds, currentWord,
-      playerCorrect, playerSkip,
-      score, results, reset, endTime,
-    } = useGame(props, timeLimit);
-
-    // GAME CONTROLS
-
-    const correctWordThrottled = throttle(playerCorrect, 500);
-    const correctWord = ({ target }: { target: HTMLInputElement }) => {
-      correctWordThrottled();
-      if (target) target.blur();
-    };
-
-    const skipWordThrottled = throttle(playerSkip, 500);
-    const skipWord = ({ target }: { target: HTMLInputElement }) => {
-      skipWordThrottled();
-      if (target) target.blur();
-    };
-
-    // SCORE SCREEN
-
-    const playAgain = () => {
-      if (nowSeconds() - endTime.value > 2) {
-        reset();
-      }
-    };
-
-    // INITIALISATION
-
-    return {
-      // START SCREEN
-      viewTitle,
-      goHome,
-      isEditable,
-      goEdit,
-      canShare,
-      goShare,
-      timeLimit,
-      setTimeLimit,
-
-      // GAME LOOP
-      isStarted,
-      isFinished,
-      currentWord,
-      reset,
-      start,
-      correctWord,
-      skipWord,
-      remainingSeconds,
-
-      // SCORE SCREEN
-      results,
-      score,
-      playAgain,
-
-      // icons
-      faHome,
-      faPlay,
-      faStepForward,
-      faCheck,
-      faUndo,
-      faEdit,
-      faTimes,
-      faShare,
-    };
-  },
+const props = defineProps({
+  title: String,
+  words: Array as PropType<string[]>,
+  id: String,
 });
+
+const router = useRouter();
+
+const viewTitle = computed(() => props.title);
+
+// NAVIGATION & START SCREEN
+
+const goHome = async () => {
+  router.push({ name: 'home' });
+  await exitFullscreen(false);
+};
+
+const isEditable = computed(() => !!props.id);
+const goEdit = () => {
+  if (props.id) {
+    exitFullscreen(false);
+    router.push({
+      name: 'edit',
+      params: { id: props.id },
+    });
+  }
+};
+
+const goShare = useShare(viewTitle);
+
+const timeLimit = ref(60);
+const setTimeLimit = (newTimeLimit: number) => {
+  timeLimit.value = newTimeLimit;
+};
+
+const {
+  isStarted, isFinished,
+  start,
+  remainingSeconds, currentWord,
+  playerCorrect, playerSkip,
+  score, results, reset, endTime,
+} = useGame(props, timeLimit);
+
+// GAME CONTROLS
+
+const correctWordThrottled = throttle(playerCorrect, 500);
+const correctWord = ({ target }: { target: HTMLInputElement }) => {
+  correctWordThrottled();
+  if (target) target.blur();
+};
+
+const skipWordThrottled = throttle(playerSkip, 500);
+const skipWord = ({ target }: { target: HTMLInputElement }) => {
+  skipWordThrottled();
+  if (target) target.blur();
+};
+
+// SCORE SCREEN
+
+const playAgain = () => {
+  if (nowSeconds() - endTime.value > 2) {
+    reset();
+  }
+};
 </script>
 
 <style>

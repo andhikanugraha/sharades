@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 
-export {}
+export {};
 
 // import { register } from 'register-service-worker';
 

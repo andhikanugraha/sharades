@@ -120,9 +120,11 @@ watch(props, (p) => {
   maxKey.value = words.length;
 });
 
-const cancel = () => emit('cancel');
+function cancel() {
+  emit('cancel');
+}
 
-const addWord = (word = '') => {
+function addWord(word = '') {
   wordList.push({
     word,
     key: maxKey.value,
@@ -130,11 +132,13 @@ const addWord = (word = '') => {
   });
 
   maxKey.value += 1;
-};
+}
 
-const handleEnter = () => addWord('');
+function handleEnter() {
+  addWord('');
+}
 
-const handlePaste = (event: ClipboardEvent) => {
+function handlePaste(event: ClipboardEvent) {
   const copied = event.clipboardData?.getData('text/plain').trim();
   if (copied && copied.includes('\n')) {
     event.preventDefault();
@@ -142,10 +146,11 @@ const handlePaste = (event: ClipboardEvent) => {
     const words = copied?.split(/[\r\n]+/);
     words?.forEach((word) => addWord(word));
   }
-};
+}
 
 const canSave = computed(() => viewTitle.value && wordList.length > 1);
-const save = () => {
+
+function save() {
   if (!canSave.value) return;
 
   const updatedTopic: Topic = {
@@ -153,23 +158,29 @@ const save = () => {
     words: wordList.map((item) => item.word),
   };
   emit('save', updatedTopic);
-};
-const deleteTopic = () => {
-  if (confirm('Are you sure you want to delete this topic?'))
+}
+
+function deleteTopic() {
+  // eslint-disable-next-line no-alert, no-restricted-globals
+  if (confirm('Are you sure you want to delete this topic?')) {
     emit('delete');
-};
-const deleteWordAtIndex = (idx: number) => {
+  }
+}
+
+function deleteWordAtIndex(idx: number) {
   wordList.splice(idx, 1);
-};
-const onBlur = (idx: number) => {
+}
+
+function onBlur(idx: number) {
   if (wordList[idx].word.trim() === '') {
     emptyIndices.add(idx);
   }
-};
-const onFocus = () => {
+}
+
+function onFocus() {
   if (emptyIndices.size > 0) {
     emptyIndices.forEach((emptyIndex) => deleteWordAtIndex(emptyIndex));
     emptyIndices.clear();
   }
-};
+}
 </script>

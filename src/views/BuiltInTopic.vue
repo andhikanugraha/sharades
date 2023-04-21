@@ -14,7 +14,7 @@ import { getBuiltInTopicByTitle } from '../lib/topic';
 import TheGame from '../components/TheGame.vue';
 
 export default defineComponent({
-  name: 'Game',
+  name: 'BuiltInTopic',
   components: { TheGame },
   props: {
     builtInTopicTitle: String,

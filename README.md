@@ -1,4 +1,4 @@
-# sharades-vue3
+# sharades
 
 ## Project setup
 ```

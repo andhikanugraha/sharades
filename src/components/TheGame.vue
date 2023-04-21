@@ -100,7 +100,7 @@
 
 <script lang="ts" setup>
 import {
-  ref, computed, defineProps,
+  ref, computed,
 } from 'vue';
 import type { PropType } from 'vue';
 import { useRouter } from 'vue-router';
@@ -167,13 +167,15 @@ const {
 // GAME CONTROLS
 
 const correctWordThrottled = throttle(playerCorrect, 500);
-const correctWord = ({ target }: { target: HTMLInputElement }) => {
+const correctWord = (event: MouseEvent) => {
+  const target = event.target as HTMLInputElement | null;
   correctWordThrottled();
   if (target) target.blur();
 };
 
 const skipWordThrottled = throttle(playerSkip, 500);
-const skipWord = ({ target }: { target: HTMLInputElement }) => {
+const skipWord = (event: MouseEvent) => {
+  const target = event.target as HTMLInputElement | null;
   skipWordThrottled();
   if (target) target.blur();
 };

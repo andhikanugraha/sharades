@@ -1,10 +1,10 @@
 import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 
-const Home = () => import('./views/Home.vue');
+const Home = () => import('./views/HomePage.vue');
 const BuiltInTopic = () => import('./views/BuiltInTopic.vue');
 const StoredTopic = () => import('./views/StoredTopic.vue');
 const NewTopic = () => import('./views/NewTopic.vue');
-const Edit = () => import('./views/Edit.vue');
+const Edit = () => import('./views/EditPage.vue');
 
 const routes: Array<RouteRecordRaw> = [
   {

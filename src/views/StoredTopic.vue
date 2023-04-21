@@ -18,7 +18,7 @@ import { decodeTopic } from '../lib/TopicEncoding';
 import TheGame from '../components/TheGame.vue';
 
 export default defineComponent({
-  name: 'Game',
+  name: 'StoredTopic',
   components: { TheGame },
   props: {
     id: String,

@@ -88,7 +88,7 @@ body {
 }
 #app.fonts-loaded {
   --font-family-base: 'Inter', var(--font-family-system);
-  font-familY: var(--font-family-base);
+  font-family: var(--font-family-base);
 }
 
 .close-button,

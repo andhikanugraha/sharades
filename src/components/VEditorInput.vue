@@ -3,47 +3,33 @@
     type="text"
     ref="input"
     v-model.trim.lazy="value"
-    @blur="blur"
-    @focus="focus"
-    @keyup="keyup($event)"
   />
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import {
-  defineComponent, watch, ref, onMounted, watchEffect,
+  watch, ref, onMounted, watchEffect,
 } from 'vue';
 
-export default defineComponent({
-  name: 'VEditorInput',
-  props: {
-    modelValue: String,
-    autoFocus: Boolean,
-  },
-  setup(props, { emit }) {
-    const value = ref(props.modelValue);
-    const input = ref<HTMLInputElement>();
-    const blur = () => emit('blur');
-    const focus = () => emit('focus');
-    const keyup = (e: KeyboardEvent) => emit('keyup', e);
-    const doDelete = () => emit('delete');
-
-    watchEffect(() => {
-      value.value = props.modelValue;
-      if (props.autoFocus) {
-        onMounted(() => input.value?.focus());
-      }
-    });
-    watch(value, (v) => emit('update:modelValue', v));
-
-    return {
-      value,
-      input,
-      blur,
-      focus,
-      keyup,
-      doDelete,
-    };
-  },
+const props = defineProps({
+  modelValue: String,
+  autoFocus: Boolean,
 });
+
+const emit = defineEmits(['delete', 'update:modelValue']);
+
+const value = ref(props.modelValue);
+const input = ref<HTMLInputElement>();
+
+onMounted(() => {
+  if (props.autoFocus) input.value?.focus();
+});
+watchEffect(() => {
+  value.value = props.modelValue;
+  if (props.autoFocus) {
+    onMounted(() => input.value?.focus());
+  }
+});
+watch(value, (v) => emit('update:modelValue', v));
+
 </script>

@@ -155,7 +155,8 @@ const save = () => {
   emit('save', updatedTopic);
 };
 const deleteTopic = () => {
-  emit('delete');
+  if (confirm('Are you sure you want to delete this topic?'))
+    emit('delete');
 };
 const deleteWordAtIndex = (idx: number) => {
   wordList.splice(idx, 1);

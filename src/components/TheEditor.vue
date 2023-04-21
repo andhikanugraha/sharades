@@ -24,7 +24,8 @@
             type="text"
             v-model="viewTitle"
             :auto-focus="isNew"
-            @keyup.enter="addWord"
+            @keyup.enter="handleEnter"
+            @paste="handlePaste"
           />
         </p>
       </div>
@@ -35,15 +36,16 @@
             v-model="item.word"
             :auto-focus="item.focus"
             @blur="onBlur(i)"
-            @focus="onFocus(i)"
-            @keyup.enter="addWord"
+            @focus="onFocus"
+            @keyup.enter="handleEnter"
+            @paste="handlePaste"
           />
           <span class="item-delete" @click="deleteWordAtIndex(i)">
             <v-icon :icon="faTimesCircle" />
           </span>
         </p>
         <p>
-          <button @click="addWord">
+          <button @click="addWord('')">
             <v-icon :icon="faPlus" />
             Add Word
           </button>
@@ -60,9 +62,8 @@
   </main>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import {
-  defineComponent,
   ref,
   computed,
   reactive,
@@ -88,98 +89,86 @@ interface WordListItem {
   focus?: boolean;
 }
 
-export default defineComponent({
-  name: 'TheEditor',
-  props: {
-    title: String,
-    words: Array as { new (): string[] },
-    id: String,
-  },
-  emits: {
-    save: (topic: Topic) => !!topic,
-    delete: () => true,
-    cancel: () => true,
-  },
-  components: { VIcon, VEditorInput },
-  setup(props, { emit }) {
-    const viewTitle = ref(props.title || '');
-    const wordList = reactive<WordListItem[]>(
-      props.words?.map((word, key) => ({ key, word })) || [],
-    );
-    const maxKey = ref<number>(props.words?.length || 0);
-    const emptyIndices = reactive(new Set<number>());
-    const viewId = ref(props.id || '');
-    const isNew = computed(() => !viewId.value);
-
-    watchEffect(() => {
-      viewTitle.value = props.title || '';
-    });
-    watch(props, (p) => {
-      const words = p.words || [];
-      wordList.splice(0);
-      wordList.splice(0, 0, ...words.map((word, key) => ({ key, word })));
-      maxKey.value = words.length;
-    });
-
-    const cancel = () => emit('cancel');
-    const addWord = () => {
-      wordList.push({
-        word: '',
-        key: maxKey.value,
-        focus: true,
-      });
-
-      maxKey.value += 1;
-    };
-    const canSave = computed(() => viewTitle.value && wordList.length > 1);
-    const save = () => {
-      if (!canSave.value) return;
-
-      const updatedTopic: Topic = {
-        title: viewTitle.value,
-        words: wordList.map((item) => item.word),
-      };
-      emit('save', updatedTopic);
-    };
-    const deleteTopic = () => {
-      emit('delete');
-    };
-    const deleteWordAtIndex = (idx: number) => {
-      wordList.splice(idx, 1);
-    };
-    const onBlur = (idx: number) => {
-      if (wordList[idx].word.trim() === '') {
-        emptyIndices.add(idx);
-      }
-    };
-    const onFocus = () => {
-      if (emptyIndices.size > 0) {
-        emptyIndices.forEach((emptyIndex) => deleteWordAtIndex(emptyIndex));
-        emptyIndices.clear();
-      }
-    };
-
-    return {
-      viewTitle,
-      wordList,
-      maxKey,
-      emptyIndices,
-      isNew,
-      cancel,
-      addWord,
-      canSave,
-      save,
-      deleteTopic,
-      onBlur,
-      onFocus,
-      deleteWordAtIndex,
-      // icons
-      faSave,
-      faPlus,
-      faTimes,
-      faTimesCircle,
-      faTrashAlt,
-    };
-  },
+const props = defineProps({
+  title: String,
+  words: Array as { new (): string[] },
+  id: String,
 });
+
+const emit = defineEmits({
+  save: (topic: Topic) => !!topic,
+  delete: () => true,
+  cancel: () => true,
+});
+
+const viewTitle = ref(props.title || '');
+const wordList = reactive<WordListItem[]>(
+  props.words?.map((word, key) => ({ key, word })) || [],
+);
+const maxKey = ref<number>(props.words?.length || 0);
+const emptyIndices = reactive(new Set<number>());
+const viewId = ref(props.id || '');
+const isNew = computed(() => !viewId.value);
+
+watchEffect(() => {
+  viewTitle.value = props.title || '';
+});
+watch(props, (p) => {
+  const words = p.words || [];
+  wordList.splice(0);
+  wordList.splice(0, 0, ...words.map((word, key) => ({ key, word })));
+  maxKey.value = words.length;
+});
+
+const cancel = () => emit('cancel');
+
+const addWord = (word = '') => {
+  wordList.push({
+    word,
+    key: maxKey.value,
+    focus: true,
+  });
+
+  maxKey.value += 1;
+};
+
+const handleEnter = () => addWord('');
+
+const handlePaste = (event: ClipboardEvent) => {
+  const copied = event.clipboardData?.getData('text/plain').trim();
+  if (copied && copied.includes('\n')) {
+    event.preventDefault();
+    window.getSelection()?.deleteFromDocument();
+    const words = copied?.split(/[\r\n]+/);
+    words?.forEach((word) => addWord(word));
+  }
+};
+
+const canSave = computed(() => viewTitle.value && wordList.length > 1);
+const save = () => {
+  if (!canSave.value) return;
+
+  const updatedTopic: Topic = {
+    title: viewTitle.value,
+    words: wordList.map((item) => item.word),
+  };
+  emit('save', updatedTopic);
+};
+const deleteTopic = () => {
+  emit('delete');
+};
+const deleteWordAtIndex = (idx: number) => {
+  wordList.splice(idx, 1);
+};
+const onBlur = (idx: number) => {
+  if (wordList[idx].word.trim() === '') {
+    emptyIndices.add(idx);
+  }
+};
+const onFocus = () => {
+  if (emptyIndices.size > 0) {
+    emptyIndices.forEach((emptyIndex) => deleteWordAtIndex(emptyIndex));
+    emptyIndices.clear();
+  }
+};
 </script>

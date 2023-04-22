@@ -11,9 +11,9 @@
   </svg>
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import {
-  defineComponent, PropType, ref, reactive, computed,
+  PropType, ref, reactive, computed,
 } from 'vue';
 import type {
   IconDefinition, IconLookup,
@@ -21,35 +21,23 @@ import type {
 
 type Icon = IconDefinition & IconLookup;
 
-export default defineComponent({
-  name: 'VIcon',
-  props: {
-    icon: {
-      type: Object as PropType<Icon>,
-      required: true,
-    },
-    class: String,
-    fixedWidth: Boolean,
+const props = defineProps({
+  icon: {
+    type: Object as PropType<Icon>,
+    required: true,
   },
-  setup(props) {
-    const icon = reactive(props.icon.icon);
-    const iconName = ref(props.icon.iconName);
-    const prefix = ref(props.icon.prefix);
-
-    const viewBox = computed(() => `0 0 ${icon[0]} ${icon[1]}`);
-    const svgPathData = computed(() => icon[4]);
-
-    const combinedClass = computed(() => `${props.class || ''} icon`.trim());
-
-    return {
-      prefix,
-      iconName,
-      svgPathData,
-      viewBox,
-      combinedClass,
-    };
-  },
+  class: String,
+  fixedWidth: Boolean,
 });
+
+const icon = reactive(props.icon.icon);
+const iconName = ref(props.icon.iconName);
+const prefix = ref(props.icon.prefix);
+
+const viewBox = computed(() => `0 0 ${icon[0]} ${icon[1]}`);
+const svgPathData = computed(() => icon[4] as string);
+
+const combinedClass = computed(() => `${props.class || ''} icon`.trim());
 </script>
 
 <style>

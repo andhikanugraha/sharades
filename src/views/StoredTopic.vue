@@ -10,21 +10,22 @@
 import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import {
-  TopicIndex, findTopicId, saveTopic,
+  useTopicIndex, findTopicId, saveTopic,
 } from '../lib/TopicStore';
 import { decodeTopic } from '../lib/TopicEncoding';
 import TheGame from '../components/TheGame.vue';
 
 const props = defineProps<{
-  id: string,
-  encodedTopic: string,
-  storedTopics: TopicIndex
+  id?: string,
+  encodedTopic: string
 }>();
+
+const storedTopics = useTopicIndex();
 
 const router = useRouter();
 const getStartingTitle = () => {
-  if (props.storedTopics && props.id) {
-    return props.storedTopics.find((t) => t.id === props.id)?.title;
+  if (storedTopics && props.id) {
+    return storedTopics.find((t) => t.id === props.id)?.title;
   }
 
   return '';

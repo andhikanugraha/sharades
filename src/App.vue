@@ -222,6 +222,7 @@ button {
   -webkit-tap-highlight-color: transparent;
   color: var(--color-foreground);
   background: var(--button-color);
+  cursor: pointer;
 }
 button:hover {
   background-color: var(--button-color-hover);
@@ -237,6 +238,10 @@ button::-moz-focus-inner {
 }
 button .icon {
   margin-right: .2em;
+}
+
+svg[data-icon] {
+  cursor: pointer;
 }
 
 #start, #correct {

@@ -5,49 +5,36 @@
   />
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
 import {
-  defineComponent, ref, watchEffect,
+  ref, watchEffect,
 } from 'vue';
 import { useRouter } from 'vue-router';
 import { getBuiltInTopicByTitle } from '../lib/topic';
 import TheGame from '../components/TheGame.vue';
 
-export default defineComponent({
-  name: 'BuiltInTopic',
-  components: { TheGame },
-  props: {
-    builtInTopicTitle: String,
-    isFullScreen: Boolean,
-  },
-  setup(props) {
-    const router = useRouter();
-    const title = ref(props.builtInTopicTitle || '\xa0');
-    const words = ref<string[]>([]);
+const props = defineProps<{ builtInTopicTitle: string }>();
 
-    const notFound = () => router.replace({ name: 'home' });
+const router = useRouter();
+const title = ref(props.builtInTopicTitle || '\xa0');
+const words = ref<string[]>([]);
 
-    watchEffect(async () => {
-      const { builtInTopicTitle } = props;
-      if (!builtInTopicTitle) {
-        notFound();
-        return;
-      }
+const notFound = () => router.replace({ name: 'home' });
 
-      const topic = await getBuiltInTopicByTitle(builtInTopicTitle);
-      if (!topic) {
-        notFound();
-        return;
-      }
+watchEffect(async () => {
+  const { builtInTopicTitle } = props;
+  if (!builtInTopicTitle) {
+    notFound();
+    return;
+  }
 
-      title.value = topic.title;
-      words.value = topic.words;
-    });
+  const topic = await getBuiltInTopicByTitle(builtInTopicTitle);
+  if (!topic) {
+    notFound();
+    return;
+  }
 
-    return {
-      title,
-      words,
-    };
-  },
+  title.value = topic.title;
+  words.value = topic.words;
 });
 </script>

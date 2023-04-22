@@ -40,6 +40,8 @@ export default defineComponent({
   --color-secondary-dark: #c21b52;
   --color-secondary-darker: #ab1848;
   --border-width: calc(0.2 * var(--spacer));
+
+  --border-radius: calc((var(--spacer) * 2 + var(--font-size-secondary)) / 2);
 }
 
 @font-face {
@@ -207,13 +209,13 @@ button {
   --button-color-focus: var(--color-primary-darker);
   display: block;
   width: 100%;
-  padding: var(--spacer);
+  padding: var(--spacer) calc(var(--spacer) * 2);
   font-family: var(--font-family-base);
   font-weight: bold;
   font-size: var(--font-size-secondary);
   line-height: 1;
   border: none;
-  border-radius: calc((var(--spacer) * 2 + var(--font-size-secondary)) / 2);
+  border-radius: var(--border-radius);
   outline: none;
   touch-action: manipulation;
   cursor: pointer;

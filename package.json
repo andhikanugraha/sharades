@@ -13,6 +13,7 @@
     "fontfaceobserver-es": "^3.3.3",
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
+    "qrcode.vue": "^3.4.0",
     "register-service-worker": "^1.7.1",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"

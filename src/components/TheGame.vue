@@ -59,7 +59,7 @@
       </p>
     </nav>
   </template>
-  <template v-else>
+  <template v-else-if="!isSharing">
     <header>
       <div class="close-button" @click="goHome">
         <v-icon :icon="faHome" />
@@ -96,11 +96,18 @@
       </p>
     </nav>
   </template>
+  <template v-else>
+    <the-share-dialog
+      :title="props.title"
+      @close="isSharing = false"
+      @edit="goEdit"
+      :is-editable="isEditable" />
+  </template>
 </template>
 
 <script lang="ts" setup>
 import {
-  ref, computed,
+  ref, computed, defineAsyncComponent,
 } from 'vue';
 import type { PropType } from 'vue';
 import { useRouter } from 'vue-router';
@@ -117,15 +124,15 @@ import {
 import { throttle } from 'lodash-es';
 import { nowSeconds, useGame } from '../lib/game';
 import { exitFullscreen } from '../lib/fullscreen';
-import { canShare, useShare } from '../lib/share';
+
 import VIcon from './VIcon.vue';
 import VFit from './VFit.vue';
 
-const props = defineProps({
-  title: String,
-  words: Array as PropType<string[]>,
-  id: String,
-});
+const props = defineProps<{
+  title: string,
+  words: string[],
+  id?: string,
+}>();
 
 const router = useRouter();
 
@@ -149,7 +156,12 @@ const goEdit = () => {
   }
 };
 
-const goShare = useShare(viewTitle);
+const TheShareDialog = defineAsyncComponent(() => import('./TheShareDialog.vue'));
+const canShare = true;
+const isSharing = ref(false);
+function goShare() {
+  isSharing.value = true;
+}
 
 // START SCREEN
 

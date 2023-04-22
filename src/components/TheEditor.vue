@@ -10,80 +10,78 @@
     <h3 v-if="isNew">New Topic</h3>
     <h3 v-else>Edit Topic</h3>
   </header>
-  <main>
-    <div class="scrollable">
-      <div class="info">
-        <div class="label">Title:</div>
+  <main class="editor">
+    <div class="info">
+      <div class="label">Title:</div>
+      <p>
+        <v-editor-input
+          type="text"
+          v-model="viewTitle"
+          :auto-focus="isNew"
+          @keyup.enter="handleEnter"
+          @paste="handlePaste"
+        />
+      </p>
+    </div>
+    <div class="info">
+      <div class="label">Words:</div>
+      <p v-for="(item, i) in wordList" :key="item.key" class="item">
+        <v-editor-input
+          v-model="item.word"
+          :auto-focus="item.focus"
+          @blur="onBlur(i)"
+          @focus="onFocus"
+          @keyup.enter="handleEnter"
+          @paste="handlePaste"
+        />
+        <span class="item-delete" @click="deleteWordAtIndex(i)">
+          <v-icon :icon="faTimesCircle" />
+        </span>
+      </p>
+      <p>
+        <button @click="addWord('')">
+          <v-icon :icon="faPlus" />
+          Add Word
+        </button>
+      </p>
+      <hr>
+      <p>
+        <button @click="handleImport">
+          <v-icon :icon="faFileUpload" />
+          Import text file
+        </button>
+      </p>
+      <p>
+        <button @click="handleAddFromClipboard">
+          <v-icon :icon="faPaste" />
+          Paste from clipboard
+        </button>
+      </p>
+      <hr>
+      <template v-if="canSave">
         <p>
-          <v-editor-input
-            type="text"
-            v-model="viewTitle"
-            :auto-focus="isNew"
-            @keyup.enter="handleEnter"
-            @paste="handlePaste"
-          />
-        </p>
-      </div>
-      <div class="info">
-        <div class="label">Words:</div>
-        <p v-for="(item, i) in wordList" :key="item.key" class="item">
-          <v-editor-input
-            v-model="item.word"
-            :auto-focus="item.focus"
-            @blur="onBlur(i)"
-            @focus="onFocus"
-            @keyup.enter="handleEnter"
-            @paste="handlePaste"
-          />
-          <span class="item-delete" @click="deleteWordAtIndex(i)">
-            <v-icon :icon="faTimesCircle" />
-          </span>
-        </p>
-        <p>
-          <button @click="addWord('')">
-            <v-icon :icon="faPlus" />
-            Add Word
+          <button @click="save">
+            <v-icon :icon="faCheck" />
+            Save
           </button>
         </p>
+        <p>
+          <button @click="handleExport">
+            <v-icon :icon="faFileDownload" />
+            Export text file
+          </button>
+        </p>
+      </template>
+      <p class="label" v-else>You need a title and at least 2 words</p>
+      <template v-if="!isNew">
         <hr>
-        <p>
-          <button @click="handleImport">
-            <v-icon :icon="faFileUpload" />
-            Import text file
+        <p v-if="!isNew">
+          <button @click="deleteTopic" class="destructive">
+            <v-icon :icon="faTrashAlt" />
+            Delete topic
           </button>
         </p>
-        <p>
-          <button @click="handleAddFromClipboard">
-            <v-icon :icon="faPaste" />
-            Paste from clipboard
-          </button>
-        </p>
-        <hr>
-        <template v-if="canSave">
-          <p>
-            <button @click="save">
-              <v-icon :icon="faCheck" />
-              Save
-            </button>
-          </p>
-          <p>
-            <button @click="handleExport">
-              <v-icon :icon="faFileDownload" />
-              Export text file
-            </button>
-          </p>
-        </template>
-        <p class="label" v-else>You need a title and at least 2 words</p>
-        <template v-if="!isNew">
-          <hr>
-          <p v-if="!isNew">
-            <button @click="deleteTopic" class="destructive">
-              <v-icon :icon="faTrashAlt" />
-              Delete topic
-            </button>
-          </p>
-        </template>
-      </div>
+      </template>
     </div>
   </main>
 </template>

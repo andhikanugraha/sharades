@@ -9,8 +9,8 @@
       </div>
       <h3>Score: {{ score }}</h3>
     </header>
-    <main>
-      <div class="scrollable">
+    <main class="results">
+      <div class="content">
         <p class="play-again">
           <button @click="playAgain">
             <v-icon :icon="faUndo" @click="playAgain" />
@@ -19,8 +19,8 @@
         </p>
         <ol>
           <li v-for="(result, i) in results" :key="i" :class="{ correct: result.isCorrect }">
-            <v-icon :icon="result.isCorrect ? faCheck : faTimes" />
             {{ result.word }}
+            <v-icon :icon="faCheck" v-if="result.isCorrect" />
           </li>
         </ol>
       </div>
@@ -74,7 +74,7 @@
           <div class="label">Time limit:</div>
           <div class="value">
             <span
-              v-for="(opt) in [30, 60, 90, 120]"
+              v-for="(opt) in [10, 30, 60, 90, 120]"
               :key="opt"
               :class="{option: true, selected: timeLimit === opt }"
               @click="setTimeLimit(opt)">{{ opt }}</span>
@@ -141,8 +141,8 @@ const goHome = async () => {
 
 const isEditable = computed(() => !!props.id);
 const goEdit = () => {
+  exitFullscreen(false);
   if (props.id) {
-    exitFullscreen(false);
     router.push({
       name: 'edit',
       params: { id: props.id },
@@ -211,7 +211,7 @@ function playAgain() {
 }
 
 .play-again {
-  padding-bottom: var(--spacer);
+  padding-bottom: calc(2 * var(--font-size-base));
 }
 .play-again button {
   width: auto;

@@ -25,13 +25,14 @@ export default defineComponent({
     "Segoe UI Symbol";
   --font-family-base: var(--font-family-system);
   --font-size-base: 1rem;
-  --font-size-secondary: calc(1.5 * var(--font-size-base));
+  --font-size-primary: calc(1.6 * var(--font-size-base));
+  --font-size-secondary: calc(1.2 * var(--font-size-base));
   --font-size-tertiary: var(--font-size-base);
 
   --spacer: calc(var(--font-size-secondary) / 2);
   --color-background: #1a5d63;
   --color-background-dark: #154a4f;
-  --color-background-darker: #0f373b;
+  --color-background-darker: hsla(185, 59%, 0%, 60%);
   --color-foreground: #fef0d5;
   --color-primary: #00beb2;
   --color-primary-dark: #00a49a;
@@ -39,9 +40,9 @@ export default defineComponent({
   --color-secondary: #d81e5b;
   --color-secondary-dark: #c21b52;
   --color-secondary-darker: #ab1848;
-  --border-width: calc(0.2 * var(--spacer));
+  --border-width: calc(0.3 * var(--spacer));
 
-  --border-radius: calc((var(--spacer) * 2 + var(--font-size-secondary)) / 2);
+  --border-radius: var(--spacer);
 }
 
 @font-face {
@@ -81,7 +82,7 @@ body {
   background: var(--color-background);
   display: flex;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   flex-direction: column;
   text-align: center;
 }
@@ -117,14 +118,16 @@ body {
 
 header {
   padding: calc(var(--spacer) * 2) var(--spacer);
-  background: var(--color-background-dark);
+  background: var(--color-background-darker);
+  backdrop-filter: blur(5px);
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 main {
-  position: relative;
   display: flex;
   width: 100%;
-  flex-grow: 1;
-  flex-basis: 0;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-content: center;
@@ -134,9 +137,32 @@ nav {
   display: flex;
   flex-direction: row-reverse;
   width: 100%;
+  padding-bottom: var(--spacer)
 }
 nav p {
   padding: (var(--spacer) / 2);
+}
+
+#app:fullscreen {
+  height: 100%;
+}
+#app:fullscreen header {
+  position: relative;
+  flex: 0;
+}
+#app:fullscreen main {
+  position: relative;
+  flex: 1;
+}
+#app:fullscreen .content {
+  display: flex;
+  height: 100%;
+  overflow-y: scroll;
+  justify-content: center;
+  flex-direction: column;
+}
+#app:fullscreen nav {
+  flex: 0;
 }
 
 @media (orientation: landscape) {
@@ -154,10 +180,7 @@ nav p {
   }
   nav {
     flex-direction: column-reverse;
-    padding-bottom: calc(env(safe-area-inset-bottom) + (var(--spacer) * 2));
-  }
-  nav button {
-    padding: calc(var(--spacer) * 2) calc(var(--spacer));
+    padding-bottom: calc(env(safe-area-inset-bottom) + var(--spacer));
   }
 }
 
@@ -176,31 +199,15 @@ h3 {
 }
 
 p {
-  position: relative;
   margin: calc(var(--spacer) / 2);
-  flex-basis: 0;
-  flex-grow: 1;
   align-content: center;
 }
 main p {
   margin: var(--spacer);
   flex-grow: 0;
 }
-
-.item-delete {
-  display: block;
-  position: absolute;
-  right: calc(var(--spacer) + var(--border-width));
-  top: calc(var(--spacer) + var(--border-width));
-  font-size: var(--font-size-secondary);
-  color: var(--color-primary);
-}
-
-input:focus + .item-delete {
-  color: var(--color-secondary);
-}
-button + .item-delete {
-  color: var(--color-background-dark);
+nav p {
+  flex: 1;
 }
 
 button {
@@ -209,10 +216,10 @@ button {
   --button-color-focus: var(--color-primary-darker);
   display: block;
   width: 100%;
-  padding: var(--spacer) calc(var(--spacer) * 2);
+  padding: calc(var(--spacer)) calc(var(--spacer) * 2);
   font-family: var(--font-family-base);
   font-weight: bold;
-  font-size: var(--font-size-secondary);
+  font-size: var(--font-size-base);
   line-height: 1;
   border: none;
   border-radius: var(--border-radius);
@@ -225,6 +232,9 @@ button {
   color: var(--color-foreground);
   background: var(--button-color);
   cursor: pointer;
+}
+nav button {
+  padding: calc(var(--spacer) * 2);
 }
 button:hover {
   background-color: var(--button-color-hover);
@@ -256,76 +266,144 @@ svg[data-icon] {
   --button-color-hover: var(--color-secondary-dark);
   --button-color-focus: var(--color-secondary-darker);
 }
-#create {
-  --button-color: var(--color-background-dark);
-  --button-color-hover: var(--color-background-darker);
-  --button-color-focus: var(--color-background-darker);
-}
 
 .delete-button {
   color: var(--color-secondary);
 }
 
+main.home {
+  margin: 0 auto;
+}
+main.home .content {
+  padding: calc(2 * var(--spacer)) 0;
+}
+#app:fullscreen main.home .content {
+  display: block;
+}
+main.home .content > * {
+  max-width: calc(60 * var(--font-size-base));
+  margin-left: auto;
+  margin-right: auto;
+}
+#create {
+  color: var(--color-background-dark);
+}
+.topic-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: calc(var(--spacer) * 0.5) 0;
+  margin-bottom: calc(-1 * var(--spacer));
+  align-items: stretch;
+  justify-content: center;
+}
+.topic-list p {
+  width: 50%;
+  padding: 0 calc(var(--spacer) * 0.5);
+  margin: 0 0 var(--spacer);
+}
+.topic-list p button {
+  height: 100%;
+}
+@media (min-width: 768px) {
+  .topic-list p {
+    width: 33.3%;
+  }
+}
+@media (min-width: 1024px) {
+  .topic-list p {
+    width: 25%;
+  }
+}
+
+main.editor {
+  max-width: calc(30 * var(--font-size-base));
+  margin: 0 auto;
+  justify-content: flex-start;
+}
+main.editor p {
+  position: relative;
+}
 input {
   user-select: text;
   display: block;
   width: 100%;
   font: inherit;
   font-size: var(--font-size-secondary);
-  /* font-weight: bold; */
   text-align: center;
   background: var(--color-background-dark);
   color: var(--color-foreground);
   border: var(--border-width) solid transparent;
   padding: var(--spacer);
-  border-radius: 4vmax;
+  border-radius: var(--border-radius);
 }
 input:focus {
   outline: 0;
-  background: var(--color-foreground);
-  color: var(--color-background);
   border: var(--border-width) solid var(--color-primary);
 }
 
-main > div.scrollable {
-  overflow-y: auto;
+span.item-delete {
+  display: block;
+  position: absolute;
+  right: calc(var(--spacer) + var(--border-width));
+  top: calc(var(--spacer) + var(--border-width));
+  font-size: var(--font-size-secondary);
+  color: var(--color-background);
+}
+input:focus + span.item-delete {
+  visibility: visible;
+  color: var(--color-primary);
+}
+button + span.item-delete {
+  color: var(--color-background-dark);
 }
 
-div.info {
+.info {
   margin: calc(var(--spacer) * 2) 0;
 }
-div.info .label {
+.info .label {
   font-size: var(--font-size-tertiary);
-  color: var(--color-primary);
-  padding-bottom: calc(var(--spacer) / 2);
+  color: var(--color-foreground);
+  padding-bottom: var(--spacer);
 }
-div.info .value {
+.info .value {
   font-weight: bold;
-  font-size: calc(1.5 * var(--font-size-secondary));
+  font-size: var(--font-size-primary);
 }
-div.info .option {
+.info .option {
   display: inline-block;
   padding: 0 var(--spacer);
   color: var(--color-primary);
 }
-div.info .option.selected {
+.info .option.selected {
   color: var(--color-foreground);
 }
 
-ol {
-  margin: 0 var(--spacer);
+main.results .content {
+  padding: calc(2 * var(--spacer)) var(--spacer);
+}
+main.results ol {
   list-style: none outside;
+  margin: 0;
   padding: 0;
 }
-li {
+main.results li {
+  display: inline-block;
+  margin: 0 calc(var(--font-size-base));
   font-size: var(--font-size-secondary);
-  margin-bottom: var(--spacer);
+  margin-bottom: var(--font-size-base);
   color: var(--color-primary);
+  text-decoration: line-through;
   font-weight: bold;
   break-inside: avoid;
 }
-.correct {
+main.results li:not(.correct)::before,
+main.results li:not(.correct)::after {
+  content: '\00a0';
+}
+main.results li.correct {
   color: var(--color-foreground);
+  text-decoration: none;
 }
 
 hr {

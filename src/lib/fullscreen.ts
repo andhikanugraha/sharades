@@ -45,7 +45,7 @@ export async function exitFullscreen(updatePreference = true): Promise<void> {
     setPreference(Pref.NOT_FULLSCREEN);
   }
 
-  if (document.fullscreenElement && state.preference === Pref.NOT_FULLSCREEN) {
+  if (document.fullscreenElement) {
     document.exitFullscreen();
   }
 }

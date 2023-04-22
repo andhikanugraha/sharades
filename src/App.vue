@@ -243,7 +243,7 @@ button .icon {
   --button-color-hover: var(--color-primary-dark);
   --button-color-focus: var(--color-primary-darker);
 }
-#skip, #reset, #random {
+#skip, #reset, #random, button.destructive {
   --button-color: var(--color-secondary);
   --button-color-hover: var(--color-secondary-dark);
   --button-color-focus: var(--color-secondary-darker);
@@ -264,7 +264,7 @@ input {
   width: 100%;
   font: inherit;
   font-size: var(--font-size-secondary);
-  font-weight: bold;
+  /* font-weight: bold; */
   text-align: center;
   background: var(--color-background-dark);
   color: var(--color-foreground);

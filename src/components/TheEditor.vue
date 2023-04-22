@@ -4,13 +4,8 @@
       <v-icon :icon="faTimes" fixed-width />
     </div>
     <div class="pull-right">
-      <v-icon
-        :icon="faTrashAlt"
-        class="delete-button"
-        @click="deleteTopic"
-        v-if="!isNew"
-      />
-      <v-icon :icon="faSave" @click="save" v-if="canSave" />
+      <v-icon :icon="faFileDownload" @click="handleExport" v-if="canSave" />
+      <v-icon :icon="faCheck" @click="save" v-if="canSave" />
     </div>
     <h3 v-if="isNew">New Topic</h3>
     <h3 v-else>Edit Topic</h3>
@@ -50,19 +45,44 @@
             Add Word
           </button>
         </p>
+        <hr>
+        <p>
+          <button @click="handleImport">
+            <v-icon :icon="faFileUpload" />
+            Import text file
+          </button>
+        </p>
         <p>
           <button @click="handleAddFromClipboard">
             <v-icon :icon="faPaste" />
-            Paste from Clipboard
+            Paste from clipboard
           </button>
         </p>
-        <p v-if="canSave">
-          <button @click="save">
-            <v-icon :icon="faSave" />
-            Save
-          </button>
-        </p>
+        <hr>
+        <template v-if="canSave">
+          <p>
+            <button @click="save">
+              <v-icon :icon="faCheck" />
+              Save
+            </button>
+          </p>
+          <p>
+            <button @click="handleExport">
+              <v-icon :icon="faFileDownload" />
+              Export text file
+            </button>
+          </p>
+        </template>
         <p class="label" v-else>You need a title and at least 2 words</p>
+        <template v-if="!isNew">
+          <hr>
+          <p v-if="!isNew">
+            <button @click="deleteTopic" class="destructive">
+              <v-icon :icon="faTrashAlt" />
+              Delete topic
+            </button>
+          </p>
+        </template>
       </div>
     </div>
   </main>
@@ -78,12 +98,14 @@ import {
 } from 'vue';
 
 import {
-  faSave,
+  faCheck,
   faPlus,
   faTimes,
   faTimesCircle,
   faTrashAlt,
   faPaste,
+  faFileDownload,
+  faFileUpload,
 } from '@fortawesome/free-solid-svg-icons';
 
 import VIcon from './VIcon.vue';
@@ -162,22 +184,39 @@ function handlePaste(event: ClipboardEvent) {
 
 async function handleAddFromClipboard() {
   try {
-    // const queryOpts = { name: 'clipboard-read', allowWithoutGesture: false };
-    // const permissionStatus = await navigator.permissions.query(queryOpts as any);
-    // // Will be 'granted', 'denied' or 'prompt':
-    // console.log(permissionStatus.state);
-
-    // // Listen for changes to the permission state
-    // permissionStatus.onchange = () => {
-    //   console.log(permissionStatus.state);
-    // };
-
     const rawInput = await navigator.clipboard.readText();
     processBulkInput(rawInput);
   } catch (e) {
     console.log(e);
     // do nothing
   }
+}
+
+async function handleImport() {
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.onchange = async () => {
+    if (fileInput.value && fileInput.files) {
+      const selectedFile = fileInput.files[0];
+      if (!viewTitle.value) {
+        const filename = selectedFile.name;
+        viewTitle.value = filename.substring(0, filename.length - 4);
+      }
+      const importedText = await selectedFile.text();
+      processBulkInput(importedText);
+    }
+  };
+  fileInput.click();
+}
+
+async function handleExport() {
+  const text = wordList.map((w) => w.word).join('\n');
+  const filename = `${viewTitle.value}.txt`;
+  const file = new File([text], filename, { type: 'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file);
+  a.download = filename;
+  a.click();
 }
 
 const canSave = computed(() => viewTitle.value && wordList.length > 1);

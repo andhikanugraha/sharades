@@ -50,6 +50,12 @@
             Add Word
           </button>
         </p>
+        <p>
+          <button @click="handleAddFromClipboard">
+            <v-icon :icon="faPaste" />
+            Paste from Clipboard
+          </button>
+        </p>
         <p v-if="canSave">
           <button @click="save">
             <v-icon :icon="faSave" />
@@ -77,6 +83,7 @@ import {
   faTimes,
   faTimesCircle,
   faTrashAlt,
+  faPaste,
 } from '@fortawesome/free-solid-svg-icons';
 
 import VIcon from './VIcon.vue';
@@ -138,6 +145,11 @@ function handleEnter() {
   addWord('');
 }
 
+function processBulkInput(multiLineInput: string) {
+  const words = multiLineInput.split(/[\r\n]+/);
+  words.forEach((word) => addWord(word));
+}
+
 function handlePaste(event: ClipboardEvent) {
   const copied = event.clipboardData?.getData('text/plain').trim();
   if (copied && copied.includes('\n')) {
@@ -145,6 +157,26 @@ function handlePaste(event: ClipboardEvent) {
     window.getSelection()?.deleteFromDocument();
     const words = copied?.split(/[\r\n]+/);
     words?.forEach((word) => addWord(word));
+  }
+}
+
+async function handleAddFromClipboard() {
+  try {
+    // const queryOpts = { name: 'clipboard-read', allowWithoutGesture: false };
+    // const permissionStatus = await navigator.permissions.query(queryOpts as any);
+    // // Will be 'granted', 'denied' or 'prompt':
+    // console.log(permissionStatus.state);
+
+    // // Listen for changes to the permission state
+    // permissionStatus.onchange = () => {
+    //   console.log(permissionStatus.state);
+    // };
+
+    const rawInput = await navigator.clipboard.readText();
+    processBulkInput(rawInput);
+  } catch (e) {
+    console.log(e);
+    // do nothing
   }
 }
 

@@ -106,5 +106,8 @@ async function doShare() {
   margin: var(--spacer);
   border: calc(var(--border-radius) / 2) solid #fff;
   border-radius: calc(var(--border-radius) / 2);
+  width: 200px;
+  height: 200px;
+  box-sizing: content-box;
 }
 </style>

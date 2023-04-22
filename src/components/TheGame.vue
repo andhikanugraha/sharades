@@ -107,9 +107,8 @@
 
 <script lang="ts" setup>
 import {
-  ref, computed, defineAsyncComponent,
+  ref, computed,
 } from 'vue';
-import type { PropType } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   faHome,
@@ -122,6 +121,7 @@ import {
   faShare,
 } from '@fortawesome/free-solid-svg-icons';
 import { throttle } from 'lodash-es';
+import TheShareDialog from './TheShareDialog.vue';
 import { nowSeconds, useGame } from '../lib/game';
 import { exitFullscreen } from '../lib/fullscreen';
 
@@ -156,7 +156,6 @@ const goEdit = () => {
   }
 };
 
-const TheShareDialog = defineAsyncComponent(() => import('./TheShareDialog.vue'));
 const canShare = true;
 const isSharing = ref(false);
 function goShare() {

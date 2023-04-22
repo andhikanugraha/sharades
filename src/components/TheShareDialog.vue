@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import QrCode from 'qrcode.vue';
+import { computed, defineAsyncComponent } from 'vue';
 import {
   faCopy,
   faEdit,
@@ -16,9 +16,13 @@ const props = defineProps<{
 
 const emit = defineEmits<{(e: 'close' | 'edit'): void}>();
 
+const QrCode = defineAsyncComponent(() => import('qrcode.vue'));
+
 function getShareUrl() {
   return `https://sharades.app/${window.location.hash}`;
 }
+
+const shareUrl = computed(() => getShareUrl());
 
 function doCopy() {
   try {
@@ -56,9 +60,10 @@ async function doShare() {
   </header>
   <main class="share-dialog">
     <div class="qr-col">
-      <div class="qr"><qr-code value="https://google.com" render-as="canvas" :size="200"></qr-code></div>
+      <div class="qr"><qr-code :value="shareUrl" render-as="canvas" :size="200"></qr-code></div>
     </div>
     <div class="btns">
+      <p>Play this topic with friends</p>
       <h3 class="topic-title">{{ props.title }}</h3>
       <hr>
       <p>

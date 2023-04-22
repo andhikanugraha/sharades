@@ -26,9 +26,6 @@ onMounted(() => {
 });
 watchEffect(() => {
   value.value = props.modelValue;
-  if (props.autoFocus) {
-    onMounted(() => input.value?.focus());
-  }
 });
 watch(value, (v) => emit('update:modelValue', v));
 

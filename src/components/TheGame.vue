@@ -131,7 +131,7 @@ const router = useRouter();
 
 const viewTitle = computed(() => props.title);
 
-// NAVIGATION & START SCREEN
+// NAVIGATION
 
 const goHome = async () => {
   router.push({ name: 'home' });
@@ -151,10 +151,14 @@ const goEdit = () => {
 
 const goShare = useShare(viewTitle);
 
+// START SCREEN
+
 const timeLimit = ref(60);
 const setTimeLimit = (newTimeLimit: number) => {
   timeLimit.value = newTimeLimit;
 };
+
+// GAME LOOP
 
 const {
   isStarted, isFinished,
@@ -167,26 +171,26 @@ const {
 // GAME CONTROLS
 
 const correctWordThrottled = throttle(playerCorrect, 500);
-const correctWord = (event: MouseEvent) => {
+function correctWord(event: MouseEvent) {
   const target = event.target as HTMLInputElement | null;
   correctWordThrottled();
-  if (target) target.blur();
-};
+  if (target) { target.blur(); }
+}
 
 const skipWordThrottled = throttle(playerSkip, 500);
-const skipWord = (event: MouseEvent) => {
+function skipWord(event: MouseEvent) {
   const target = event.target as HTMLInputElement | null;
   skipWordThrottled();
-  if (target) target.blur();
-};
+  if (target) { target.blur(); }
+}
 
 // SCORE SCREEN
 
-const playAgain = () => {
+function playAgain() {
   if (nowSeconds() - endTime.value > 2) {
     reset();
   }
-};
+}
 </script>
 
 <style>

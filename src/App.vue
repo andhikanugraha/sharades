@@ -218,6 +218,7 @@ button {
   touch-action: manipulation;
   cursor: pointer;
   -webkit-appearance: button;
+  appearance: button;
   -webkit-tap-highlight-color: transparent;
   color: var(--color-foreground);
   background: var(--button-color);

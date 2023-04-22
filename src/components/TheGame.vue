@@ -11,6 +11,12 @@
     </header>
     <main>
       <div class="scrollable">
+        <p class="play-again">
+          <button @click="playAgain">
+            <v-icon :icon="faUndo" @click="playAgain" />
+            Play again
+          </button>
+        </p>
         <ol>
           <li v-for="(result, i) in results" :key="i" :class="{ correct: result.isCorrect }">
             <v-icon :icon="result.isCorrect ? faCheck : faTimes" />
@@ -19,18 +25,6 @@
         </ol>
       </div>
     </main>
-    <nav>
-      <p>
-        <button @click="goHome">
-          <v-icon :icon="faHome" />Home
-        </button>
-      </p>
-      <p>
-        <button id="reset" @click="playAgain">
-          <v-icon :icon="faUndo" />Play again
-        </button>
-      </p>
-    </nav>
   </template>
   <template v-else-if="isStarted">
     <header>
@@ -122,7 +116,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { throttle } from 'lodash-es';
 import TheShareDialog from './TheShareDialog.vue';
-import { nowSeconds, useGame } from '../lib/game';
+import { useGame } from '../lib/game';
 import { exitFullscreen } from '../lib/fullscreen';
 
 import VIcon from './VIcon.vue';
@@ -176,7 +170,7 @@ const {
   start,
   remainingSeconds, currentWord,
   playerCorrect, playerSkip,
-  score, results, reset, endTime,
+  score, results, reset,
 } = useGame(props, timeLimit);
 
 // GAME CONTROLS
@@ -198,9 +192,7 @@ function skipWord(event: MouseEvent) {
 // SCORE SCREEN
 
 function playAgain() {
-  if (nowSeconds() - endTime.value > 2) {
-    reset();
-  }
+  reset();
 }
 </script>
 
@@ -217,6 +209,15 @@ function playAgain() {
   height: 100%;
   flex-grow: 1;
 }
+
+.play-again {
+  padding-bottom: var(--spacer);
+}
+.play-again button {
+  width: auto;
+  display: inline-block;
+}
+
 @media (orientation: portrait) {
   .overlay {
     display: none;

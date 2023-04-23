@@ -1,5 +1,4 @@
 import { ref, reactive } from 'vue';
-import type { Router } from 'vue-router';
 import localForage from 'localforage';
 import { Topic } from './topic';
 
@@ -190,21 +189,6 @@ export async function findTopicId(topic: Topic): Promise<string | null> {
   }
 
   return id;
-}
-
-export async function goToTopicPage(router: Router, id: string): Promise<void> {
-  const topic = await loadTopic(id);
-  if (!topic) {
-    router.push({ name: 'home' });
-    return;
-  }
-
-  const { encodeTopic } = await import('./TopicEncoding');
-  const encodedTopic = await encodeTopic(topic);
-  router.push({
-    name: 'game',
-    params: { encodedTopic, id },
-  });
 }
 
 export function clearCache(): void {

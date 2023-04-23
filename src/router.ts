@@ -19,6 +19,12 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
   {
+    path: '/s/:id',
+    name: 'game-stored',
+    component: StoredTopic,
+    props: true,
+  },
+  {
     path: '/b/:builtInTopicTitle',
     name: 'game-built-in',
     component: BuiltInTopic,

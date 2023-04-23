@@ -57,17 +57,11 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import VIcon from '../components/VIcon.vue';
 import { useBuiltInTopicTitles } from '../lib/topic';
-import { useTopicIndex, goToTopicPage } from '../lib/TopicStore';
+import { useTopicIndex } from '../lib/TopicStore';
 import { requestFullscreen, exitFullscreen } from '../lib/fullscreen';
 
-(async function preload() {
-  // eslint-disable-next-line
-  import('./BuiltInTopic.vue');
-  // eslint-disable-next-line
-  import('./StoredTopic.vue');
-}());
-
 const router = useRouter();
+
 const storedTopics = useTopicIndex();
 const builtInTopicTitles = useBuiltInTopicTitles();
 
@@ -89,7 +83,10 @@ function openBuiltInTopic(builtInTopicTitle: string) {
 
 function openStoredTopic(id: string) {
   requestFullscreen(false);
-  goToTopicPage(router, id);
+  router.push({
+    name: 'game-stored',
+    params: { id },
+  });
 }
 
 function createNewTopic() {

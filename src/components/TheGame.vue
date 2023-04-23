@@ -74,7 +74,7 @@
           <div class="label">Time limit:</div>
           <div class="value">
             <span
-              v-for="(opt) in [10, 30, 60, 90, 120]"
+              v-for="(opt) in timeLimitOptions"
               :key="opt"
               :class="{option: true, selected: timeLimit === opt }"
               @click="setTimeLimit(opt)">{{ opt }}</span>
@@ -158,6 +158,7 @@ function goShare() {
 
 // START SCREEN
 
+const timeLimitOptions = [30, 60, 90, 120];
 const timeLimit = ref(60);
 const setTimeLimit = (newTimeLimit: number) => {
   timeLimit.value = newTimeLimit;

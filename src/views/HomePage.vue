@@ -9,7 +9,7 @@
   <main class="home">
     <div class="content">
       <template v-if="storedTopics.length > 0">
-        <div class="label">Your custom topics:</div>
+        <h4>Your custom topics:</h4>
         <div class="topic-list">
           <p v-for="item in storedTopics" :key="item.id">
             <button @click="openStoredTopic(item.id)">{{ item.title }}</button>
@@ -28,7 +28,7 @@
         </button>
       </p>
       <hr />
-      <div class="label">Choose a topic:</div>
+      <h4>Choose a topic:</h4>
       <div class="topic-list">
         <p v-for="topicTitle in builtInTopicTitles" :key="topicTitle">
           <button @click="openBuiltInTopic(topicTitle)">

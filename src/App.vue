@@ -237,9 +237,16 @@ button {
   color: var(--color-foreground);
   background: var(--button-color);
   cursor: pointer;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
 }
 nav button {
   padding: calc(var(--spacer) * 2);
+}
+button.inline {
+  width: auto;
+  display: inline-block;
+  margin: 0 var(--spacer);
+  padding: calc(var(--spacer));
 }
 button:hover {
   background-color: var(--button-color-hover);
@@ -248,6 +255,9 @@ button:active, button:focus {
   background-color: var(--button-color-focus);
   border: none;
   outline: 0;
+}
+button.alt {
+  color: var(--color-background-dark);
 }
 button::-moz-focus-inner {
   border-style: none;
@@ -291,9 +301,6 @@ main.home .content > * {
   max-width: 40rem;
   margin-left: auto;
   margin-right: auto;
-}
-#create {
-  color: var(--color-background-dark);
 }
 .topic-list {
   display: flex;

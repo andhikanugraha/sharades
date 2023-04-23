@@ -15,7 +15,7 @@
             <button @click="openStoredTopic(item.id)">{{ item.title }}</button>
           </p>
           <p>
-            <button id="create" @click="createNewTopic">
+            <button id="create" class="alt" @click="createNewTopic">
               <v-icon :icon="faPlus" />
               New topic
             </button>
@@ -23,7 +23,7 @@
         </div>
       </template>
       <p v-else>
-        <button id="create" @click="createNewTopic">
+        <button id="create" class="alt" @click="createNewTopic">
           <v-icon :icon="faPlus" />Make your own topic
         </button>
       </p>

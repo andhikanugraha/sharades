@@ -73,11 +73,11 @@
         <div class="info">
           <div class="label">Time limit:</div>
           <div class="value">
-            <span
+            <button
               v-for="(opt) in timeLimitOptions"
               :key="opt"
-              :class="{option: true, selected: timeLimit === opt }"
-              @click="setTimeLimit(opt)">{{ opt }}</span>
+              :class="{ inline: true, alt: timeLimit !== opt }"
+              @click="setTimeLimit(opt)">{{ opt }}</button>
           </div>
         </div>
       </div>

@@ -31,3 +31,14 @@ export async function decodeTopic(topicString: string): Promise<Topic> {
     words: await inflateTopicWords(atobUrl(deflatedWordsB64)),
   };
 }
+
+export async function decodeTopicDeflated(topicString: string): Promise<{
+  title: string,
+  deflatedWords: Uint8Array,
+}> {
+  const [titleB64, deflatedWordsB64] = topicString.split('.');
+  return {
+    title: textDecoder.decode(atobUrl(titleB64)),
+    deflatedWords: atobUrl(deflatedWordsB64),
+  };
+}

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
-import { useTopicIndex, resolveTopic } from '../lib/TopicStore';
+import { useCustomTopicsStore } from '../lib/topic-store';
 import TheGame from '../components/TheGame.vue';
 
 // this component receives either an id or encodedTopic
@@ -10,10 +10,11 @@ const props = defineProps<{
 }>();
 
 const router = useRouter();
-const storedTopics = useTopicIndex();
 
-const title = ref('\xa0');
-const words = ref<string[]>([]);
+const store = useCustomTopicsStore();
+
+const title = computed(() => store.loadedTopic.title || '\xa0');
+const words = computed(() => store.loadedTopic.words || []);
 const topicId = ref(props.id);
 
 function notFound() {
@@ -29,26 +30,26 @@ watchEffect(
     // topic already exists. load from storage.
     // ignore props.encodedTopic
     if (props.id) {
-      const topicInIndex = storedTopics.find((t) => t.id === props.id);
+      const topicInIndex = store.topicIndex.find((t) => t.id === props.id);
 
       if (!topicInIndex) {
         return notFound();
       }
-    }
 
-    const results = await resolveTopic(
-      { id: props.id, encodedTopic: props.encodedTopic },
-      router,
-    );
+      const topic = await store.resolveTopicById(props.id);
+      if (!topic) {
+        return notFound();
+      }
+    } else if (props.encodedTopic) {
+      const topic = await store.resolveTopicByEncodedTopic(props.encodedTopic);
 
-    if (results) {
-      const [id, topic] = results;
+      if (!topic) {
+        return notFound();
+      }
 
-      topicId.value = id;
-      title.value = topic.title;
-      words.value = topic.words;
-    } else {
-      return notFound();
+      if (topic.id) {
+        topicId.value = topic.id;
+      }
     }
 
     return undefined;

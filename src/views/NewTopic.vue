@@ -7,49 +7,31 @@
   />
 </template>
 
-<script lang="ts">
-import {
-  defineComponent,
-  ref,
-  reactive,
-} from 'vue';
+<script setup lang="ts">
+import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 import { requestFullscreen } from '../lib/fullscreen';
-import { Topic } from '../lib/topic';
-import { saveTopic, goToTopicPage, clearCache } from '../lib/TopicStore';
+import type { Topic } from '../lib/topic';
+import { useCustomTopicsStore } from '../lib/topic-store';
 import TheEditor from '../components/TheEditor.vue';
 
-export default defineComponent({
-  name: 'NewTopic',
-  components: { TheEditor },
-  setup() {
-    const router = useRouter();
+const router = useRouter();
+const store = useCustomTopicsStore();
 
-    const title = ref('');
-    const words = reactive<string[]>([]);
+const title = ref('');
+const words = reactive<string[]>([]);
 
-    const handleSave = async (updatedTopic: Topic) => {
-      const id = await saveTopic(updatedTopic);
-      console.log(id);
+async function handleSave(updatedTopic: Topic) {
+  const id = await store.saveTopic(updatedTopic);
 
-      if (id) {
-        goToTopicPage(router, id);
-        await requestFullscreen(false);
-      }
-    };
+  if (id) {
+    store.goToTopicPage(id);
+    await requestFullscreen(false);
+  }
+}
 
-    const handleCancel = async () => {
-      clearCache();
-      router.push({ name: 'home' });
-      await requestFullscreen();
-    };
-
-    return {
-      title,
-      words,
-      handleSave,
-      handleCancel,
-    };
-  },
-});
+async function handleCancel() {
+  router.push({ name: 'home' });
+  await requestFullscreen();
+}
 </script>

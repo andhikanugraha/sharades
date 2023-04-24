@@ -185,7 +185,6 @@ async function handleAddFromClipboard() {
     const rawInput = await navigator.clipboard.readText();
     processBulkInput(rawInput);
   } catch (e) {
-    console.log(e);
     // do nothing
   }
 }

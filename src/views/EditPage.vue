@@ -18,13 +18,7 @@ import {
 import { useRouter } from 'vue-router';
 import { requestFullscreen } from '../lib/fullscreen';
 import { Topic } from '../lib/topic';
-import {
-  useTopicIndex,
-  saveTopic,
-  loadTopic,
-  deleteTopic,
-  goToTopicPage,
-} from '../lib/TopicStore';
+import { useCustomTopicsStore } from '../lib/topic-store';
 import TheEditor from '../components/TheEditor.vue';
 
 const props = defineProps({
@@ -35,32 +29,32 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const store = useCustomTopicsStore();
 
-const storedTopics = useTopicIndex();
-const title = ref(storedTopics.find((t) => t.id === props.id)?.title || '');
+const title = ref(store.findTopicInIndex(props.id)?.title || '');
 const words = reactive<string[]>([]);
 const existing = ref(false);
 const topicId = ref(props.id);
 
 const handleSave = async (updatedTopic: Topic) => {
-  await saveTopic(updatedTopic, topicId.value);
-  goToTopicPage(router, topicId.value);
+  await store.saveTopic(updatedTopic, topicId.value);
+  store.goToTopicPage(topicId.value);
   await requestFullscreen(false);
 };
 
 const handleDelete = async () => {
-  await deleteTopic(topicId.value);
+  await store.deleteTopic(topicId.value);
   router.push({ name: 'home' });
   await requestFullscreen(false);
 };
 
 const handleCancel = async () => {
-  goToTopicPage(router, topicId.value);
+  store.goToTopicPage(topicId.value);
   await requestFullscreen(false);
 };
 
 watchEffect(async () => {
-  const topic = await loadTopic(props.id);
+  const topic = await store.loadTopic(props.id);
   if (!topic) {
     topicId.value = '';
     return;

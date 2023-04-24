@@ -48,6 +48,7 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   faExpand,
@@ -57,13 +58,15 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import VIcon from '../components/VIcon.vue';
 import { useBuiltInTopicTitles } from '../lib/topic';
-import { useTopicIndex } from '../lib/TopicStore';
+import { useCustomTopicsStore } from '../lib/topic-store';
 import { requestFullscreen, exitFullscreen } from '../lib/fullscreen';
 
 const router = useRouter();
 
-const storedTopics = useTopicIndex();
 const builtInTopicTitles = useBuiltInTopicTitles();
+
+const customTopicsStore = useCustomTopicsStore();
+const storedTopics = computed(() => customTopicsStore.topicIndex);
 
 function goFullscreen() {
   requestFullscreen(true);

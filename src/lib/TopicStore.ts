@@ -5,11 +5,9 @@ import { Topic } from './topic';
 
 const KEY_INDEX = '_index';
 
-async function getStore(): Promise<LocalForage> {
-  return localForage.createInstance({
-    name: 'charades',
-  });
-}
+const store = localForage.createInstance({
+  name: 'charades',
+});
 
 export type TopicIndex = {
   id: string;
@@ -36,7 +34,6 @@ function replaceTopicIndex(updatedIndex: TopicIndex) {
 }
 
 export async function loadTopicIndex(): Promise<TopicIndex> {
-  const store = await getStore();
   const loadedIndex = await store.getItem<TopicIndex>(KEY_INDEX);
   if (!loadedIndex) {
     await store.clear();
@@ -57,7 +54,6 @@ export function useTopicIndex(): TopicIndex {
 }
 
 export async function saveTopicIndex(updatedIndex: TopicIndex): Promise<void> {
-  const store = await getStore();
   if (updatedIndex.length > 0) {
     await store.setItem<TopicIndex>(KEY_INDEX, updatedIndex);
     replaceTopicIndex(updatedIndex);
@@ -84,7 +80,6 @@ export async function loadTopic(id: string): Promise<Topic | null> {
     return null;
   }
 
-  const store = await getStore();
   const deflatedWordsBuffer = await store.getItem<DeflatedWordsBuffer>(id);
   if (!deflatedWordsBuffer) {
     return null;
@@ -129,7 +124,6 @@ export async function saveTopic(topicObj: Topic, id?: string): Promise<string> {
 
   const { deflateTopicWords } = await import('./TopicEncoding');
 
-  const store = await getStore();
   const { title, words } = sanitiseTopic(topicObj);
   const wordsBuffer = await deflateTopicWords(words);
   const topicIndex = await loadTopicIndex();
@@ -157,7 +151,6 @@ export async function saveTopic(topicObj: Topic, id?: string): Promise<string> {
 }
 
 export async function deleteTopic(id: string): Promise<void> {
-  const store = await getStore();
   await store.removeItem(id);
 
   const topicIndex = await loadTopicIndex();

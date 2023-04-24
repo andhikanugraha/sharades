@@ -1,10 +1,7 @@
 <script lang="ts" setup>
 import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
-import {
-  useTopicIndex, findTopicId, saveTopic, loadTopic, restoreCanonicalLocation, resolveTopic,
-} from '../lib/TopicStore';
-import { decodeTopic } from '../lib/TopicEncoding';
+import { useTopicIndex, resolveTopic } from '../lib/TopicStore';
 import TheGame from '../components/TheGame.vue';
 
 // this component receives either an id or encodedTopic

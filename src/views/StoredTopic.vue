@@ -2,11 +2,10 @@
 import { ref, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import {
-  useTopicIndex, findTopicId, saveTopic, loadTopic,
+  useTopicIndex, findTopicId, saveTopic, loadTopic, restoreCanonicalLocation, resolveTopic,
 } from '../lib/TopicStore';
 import { decodeTopic } from '../lib/TopicEncoding';
 import TheGame from '../components/TheGame.vue';
-import { Topic } from '../lib/topic';
 
 // this component receives either an id or encodedTopic
 const props = defineProps<{
@@ -24,16 +23,6 @@ function notFound() {
   router.replace({ name: 'home' });
 }
 
-async function restoreCanonicalUrl(topicObj: Topic) {
-  const { encodeTopic } = await import('../lib/TopicEncoding');
-  const encodedTopic = await encodeTopic(topicObj);
-  const route = router.getRoutes().find((r) => r.name === 'game');
-  if (route) {
-    const { path } = route;
-    window.history.replaceState(window.history.state, '', path.replace(':encodedTopic', encodedTopic));
-  }
-}
-
 watchEffect(
   async (): Promise<void> => {
     if (!props.encodedTopic && !props.id) {
@@ -45,48 +34,22 @@ watchEffect(
     if (props.id) {
       const topicInIndex = storedTopics.find((t) => t.id === props.id);
 
-      if (topicInIndex) {
-        title.value = topicInIndex.title;
-        const topic = await loadTopic(props.id);
-        if (topic) {
-          title.value = topic?.title;
-          words.value = topic?.words;
-
-          restoreCanonicalUrl(topic);
-        } else {
-          return notFound();
-        }
-      } else {
+      if (!topicInIndex) {
         return notFound();
       }
-    } else if (props.encodedTopic) {
-      // props.id is null.
-      // in reality, the topic may already be in the store.
-      try {
-        // decode the encodedTopic
-        const topic = await decodeTopic(props.encodedTopic);
-        if (!topic) {
-          // decoding failed, go home.
-          return notFound();
-        }
+    }
 
-        // check if the topic already exists in the store
-        const existingTopicId = await findTopicId(topic);
-        if (existingTopicId) {
-          // the topic already exists. use it for editing, etc.
-          topicId.value = existingTopicId;
-        }
-        if (!existingTopicId) {
-          // the topic does not exist in the store. save it.
-          topicId.value = await saveTopic(topic);
-        }
+    const results = await resolveTopic(
+      { id: props.id, encodedTopic: props.encodedTopic },
+      router,
+    );
 
-        // load the topic into the refs
-        title.value = topic.title;
-        words.value = topic.words;
-      } catch (e) {
-        return notFound();
-      }
+    if (results) {
+      const [id, topic] = results;
+
+      topicId.value = id;
+      title.value = topic.title;
+      words.value = topic.words;
     } else {
       return notFound();
     }

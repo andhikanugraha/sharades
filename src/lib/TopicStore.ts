@@ -1,4 +1,5 @@
-import { ref, reactive } from 'vue';
+import { ref, reactive, Ref } from 'vue';
+import type { Router } from 'vue-router';
 import localForage from 'localforage';
 import { Topic } from './topic';
 
@@ -189,6 +190,73 @@ export async function findTopicId(topic: Topic): Promise<string | null> {
   }
 
   return id;
+}
+
+export async function goToTopicPage(router: Router, id: string): Promise<void> {
+  router.push({
+    name: 'game-stored',
+    params: { id },
+  });
+}
+
+export async function restoreCanonicalLocation(router: Router, topicObj: Topic) {
+  const { encodeTopic } = await import('./TopicEncoding');
+  const encodedTopic = await encodeTopic(topicObj);
+  const route = router.getRoutes().find((r) => r.name === 'game');
+  if (route) {
+    const { path } = route;
+    window.history.replaceState(window.history.state, '', `#${path.replace(':encodedTopic', encodedTopic)}`);
+  }
+}
+
+export async function resolveTopic(
+  props: Readonly<{ id?: string, encodedTopic?: string }>,
+  router: Router,
+): Promise<[string, Topic] | null> {
+  if (props.id) {
+    const topic = await loadTopic(props.id);
+    if (!topic) {
+      return null;
+    }
+
+    if (props.id && !props.encodedTopic) {
+      restoreCanonicalLocation(router, topic);
+    }
+
+    return [props.id, topic];
+  }
+
+  if (props.encodedTopic) {
+    // props.id is null.
+    // in reality, the topic may already be in the store.
+    try {
+      // decode the encodedTopic
+      const { decodeTopic } = await import('./TopicEncoding');
+      const topic = await decodeTopic(props.encodedTopic);
+      if (!topic) {
+        // decoding failed, go home.
+        return null;
+      }
+
+      // check if the topic already exists in the store
+      let topicId = '';
+      const existingTopicId = await findTopicId(topic);
+      if (existingTopicId) {
+        // the topic already exists. use it for editing, etc.
+        return [existingTopicId, topic];
+      }
+
+      // the topic does not exist in the store. save it.
+      topicId = await saveTopic(topic);
+      return [topicId, topic];
+    } catch (e) {
+      return null;
+    }
+  } else {
+    return null;
+  }
+
+  return null;
 }
 
 export function clearCache(): void {

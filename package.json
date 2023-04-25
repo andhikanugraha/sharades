@@ -8,13 +8,14 @@
     "build": "vite build --assetsDir assets"
   },
   "dependencies": {
+    "@chenfengyuan/vue-qrcode": "^2.0.0",
     "@fortawesome/free-solid-svg-icons": "^5.15.4",
     "@progress/pako-esm": "^1.0.1",
     "fontfaceobserver-es": "^3.3.3",
     "localforage": "^1.10.0",
     "lodash-es": "^4.17.21",
     "pinia": "^2.0.35",
-    "qrcode.vue": "^3.4.0",
+    "qrcode": "^1.5.3",
     "register-service-worker": "^1.7.1",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"

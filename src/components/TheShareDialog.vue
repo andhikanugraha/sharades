@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { computed, defineAsyncComponent } from 'vue';
+// import VueQrcode from '@chenfengyuan/vue-qrcode';
+
 import {
   faCopy,
   faEdit,
   faShare,
   faArrowLeft,
 } from '@fortawesome/free-solid-svg-icons';
+
 import VIcon from './VIcon.vue';
 import { exitFullscreen } from '../lib/fullscreen';
 
@@ -16,7 +19,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{(e: 'close' | 'edit'): void}>();
 
-const QrCode = defineAsyncComponent(() => import('qrcode.vue'));
+const VueQrcode = defineAsyncComponent(() => import('@chenfengyuan/vue-qrcode'));
 
 function getShareUrl() {
   return `https://sharades.app/${window.location.hash}`;
@@ -60,7 +63,7 @@ async function doShare() {
   </header>
   <main class="share-dialog">
     <div class="qr-col">
-      <div class="qr"><qr-code :value="shareUrl" render-as="canvas" :size="200"></qr-code></div>
+      <div class="qr"><vue-qrcode :value="shareUrl" tag="svg" /></div>
     </div>
     <div class="btns">
       <p>Play this topic with friends</p>

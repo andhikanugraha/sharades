@@ -246,33 +246,23 @@ export const useCustomTopicsStore = defineStore('customTopics', () => {
         return null;
       }
 
+      loadedTopic.title = deflatedTopic.title;
+      loadedTopic.words = await inflateTopicWords(deflatedTopic.deflatedWords);
+
       // check if the topic already exists in the store
       const existingTopicId = await findTopicId(deflatedTopic.title, deflatedTopic.deflatedWords);
       if (existingTopicId) {
         // the topic already exists. use it for editing, etc.
-        return {
-          id: existingTopicId,
-          title: deflatedTopic.title,
-          words: await inflateTopicWords(deflatedTopic.deflatedWords),
-        };
+        loadedTopic.id = existingTopicId;
+      } else {
+        // the topic does not exist in the store. save it.
+        loadedTopic.id = await saveTopic(loadedTopic);
       }
 
-      // the topic does not exist in the store. save it.
-      const topic = {
-        title: deflatedTopic.title,
-        words: await inflateTopicWords(deflatedTopic.deflatedWords),
-      };
-
-      const id = await saveTopic(topic);
-      return {
-        id,
-        ...topic,
-      };
+      return loadedTopic;
     } catch (e) {
       return null;
     }
-
-    return null;
   }
 
   function goToTopicPage(id: string) {

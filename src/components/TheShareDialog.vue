@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue';
 // import VueQrcode from '@chenfengyuan/vue-qrcode';
 
 import {
@@ -24,8 +24,6 @@ const VueQrcode = defineAsyncComponent(() => import('@chenfengyuan/vue-qrcode'))
 function getShareUrl() {
   return `https://sharades.app/${window.location.hash}`;
 }
-
-const shareUrl = computed(() => getShareUrl());
 
 function doCopy() {
   try {
@@ -63,7 +61,7 @@ async function doShare() {
   </header>
   <main class="share-dialog">
     <div class="qr-col">
-      <div class="qr"><vue-qrcode :value="shareUrl" tag="svg" /></div>
+      <div class="qr"><vue-qrcode :value="getShareUrl()" tag="svg" /></div>
     </div>
     <div class="btns">
       <p>Play this topic with friends</p>

@@ -1,4 +1,4 @@
-import { ref, reactive } from 'vue';
+import { ref, reactive, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import localForage from 'localforage';
 import { defineStore } from 'pinia';
@@ -276,8 +276,11 @@ export const useCustomTopicsStore = defineStore('customTopics', () => {
   loadTopicIndex();
 
   return {
-    topicIndex,
+    topicIndex: computed(() => topicIndex),
     loadedTopic,
+    id: computed(() => loadedTopic.id),
+    title: computed(() => loadedTopic.title),
+    words: computed(() => loadedTopic.words),
     findTopicInIndex,
     loadTopic,
     saveTopic,

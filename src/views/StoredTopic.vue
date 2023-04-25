@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref, watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
+import { storeToRefs } from 'pinia';
 import { useRouter } from 'vue-router';
 import { useCustomTopicsStore } from '../lib/topic-store';
 import TheGame from '../components/TheGame.vue';
@@ -13,8 +14,7 @@ const router = useRouter();
 
 const store = useCustomTopicsStore();
 
-const title = computed(() => store.loadedTopic.title || '\xa0');
-const words = computed(() => store.loadedTopic.words || []);
+const { title, words } = storeToRefs(store);
 const topicId = ref(props.id);
 
 function notFound() {
@@ -30,7 +30,7 @@ watchEffect(
     // topic already exists. load from storage.
     // ignore props.encodedTopic
     if (props.id) {
-      const topicInIndex = store.topicIndex.find((t) => t.id === props.id);
+      const topicInIndex = store.findTopicInIndex(props.id);
 
       if (!topicInIndex) {
         return notFound();

@@ -8,7 +8,7 @@ interface Word {
   isCorrect: boolean;
 }
 
-export function nowSeconds(): number {
+function nowSeconds(): number {
   return Math.floor(Date.now() / 1000);
 }
 
@@ -178,7 +178,7 @@ function reset() {
 
 // INITIALISATION
 
-export function useGame(
+export default function useGame(
   props: { words?: string[] },
   selectedTimeLimit: Ref<number>,
 ): {

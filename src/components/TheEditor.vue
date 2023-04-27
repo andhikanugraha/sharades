@@ -39,7 +39,7 @@
         </span>
       </p>
       <p>
-        <button @click="addWord('')">
+        <button @click="addWord()">
           <v-icon :icon="faPlus" />
           Add Word
         </button>
@@ -151,23 +151,31 @@ function cancel() {
   emit('cancel');
 }
 
-function addWord(word = '') {
-  wordList.push({
+function generateWordObject(word: string, focus = false) {
+  const wordObject = {
     word,
     key: maxKey.value,
-    focus: true,
-  });
+    focus,
+  };
 
   maxKey.value += 1;
+
+  return wordObject;
+}
+
+function addWord() {
+  wordList.push(generateWordObject(''));
 }
 
 function handleEnter() {
-  addWord('');
+  addWord();
 }
 
 function processBulkInput(multiLineInput: string) {
-  const words = multiLineInput.split(/[\r\n]+/);
-  words.forEach((word) => addWord(word));
+  const words = multiLineInput.split(/[\r\n\s]+/);
+  const wordObjects = words.map((word) => generateWordObject(word));
+  wordObjects[wordObjects.length - 1].focus = true;
+  wordList.push(...wordObjects);
 }
 
 function handlePaste(event: ClipboardEvent) {
@@ -175,8 +183,7 @@ function handlePaste(event: ClipboardEvent) {
   if (copied && copied.includes('\n')) {
     event.preventDefault();
     window.getSelection()?.deleteFromDocument();
-    const words = copied?.split(/[\r\n]+/);
-    words?.forEach((word) => addWord(word));
+    processBulkInput(copied);
   }
 }
 

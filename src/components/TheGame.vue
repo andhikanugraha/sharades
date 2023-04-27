@@ -116,7 +116,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { throttle } from 'lodash-es';
 import TheShareDialog from './TheShareDialog.vue';
-import { useGame } from '../lib/game';
+import useGame from '../lib/game';
 import { exitFullscreen } from '../lib/fullscreen';
 
 import VIcon from './VIcon.vue';

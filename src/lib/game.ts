@@ -18,10 +18,20 @@ let timeLimit = 60;
 
 // WORD SHUFFLING & RESETTING
 
+// a Set of words that have been displayed before
+// words in this Set should be avoided from being displayed again
+// unless all words in the Topic have been used
+// Regarding clearing this set:
+// - This Set represents the players' recent memory
+// - As such, elements should only be removed from it
+//   the same way human memory works: after some time
+// – This can be implemented using a Map structure and some timeouts,
+//   but this isn't needed yet
+const usedWords = new Set<string>();
+
 // custom type to distinguish which variables refer to words
 type WordIndex = number;
 const shuffledWordIndices = reactive<WordIndex[]>([]);
-const usedWordIndices = new Set<WordIndex>();
 const correctIndices = reactive(new Set<WordIndex>());
 
 function shuffleWords() {
@@ -31,22 +41,20 @@ function shuffleWords() {
   }
 
   const unusedWordIndices = [];
-  if (usedWordIndices.size < words.length) { // some words have not yet been used
-    for (let i = 0; i < words.length; i += 1) {
-      if (!usedWordIndices.has(i)) {
-        unusedWordIndices.push(i);
-      }
-    }
-  } else { // all words have been used
-    usedWordIndices.clear();
-    for (let i = 0; i < words.length; i += 1) {
+  const usedWordIndices = [];
+  for (let i = 0; i < words.length; i += 1) {
+    if (usedWords.has(words[i])) {
+      usedWordIndices.push(i);
+    } else {
       unusedWordIndices.push(i);
     }
   }
-  const shuffledLeft = shuffle(unusedWordIndices);
-  const shuffledRight = shuffle([...usedWordIndices.values()]);
-  shuffledWordIndices.splice(0);
-  shuffledWordIndices.splice(0, 0, ...shuffledLeft, ...shuffledRight);
+
+  // clear the current array
+  shuffledWordIndices.length = 0;
+  // add in the shuffled words, starting with the unused words, then the used words
+  // note that unusedWordIndices may be empty. this is fine.
+  shuffledWordIndices.push(...shuffle(unusedWordIndices), ...shuffle(usedWordIndices));
 }
 
 // GAME LOOP
@@ -86,15 +94,16 @@ function start() {
   tick();
 }
 
-const currentWord = computed<string>(() => (
-  viewWords.length
-    ? viewWords[shuffledWordIndices[currentCursor.value]]
-    : ''
-));
+function getCurrentWord() {
+  if (!viewWords.length) return '';
+  return viewWords[shuffledWordIndices[currentCursor.value]];
+}
+
+const currentWord = computed<string>(() => getCurrentWord());
 
 function nextWord() {
   // add current index to used words
-  usedWordIndices.add(shuffledWordIndices[currentCursor.value]);
+  usedWords.add(getCurrentWord());
 
   // find next unanswered word
   let i: number;
@@ -196,15 +205,14 @@ export default function useGame(
 } {
   // Initialise
   watchEffect(() => {
-    viewWords.splice(0);
+    viewWords.length = 0;
     if (props.words) {
-      viewWords.splice(0, 0, ...props.words);
+      viewWords.push(...props.words);
     }
 
     timeLimit = selectedTimeLimit.value;
 
     reset();
-    usedWordIndices.clear();
   });
 
   return {

@@ -61,8 +61,8 @@ watchEffect(async () => {
   }
 
   title.value = topic.title;
-  words.splice(0);
-  words.splice(0, 0, ...topic.words);
+  words.length = 0;
+  words.push(...topic.words);
   existing.value = true;
   topicId.value = props.id;
 })();

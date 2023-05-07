@@ -142,8 +142,8 @@ watchEffect(() => {
 });
 watch(props, (p) => {
   const words = p.words || [];
-  wordList.splice(0);
-  wordList.splice(0, 0, ...words.map((word, key) => ({ key, word })));
+  wordList.length = 0;
+  wordList.push(...words.map((word, key) => ({ key, word })));
   maxKey.value = words.length;
 });
 

@@ -54,8 +54,8 @@ export const useCustomTopicsStore = defineStore('customTopics', () => {
   // Topic index
   const isTopicIndexLoaded = ref(false);
   function replaceTopicIndex(updatedIndex: TopicIndex) {
-    topicIndex.splice(0);
-    topicIndex.splice(0, 0, ...updatedIndex);
+    topicIndex.length = 0;
+    topicIndex.push(...updatedIndex);
   }
 
   async function loadTopicIndex(): Promise<TopicIndex> {

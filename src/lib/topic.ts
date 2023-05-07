@@ -9,8 +9,8 @@ export interface Topic {
 const topicTitles = reactive<string[]>([]);
 
 async function loadBuiltInTopicTitles() {
-  topicTitles.splice(0);
-  topicTitles.splice(0, 0, ...builtInTopicList.map((cat) => cat.title).sort());
+  topicTitles.length = 0;
+  topicTitles.push(...builtInTopicList.map((cat) => cat.title).sort());
 }
 
 export function useBuiltInTopicTitles(): string[] {

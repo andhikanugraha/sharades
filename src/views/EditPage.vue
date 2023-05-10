@@ -17,7 +17,7 @@ import {
 } from 'vue';
 import { useRouter } from 'vue-router';
 import { requestFullscreen } from '../lib/fullscreen';
-import { Topic } from '../lib/topic';
+import type { Topic } from '../lib/topic';
 import { useCustomTopicsStore } from '../lib/topic-store';
 import TheEditor from '../components/TheEditor.vue';
 

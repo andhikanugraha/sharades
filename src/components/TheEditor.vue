@@ -108,7 +108,7 @@ import {
 
 import VIcon from './VIcon.vue';
 import VEditorInput from './VEditorInput.vue';
-import { Topic } from '../lib/topic';
+import type { Topic } from '../lib/topic';
 
 interface WordListItem {
   key: number;

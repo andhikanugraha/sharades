@@ -1,5 +1,5 @@
 import { inflate, deflate } from '@progress/pako-esm';
-import { Topic } from './topic';
+import type { Topic } from './topic';
 import { btoaUrl, atobUrl } from './base64url';
 
 const SEPARATOR = '\x1F';

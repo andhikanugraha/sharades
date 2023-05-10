@@ -27,12 +27,14 @@
     font-family: "Inter";
     font-weight: 400;
     src: url("/fonts/Inter-Regular.woff2"), local("Inter");
+    font-display: swap;
 }
 
 @font-face {
     font-family: "Inter";
     font-weight: bold;
     src: url("/fonts/Inter-Bold.woff2"), local("Inter");
+    font-display: swap;
 }
 
 * {

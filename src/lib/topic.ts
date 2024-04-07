@@ -1,5 +1,4 @@
 import { reactive } from 'vue';
-import builtInTopicList from './builtInTopics';
 
 export interface Topic {
   title: string;
@@ -8,9 +7,20 @@ export interface Topic {
 
 const topicTitles = reactive<string[]>([]);
 
+async function fetchMultilineTextFile(basename: string): Promise<string[] | null> {
+  try {
+    const fetched = await fetch(`/topics/${basename}.txt`);
+    const text = await fetched.text();
+    const split = text.split('\n');
+    return split;
+  } catch {
+    return null;
+  }
+}
+
 async function loadBuiltInTopicTitles() {
   topicTitles.length = 0;
-  topicTitles.push(...builtInTopicList.map((cat) => cat.title).sort());
+  topicTitles.push(...(await fetchMultilineTextFile('_')) || []);
 }
 
 export function useBuiltInTopicTitles(): string[] {
@@ -21,5 +31,9 @@ export function useBuiltInTopicTitles(): string[] {
 export async function getBuiltInTopicByTitle(
   title: string,
 ): Promise<Topic | null> {
-  return builtInTopicList.find((v) => v.title === title) || null;
+  const words = await fetchMultilineTextFile(title);
+  if (words)
+    return { title, words }
+
+  return null;
 }

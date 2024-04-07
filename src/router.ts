@@ -1,4 +1,5 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 
 const Home = () => import('./views/HomePage.vue');
 const BuiltInTopic = () => import('./views/BuiltInTopic.vue');

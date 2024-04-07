@@ -9,7 +9,7 @@ const topicTitles = reactive<string[]>([]);
 
 async function fetchMultilineTextFile(basename: string): Promise<string[] | null> {
   try {
-    const fetched = await fetch(`/topics/${basename}.txt`);
+    const fetched = await fetch(`/topics/${encodeURIComponent(basename)}.txt`);
     const text = await fetched.text();
     const split = text.split('\n');
     return split;

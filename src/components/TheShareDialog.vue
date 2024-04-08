@@ -42,8 +42,6 @@ async function doShare() {
     });
   } catch {
     doCopy();
-  } finally {
-    emit('close');
   }
 }
 </script>

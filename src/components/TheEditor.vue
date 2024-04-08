@@ -164,7 +164,7 @@ function generateWordObject(word: string, focus = false) {
 }
 
 function addWord() {
-  wordList.push(generateWordObject(''));
+  wordList.push(generateWordObject('', true));
 }
 
 function handleEnter() {

@@ -1,6 +1,7 @@
 import {
-  ref, reactive, computed, watchEffect, Ref,
+  ref, reactive, computed, watchEffect,
 } from 'vue';
+import type { Ref } from 'vue';
 import { shuffle } from 'lodash-es';
 
 interface Word {
